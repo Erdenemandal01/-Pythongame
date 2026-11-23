@@ -100,6 +100,14 @@ function readAcademy(raw) {
         }
         if (Array.isArray(source.won) && source.won.includes(i)) result.won.push(i);
     }
+    if (source.importedForRanking) {
+        const baseline = source.importedForRanking;
+        result.importedForRanking = {
+            lessons: result.won.filter(id => Array.isArray(baseline.lessons) && baseline.lessons.includes(id)),
+            greenhouse: (result.workshops.greenhouse?.won || []).filter(id =>
+                Array.isArray(baseline.greenhouse) && baseline.greenhouse.includes(id))
+        };
+    }
     return result;
 }
 
@@ -153,6 +161,14 @@ function importPortfolio() {
             if (startingSave !== state) return;
             if (window.GameAccount?.isCloud()) {
                 if (!confirm('Энэ бүтээлээр өөрийн бүртгэл дэх урлангийн ажлыг солих уу?')) return;
+                // Imported work restores the portfolio. Only newly earned milestones count toward the board.
+                const previous = state.academy;
+                const previousGarden = previous.workshops.greenhouse?.won || [];
+                restored.importedForRanking = {
+                    lessons: restored.won.filter(id => !previous.won.includes(id) || previous.importedForRanking?.lessons.includes(id)),
+                    greenhouse: (restored.workshops.greenhouse?.won || []).filter(id =>
+                        !previousGarden.includes(id) || previous.importedForRanking?.greenhouse.includes(id))
+                };
                 restored.portfolioId=state.academy.portfolioId;
                 state.academy=restored;
                 persist();switchView('academy',false);toast('Урлангийн ажлыг сэргээсэн.');

@@ -313,6 +313,11 @@
             const grid = node('div', 'ac-workbench');
             const brief = node('div','ac-brief');
             brief.append(node('h3','',task.title),node('p','ac-prose',task.brief));
+            if (task.workshop) {
+                const link = node('a', 'ac-link', Workshops.describe(task.workshop)[0] + ' урланд турших');
+                link.href = '#' + task.workshop;
+                brief.append(link);
+            }
             if (task.hint) brief.append(details('Санаа авах',task.hint));
             if (this.phase !== 0) brief.append(details('Хичээлийн жишээ', this.lesson.example));
             grid.append(brief, this.editor(key, task));

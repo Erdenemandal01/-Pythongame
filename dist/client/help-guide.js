@@ -21,6 +21,7 @@
         dialog.close();
         if(action==='first') openMission(0);
         else if(action==='academy') switchView('academy');
+        else if(action==='greenhouse') switchView('greenhouse');
         const heading=document.querySelector('.view:not([hidden]) h1');
         if(heading) {
             heading.tabIndex=-1;

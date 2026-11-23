@@ -24,7 +24,7 @@ async function runEncounter(py) {
 }
 let academySource;
 let levelSource;
-const studioRunners={dragon:'dragon-runner.py',music:'music-runner.py',detective:'detective-runner.py',city:'city-runner.py'};
+const studioRunners={dragon:'dragon-runner.py',music:'music-runner.py',detective:'detective-runner.py',city:'city-runner.py',greenhouse:'greenhouse-runner.py'};
 async function runStudio(py,mode){
     if(!Object.hasOwn(studioRunners,mode))throw Error('Танигдахгүй урлан байна.');
     const response=await fetch(new URL('./'+studioRunners[mode],self.location.href));

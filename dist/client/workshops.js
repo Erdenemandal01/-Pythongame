@@ -1,5 +1,6 @@
 const Workshops=(()=>{
     const catalogue = {
+        greenhouse:['Миний хүлэмж','Нөхцөл ба давталт','Гурван саванд хоёр дусал ус хуваарилаарай. Аль саванд ус орохыг тааж, дүрмээ Python дээр турш.','GreenhouseStudio'],
         dragon:['Луугаа сурга','Нөхцөл ба шийдвэр','Луу чинь ядарсан үедээ өндөг олбол яах вэ? Хоёр дүрэм бичээд нэг талбайд турш.','DragonStudio'],
         music:['Хөгжмийн урлан','Жагсаалт ба давталт','Кодоор хэмнэл зохио. Нэг хэсгийг өөрчлөөд найздаа хоёр хувилбарыг сонсго.','MusicStudio'],
         detective:['Алдааны мөрдөгч','Туршилт ба захын утга','Роботын алдаа ямар оролт дээр гардаг вэ? Нотлох жишээ олоод кодыг зас.','DetectiveStudio'],
@@ -21,7 +22,7 @@ const Workshops=(()=>{
         function run(code,payload={}){
             if(closed)return Promise.reject(Error('Урлан хаагдсан байна.'));
             return new Promise((resolve,reject)=>{
-                const worker=new Worker('worker.js?v=6');
+                const worker=new Worker('worker.js?v=15');
                 let timer;
                 const complete=(callback,value)=>{
                     clearTimeout(timer);worker.terminate();pending.delete(cancel);callback(value);
@@ -77,6 +78,8 @@ const Workshops=(()=>{
         if(!group[key]){group[key]=studio.normalize(null);persist();}
         active={studio,runtime};
         studio.mount(body,{state:group[key],save:persist,run:runtime.run,stop:runtime.stop,startMode,
+            lessonProgress:()=>state.done.length+state.academy.won.length,
+            onMilestone:updateHeader,
             getLevel:()=>LevelBoard.validate(state.academy.level.map||LevelBoard.defaultMap())});
     }
     return {read,mount,leave,has:key=>Object.hasOwn(catalogue,key),

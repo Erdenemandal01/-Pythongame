@@ -56,7 +56,7 @@
         };
         const workshops = {
             kind:'workshops', icon: 'journal.png', label: 'Чөлөөт урлан', title: 'Өөрийн бүтээл',
-            detail: 'Хөгжим, хот, мөрдлөг, луу', action: 'Урлан сонгох', visit: openWorkshops
+            detail: 'Хүлэмж, хөгжим, хот, мөрдлөг, луу', action: 'Урлан сонгох', visit: openWorkshops
         };
         if (lesson && (startedClass >= 0 || nextMission < 0 ||
             (classDone.size > 0 && !adventuring))) {

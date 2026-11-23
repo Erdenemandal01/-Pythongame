@@ -12,6 +12,7 @@ const WorkshopArt = (() => {
             }));
         };
         const skies={
+            greenhouse:['#244c60','#457778','#77a58c','#c9cd91'],
             dragon:['#193951','#345a66','#72917b','#acc384'],
             music:['#211937','#352449','#533255','#895064'],
             detective:['#18293e','#244052','#395968','#6f8b88'],
@@ -20,7 +21,36 @@ const WorkshopArt = (() => {
         const sky=skies[type];
         [0,22,40,56].forEach((y,i)=>box(0,y,WIDTH,HEIGHT-y,sky[i]));
         for(let i=0;i<29;i++)box((17*i+9)%WIDTH,(i*i*7+5)%39,i%5===0?2:1,1,'#cecdb1');
-        if(type==='dragon') {
+        if(type==='greenhouse') {
+            // Glass panes and workbench in the late afternoon light.
+            box(29,11,15,15,'#ffd48a');box(26,14,21,9,'#ffd48a');
+            for(let i=0;i<WIDTH;i+=3){
+                const h=Math.round(6*Math.sin(i/18)+4*Math.sin(i/9));
+                box(i,48+h,3,30,'#456e64');
+            }
+            box(0,69,WIDTH,19,'#41684e');
+            const pane='#91bdae',frame='#315951',glint='#d2dcae';
+            box(42,36,141,36,frame);
+            for(let i=0;i<14;i++){
+                box(40+i*5,35-i*2,143-i*10,3,frame);
+                if(i<13)box(46+i*5,35-i*2,131-i*10,3,pane);
+            }
+            box(45,37,135,31,pane);
+            for(let x=58;x<175;x+=25){
+                box(x,38,2,28,'#c1d6aa');box(x+5,40,2,13,glint);
+                box(x+8,37,3,31,frame);
+            }
+            box(44,48,137,2,'#69978b');box(41,68,144,4,frame);
+            box(20,73,182,4,'#ae7850');box(20,77,182,3,'#664b3d');
+            for(const x of [25,194])box(x,80,3,8,'#664b3d');
+            const pot=['ttttttt','.ccccc.','.lccsc.','..ccc..'];
+            for(const [i,x] of [65,105,145].entries()){
+                box(x+5,52-i*3,2,10+i*3,'#336746');
+                block(x-2,49-i*3,['.gg.....','ggg..jj.','.gggjjjj','...gjjj.'],{g:'#44845a',j:'#729e51'},2);
+                if(i===2)block(x+1,36,['.aa.','abba','abba','.aa.'],{a:'#f69a81',b:'#ffdd83'},2);
+                block(x-1,63,pot,{t:'#ffe1a0',c:'#c77c51',l:'#e69963',s:'#a05f46'},2);
+            }
+        } else if(type==='dragon') {
             box(173,8,14,14,'#f6dc99');box(170,11,20,8,'#f6dc99');
             for(let x=0;x<WIDTH;x+=3){
                 const h=Math.floor(15+8*Math.sin(x/19)+4*Math.sin(x/8));

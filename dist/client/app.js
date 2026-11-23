@@ -45,7 +45,9 @@ function persist(remember=true){
 function esc(s){return String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))}
 function xp() {
     const lessons = state.done.reduce((sum, id) => sum + (MISSIONS[id].boss ? 200 : 100), 0);
-    return state.battles.won.reduce((sum, id) => sum + BATTLES[id].reward, lessons + state.academy.won.length * ACADEMY_XP);
+    const garden = state.academy.workshops.greenhouse?.won || [];
+    const gardenXP = (garden.includes('first') ? 50 : 0) + (garden.includes('five') ? 100 : 0);
+    return state.battles.won.reduce((sum, id) => sum + BATTLES[id].reward, lessons + state.academy.won.length * ACADEMY_XP + gardenXP);
 }
 function sound(win){if(!state.sound)return;try{audio??=new(window.AudioContext||window.webkitAudioContext)();audio.resume();[440,554,659].slice(0,win?3:1).forEach((f,i)=>{const o=audio.createOscillator(),g=audio.createGain();o.type='triangle';o.frequency.value=f;o.connect(g);g.connect(audio.destination);g.gain.setValueAtTime(.05,audio.currentTime+i*.12);g.gain.exponentialRampToValueAtTime(.001,audio.currentTime+i*.12+.25);o.start(audio.currentTime+i*.12);o.stop(audio.currentTime+i*.12+.26)})}catch{}}
 function updateHeader() {
@@ -72,8 +74,9 @@ function switchView(requestedView,savePrevious=true,levelMode='play') {
     if (view === 'academy') AcademyUI.leave();
     if (view === 'maker') MakerUI.leave();
     if (view === 'level') LevelUI.leave();
+    if (view === 'leaderboard') Leaderboard.leave();
     if (Workshops.has(view)) Workshops.leave();
-    const pages = ['map','quest','battle','practice','journal','awards','academy','maker','level','workshops',...Workshops.names];
+    const pages = ['map','quest','battle','practice','journal','awards','leaderboard','academy','maker','level','workshops',...Workshops.names];
     view = pages.includes(requestedView) ? requestedView : 'map';
     document.querySelectorAll('.view').forEach(el => el.hidden = el.id !== view + 'View');
     if(view==='workshops'||Workshops.has(view)){
@@ -122,6 +125,7 @@ function switchView(requestedView,savePrevious=true,levelMode='play') {
     });
     if (view === 'journal') renderJournal();
     if (view === 'awards') renderAwards();
+    if (view === 'leaderboard') Leaderboard.mount($('leaderboardView'));
     $('editor').hidden = !['quest','practice'].includes(view);
     updateHeader();
     const url = new URL(location.href);
