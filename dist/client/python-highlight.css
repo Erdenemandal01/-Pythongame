@@ -1,0 +1,78 @@
+.py-editor-wrap {
+    position: relative;
+    display: block;
+    isolation: isolate;
+    min-width: 0;
+}
+
+/* Carry the original editor's place in its flex, grid or debugger layout. */
+.code-wrap > .py-editor-wrap,
+.dr-editor > .py-editor-wrap,
+.mu-codecard > .py-editor-wrap {
+    display: flex;
+    flex: 1;
+}
+
+.gh-code-wrap > .py-editor-wrap {
+    grid-column: 2;
+}
+
+.lv-code-pane > .py-editor-wrap {
+    position: absolute;
+    inset: 0;
+}
+
+.py-editor-wrap > textarea.py-editor-input {
+    color: transparent;
+    -webkit-text-fill-color: transparent;
+    caret-color: #fff1db;
+    text-shadow: none;
+}
+
+.py-editor-input::placeholder {
+    color: #a7b1c4;
+    -webkit-text-fill-color: currentColor;
+}
+
+.py-editor-input::selection {
+    color: transparent;
+    background-color: #3f536f;
+}
+
+/* Only glyphs are painted here. The native field owns focus, selection and scrolling. */
+.py-editor-wrap > .py-editor-mirror {
+    position: absolute;
+    z-index: 2;
+    display: block;
+    box-sizing: border-box;
+    overflow: hidden;
+    pointer-events: none;
+    user-select: none;
+    margin: 0;
+    border: 0;
+    color: #edf0f5;
+    background: transparent;
+}
+
+.py-editor-mirror[data-trailing-line]::after { content: '\200b'; }
+
+.py-token-keyword { color: #ffa4c9; }
+.py-token-name { color: #d4b2ff; }
+.py-token-string { color: #8ee4aa; }
+.py-token-comment { color: #a1acbb; }
+.py-token-number { color: #ffd18b; }
+.py-token-builtin { color: #96deef; }
+.py-token-operator { color: #edf0f5; }
+
+@media (forced-colors: active), print {
+    .py-editor-wrap > .py-editor-mirror { display: none; }
+    .py-editor-wrap > textarea.py-editor-input {
+        color: CanvasText;
+        -webkit-text-fill-color: currentColor;
+        caret-color: auto;
+    }
+    .py-editor-input::selection {
+        color: HighlightText;
+        background-color: Highlight;
+    }
+}

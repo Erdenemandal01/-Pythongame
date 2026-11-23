@@ -73,7 +73,7 @@
             watchLock.disconnect();
             field=target;
             // Keep buttons out of editor gutters and out of the city's input label.
-            const anchor=target.closest('.code-wrap,.lv-code-field,label') || target;
+            const anchor=target.closest('.code-wrap,.lv-code-field,label') || target.closest('.py-editor-wrap') || target;
             anchor.after(controls);
             message.textContent='';
             watchLock.observe(field,{attributes:true,attributeFilter:['readonly','disabled']});
