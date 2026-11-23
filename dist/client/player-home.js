@@ -86,8 +86,15 @@
             const id=state.battles.selected;
             return {...card,icon:'map.png',title:BATTLES[id].title,detail:'Кодоор тулалдах',visit:()=>openBattle(id)};
         }
+        if (r.view==='journal' && Number.isInteger(r.mission) && MISSIONS[r.mission]) {
+            return {...card,title:MISSIONS[r.mission].title,detail:'Дэвтрийн туршилт',
+                visit:()=>openActivity('journal','topic-'+r.mission)};
+        }
         const labels={
             practice:['Чөлөөт талбар','Python код'],maker:['Бүтээлийн тайз','Миний бүтээл'],
+            journal:['Мэдлэгийн дэвтэр','Жишээг өөрчилж турших'],
+            weekly:['Долоо хоногийн сорил','Энэ долоо хоногийн Python бодлого'],
+            duel:['Роботын халз сорил','Роботынхоо дүрмийг кодоор бичих'],
             level:['Миний түвшин',({edit:'Зургаа засах',pair:'Хосын сорил',play:'Түвшнээ тоглох'})[r.mode]]
         };
         const info=labels[r.view] || Workshops.describe(r.view);
@@ -116,8 +123,35 @@
 
     function counter(label, value, total) {
         const stat = element('span', 'ph-counter');
-        stat.append(element('strong', '', value + '/' + total), document.createTextNode(' ' + label));
+        const bar = element('progress');
+        bar.max = total;
+        bar.value = value;
+        bar.setAttribute('aria-label', label);
+        stat.append(element('span', '', label), element('strong', '', value + '/' + total), bar);
         return stat;
+    }
+
+    function studyLinks({state, openActivity}) {
+        const nav = element('nav', 'ph-study-links');
+        nav.setAttribute('aria-label', 'Сурагчийн холбоосууд');
+        const bookmarks = state.journalBookmarks?.length || 0;
+        const links = [
+            ['journal', 'Мэдлэгийн дэвтэр', () => openActivity('journal')],
+            ['saved', 'Хадгалсан жишээ (' + bookmarks + ')', () => openActivity('journal', 'saved')],
+            ['duel', 'Роботын халз сорил', () => openActivity('duel')],
+            ['weekly', 'Долоо хоногийн сорил', () => openActivity('weekly')]
+        ];
+        for (const [key, label, open] of links) {
+            const button = element('button', '', label);
+            button.type = 'button';
+            button.dataset.campControl = key;
+            const arrow = element('span', 'ph-arrow', '→');
+            arrow.setAttribute('aria-hidden', 'true');
+            button.append(arrow);
+            button.addEventListener('click', open);
+            nav.append(button);
+        }
+        return nav;
     }
 
     function mount(root, context) {
@@ -142,9 +176,9 @@
         location.append(star, document.createTextNode('Аялагчийн отог'));
         const title = element('h1', '', name && (profile || name !== 'Аялагч') ? 'Сайн уу, ' + name + '!' : 'Тавтай морил!');
         title.id = 'ph-welcome';
-        const record = element('p', 'ph-record');
-        record.append(counter('даалгавар', state.done.length, MISSIONS.length),
-            counter('хичээл', state.academy.won.length, ACADEMY.length));
+        const record = element('div', 'ph-record');
+        record.append(counter('Аяллын даалгавар', state.done.length, MISSIONS.length),
+            counter('Урлангийн хичээл', state.academy.won.length, ACADEMY.length));
         intro.append(location, title, record);
         if (typeof openAccount === 'function') {
             const member = !!profile && account?.phase === 'member';
@@ -171,7 +205,7 @@
         const recent = recentWork(context);
         const choices = recent ? [recent, suggested.find(route=>route.kind!==recent.kind) || suggested[1]] : suggested;
         choices.forEach((route, i) => options.append(routeCard(route, i === 0)));
-        camp.append(hero, options);
+        camp.append(hero, options, studyLinks(context));
         root.replaceChildren(camp);
         if (previousFocus) root.querySelector('[data-camp-control="' + previousFocus + '"]')?.focus({preventScroll: true});
     }

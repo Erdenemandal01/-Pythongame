@@ -115,20 +115,66 @@
     text-shadow: 0 2px 0 #17223170;
 }
 .ph-record {
-    display: flex;
-    align-items: center;
-    flex-wrap: wrap;
-    gap: 1px 13px;
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 10px 22px;
     margin: 12px 0 17px;
-    color: #d7dfda;
-    font-size: 13px;
+    width: max-content;
+    max-width: 100%;
+    color: #e2e9e4;
+    font-size: 12px;
 }
 .ph-counter {
-    white-space: nowrap;
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    align-items: baseline;
+    gap: 5px 9px;
 }
 .ph-counter strong {
     font-variant-numeric: tabular-nums;
     color: #fff0cf;
+}
+.ph-counter progress {
+    grid-column: 1 / -1;
+    display: block;
+    width: 100%;
+    min-width: 0;
+    height: 5px;
+    border: 0;
+    border-radius: 3px;
+    overflow: hidden;
+    background: #415154;
+    accent-color: var(--camp-mint);
+    appearance: none;
+}
+.ph-counter progress::-webkit-progress-bar {background:#415154;}
+.ph-counter progress::-webkit-progress-value {background:var(--camp-mint);}
+.ph-counter progress::-moz-progress-bar {background:var(--camp-mint);}
+.ph-study-links {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 1px;
+    background: #405156;
+    border-top: 1px solid #405156;
+}
+.ph-study-links button {
+    display: flex;
+    gap: 12px;
+    align-items: center;
+    justify-content: space-between;
+    padding: 12px clamp(14px, 2.5cqw, 32px);
+    border: 0;
+    border-radius: 0;
+    background: #1b2930;
+    color: #e2eee8;
+    font: 640 13px/1.4 "Segoe UI", sans-serif;
+    text-align: left;
+}
+.ph-study-links button .ph-arrow {color:var(--camp-mint);}
+.ph-study-links button:hover {background:#2b4244;}
+.ph-study-links button:focus-visible {outline:3px solid var(--camp-gold); outline-offset:-4px;}
+@container player-camp (max-width: 740px) {
+    .ph-study-links {grid-template-columns:repeat(2,minmax(0,1fr));}
 }
 .ph-account {
     display: inline-flex;

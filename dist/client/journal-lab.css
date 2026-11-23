@@ -1,0 +1,28 @@
+.jl-dialog {
+    width: min(900px, 92vw); max-width: 92vw; max-height: 88vh; overflow: auto;
+    padding: clamp(20px, 3vw, 34px); color: #e8edf7; background: #171d2a;
+    border: 1px solid #505970; border-radius: 18px; box-shadow: 0 24px 80px #060814b3;
+}
+.jl-dialog::backdrop { background: #050811bf; }
+.jl-head { display:flex; align-items:flex-start; justify-content:space-between; gap:20px; }
+.jl-head small { color:#bab0e1; font-weight:700; }
+.jl-head h2 { margin:4px 0 0; font-size:clamp(24px,3vw,36px); }
+.jl-dialog .jl-prompt { margin:16px 0 22px; color:#e1e5ed; }
+.jl-layout { display:grid; grid-template-columns:minmax(0,1.45fr) minmax(0,1fr); gap:16px; }
+.jl-editor,.jl-results { min-width:0; }
+.jl-editor { border:1px solid #414b61; border-radius:11px; background:#101622; overflow:hidden; }
+.jl-editor label { display:flex; justify-content:space-between; padding:12px 15px; font-weight:700; background:#212938; }
+.jl-editor label span { color:#a9b8cb; font-size:12px; align-self:center; }
+.jl-dialog .jl-code { display:block; width:100%; min-height:235px; resize:vertical; padding:14px; border:0; border-radius:0; background:#101622; color:#e4d2ff; font:15px/1.6 Consolas,monospace; tab-size:4; }
+.jl-actions { display:flex; flex-wrap:wrap; align-items:center; gap:8px; border-top:1px solid #354056; padding:12px; }
+.jl-run,.jl-try { color:#17231e; background:#b8ed88; border:1px solid #a5d879; border-radius:8px; padding:9px 13px; font-weight:750; }
+.jl-results { background:#1c2432; border:1px solid #3a455b; border-radius:11px; padding:16px; }
+.jl-results h3 { margin:0 0 6px; font-size:14px; color:#bfcee0; }
+.jl-results pre { white-space:pre-wrap; overflow-wrap:anywhere; max-height:32vh; overflow:auto; margin:0 0 18px; padding:10px 12px; border-left:3px solid #74829c; background:#121925; font:15px/1.55 Consolas,monospace; }
+.jl-results .jl-output { border-color:#aaeb85; margin-bottom:0; }
+.jl-links { display:flex; flex-wrap:wrap; align-items:center; gap:10px; }
+.jl-filter { display:inline-flex; width:fit-content; align-items:center; gap:9px; margin:12px 0 4px; color:#d7d2e8; cursor:pointer; }
+.jl-filter input { width:17px; height:17px; margin:0; accent-color:#b5e98b; }
+.jl-filter span { color:#cee7a5; font-variant-numeric:tabular-nums; }
+.jl-pin[aria-pressed="true"] { color:#ffdb91; border-color:#96835f; }
+@media (max-width:780px) { .jl-layout { grid-template-columns:1fr; } }

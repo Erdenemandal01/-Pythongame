@@ -1,6 +1,6 @@
 const $=id=>document.getElementById(id),KEY='pythonQuestFullMN_v1';
-const fresh=()=>({version:1,name:'Аялагч',done:[],drafts:{},attempts:{},hints:{},practice:'# Өөрийн санааг энд туршаарай\nprint("Сайн уу, ертөнц!")',days:[],sound:false,battles:readCampaign(null),academy:readAcademy(null)});
-function validState(s){if(!s||s.version!==1||!Array.isArray(s.done))throw Error('Тохирох хадгаламж биш байна.');const t=fresh();t.name=typeof s.name==='string'?s.name.slice(0,24)||'Аялагч':t.name;const done=new Set(s.done);for(let i=0;i<MISSIONS.length&&done.has(i);i++)t.done.push(i);for(let i=0;i<MISSIONS.length;i++){if(typeof s.drafts?.[i]==='string')t.drafts[i]=s.drafts[i].slice(0,20000);for(const k of ['attempts','hints'])if(Number.isInteger(s[k]?.[i])&&s[k][i]>=0)t[k][i]=Math.min(s[k][i],10000)}if(typeof s.practice==='string')t.practice=s.practice.slice(0,20000);t.days=Array.isArray(s.days)?[...new Set(s.days.filter(d=>typeof d==='string'&&/^\d{4}-\d{2}-\d{2}$/.test(d)))].sort().slice(-366):[];t.sound=s.sound===true;t.battles=readCampaign(s.battles);t.academy=readAcademy(s.academy);const bookmark=readBookmark(s.resume,t.done.length);if(bookmark)t.resume=bookmark;return t}
+const fresh=()=>({version:1,name:'Аялагч',done:[],drafts:{},journalDrafts:{},journalBookmarks:[],weeklyPython:WeeklyPython.readSave(null),attempts:{},hints:{},practice:'# Өөрийн санааг энд туршаарай\nprint("Сайн уу, ертөнц!")',days:[],sound:false,battles:readCampaign(null),academy:readAcademy(null)});
+function validState(s){if(!s||s.version!==1||!Array.isArray(s.done))throw Error('Тохирох хадгаламж биш байна.');const t=fresh();t.weeklyPython=WeeklyPython.readSave(s.weeklyPython);if(Array.isArray(s.journalBookmarks))t.journalBookmarks=MISSIONS.filter(m=>s.journalBookmarks.includes(m.id)).map(m=>m.id);t.name=typeof s.name==='string'?s.name.slice(0,24)||'Аялагч':t.name;const done=new Set(s.done);for(let i=0;i<MISSIONS.length&&done.has(i);i++)t.done.push(i);for(let i=0;i<MISSIONS.length;i++){if(typeof s.journalDrafts?.[i]==='string')t.journalDrafts[i]=s.journalDrafts[i].slice(0,20000);if(typeof s.drafts?.[i]==='string')t.drafts[i]=s.drafts[i].slice(0,20000);for(const k of ['attempts','hints'])if(Number.isInteger(s[k]?.[i])&&s[k][i]>=0)t[k][i]=Math.min(s[k][i],10000)}if(typeof s.practice==='string')t.practice=s.practice.slice(0,20000);t.days=Array.isArray(s.days)?[...new Set(s.days.filter(d=>typeof d==='string'&&/^\d{4}-\d{2}-\d{2}$/.test(d)))].sort().slice(-366):[];t.sound=s.sound===true;t.battles=readCampaign(s.battles);t.academy=readAcademy(s.academy);const bookmark=readBookmark(s.resume,t.done.length);if(bookmark)t.resume=bookmark;return t}
 let state=fresh(),lastActiveSave=null;
 try{lastActiveSave=localStorage.getItem(KEY);if(lastActiveSave)state=validState(JSON.parse(lastActiveSave))}catch{}
 let current=state.resume?.view==='quest'?state.resume.mission:Math.min(state.done.length,29),view='map',worker=null,ready=false,busy=false,timer,animationId=0,stdout=[],hintIndex=0,toastTimer,audio;
@@ -25,13 +25,15 @@ function readBookmark(raw, unlocked) {
         return Number.isInteger(id) && id>=0 && id<MISSIONS.length && id<=unlocked ? {view:'quest',mission:id} : null;
     }
     if (raw.view==='level') return {view:'level',mode:['edit','pair'].includes(raw.mode)?raw.mode:'play'};
-    if (['practice','academy','battle','maker'].includes(raw.view) || Workshops.has(raw.view)) return {view:raw.view};
+    if (raw.view==='journal') return Number.isInteger(raw.mission) && MISSIONS[raw.mission]
+        ? {view:'journal',mission:raw.mission} : {view:'journal'};
+    if (['practice','academy','battle','maker','weekly','duel'].includes(raw.view) || Workshops.has(raw.view)) return {view:raw.view};
     return null;
 }
-let restoringPlayer=false, levelModeInUse='play';
+let restoringPlayer=false, levelModeInUse='play', journalTopic=null;
 function rememberActivity() {
     if (restoringPlayer) return false;
-    const next=readBookmark({view,mission:current,mode:levelModeInUse},state.done.length);
+    const next=readBookmark({view,mission:view==='journal'?journalTopic:current,mode:levelModeInUse},state.done.length);
     if (!next || (next.view===state.resume?.view && next.mission===state.resume.mission && next.mode===state.resume.mode)) return false;
     state.resume=next;
     return true;
@@ -75,8 +77,11 @@ function switchView(requestedView,savePrevious=true,levelMode='play') {
     if (view === 'maker') MakerUI.leave();
     if (view === 'level') LevelUI.leave();
     if (view === 'leaderboard') Leaderboard.leave();
+    if (view === 'journal') JournalLab.close();
+    if (view === 'duel') RobotDuelUI.leave();
+    if (view === 'weekly') WeeklyPython.leave();
     if (Workshops.has(view)) Workshops.leave();
-    const pages = ['map','quest','battle','practice','journal','awards','leaderboard','academy','maker','level','workshops',...Workshops.names];
+    const pages = ['map','quest','battle','duel','weekly','practice','journal','awards','leaderboard','academy','maker','level','workshops',...Workshops.names];
     view = pages.includes(requestedView) ? requestedView : 'map';
     document.querySelectorAll('.view').forEach(el => el.hidden = el.id !== view + 'View');
     if(view==='workshops'||Workshops.has(view)){
@@ -123,7 +128,16 @@ function switchView(requestedView,savePrevious=true,levelMode='play') {
             switchView('level',true,'edit');
         }
     });
-    if (view === 'journal') renderJournal();
+    if (view === 'journal') {
+        const target = /^topic-(\d+)$/.exec(levelMode);
+        journalTopic = target && MISSIONS[Number(target[1])] ? Number(target[1]) : null;
+        $('journalSaved').checked = levelMode === 'saved';
+        if (levelMode === 'saved' || target) $('search').value = '';
+        renderJournal();
+        if (journalTopic !== null) $('journalCards').querySelector('[data-try="'+journalTopic+'"]')?.click();
+    }
+    if (view === 'duel') RobotDuelUI.mount($('duelView'), {openAccount: () => GameAccount.open()});
+    if (view === 'weekly') WeeklyPython.mount($('weeklyView'), {getSave: () => state.weeklyPython, save: persist});
     if (view === 'awards') renderAwards();
     if (view === 'leaderboard') Leaderboard.mount($('leaderboardView'));
     $('editor').hidden = !['quest','practice'].includes(view);
@@ -147,7 +161,52 @@ function terminate(message){clearTimeout(timer);animationId++;worker?.terminate(
 function errorHelp(message){if(/SyntaxError/.test(message))return 'Бичлэгийн алдаа: хашилт, хаалт, : тэмдгээ шалгаарай.';if(/IndentationError|TabError/.test(message))return 'Догол мөрийн алдаа: блокийн доторх мөр 4 зайтай байна.';if(/NameError/.test(message))return 'Энэ нэрийг Python танихгүй байна. Хувьсагчийн нэр, том жижиг үсгээ шалгаарай.';if(/TypeError/.test(message))return 'Утгын төрлүүд таарахгүй байна. Тоо болон текстийг ялгаарай.';if(/ZeroDivisionError/.test(message))return 'Тэгээр хувааж болохгүй. Хуваагчаа шалгаарай.';return 'Алдааны тайлбарыг уншаад засварлаж дахин оролдоорой.'}
 async function result(data,m,mode){clearTimeout(timer);$('runtime').textContent='Дууссан';if(data.trace?.length&&mode==='quest')await animate(data.trace,m);if(!busy)return;setBusy(false);if(!data.ok){$('output').textContent=(stdout.join('\n')+'\n'+data.error).trim();if(mode==='quest'){$('feedback').className='feedback-error';$('feedback').textContent=data.kind==='test'?'Шалгалт: '+data.error:errorHelp(data.error)}return}if(mode==='practice'){$('output').textContent=stdout.join('\n')||'(Код амжилттай ажиллалаа. Хэвлэсэн гаралт алга.)';return}const out=stdout.join('\n').trim();if(out!==m.expected.trim()){$('feedback').className='feedback-error';$('feedback').textContent='Гаралт таарахгүй байна. Үсэг, зай, мөрийн тоогоо хүлээгдэж буй үр дүнтэй харьцуулаарай.';return}const first=!state.done.includes(m.id);if(first)state.done.push(m.id);if(!state.days.includes(today()))state.days.push(today());persist();updateHeader();sound(true);celebrateScene(m,out);showAmbush();$('feedback').className='feedback-success';$('feedback').textContent=state.done.length===30?'🏆 Баяр хүргэе, '+state.name+'! Бүх 5 ертөнцийг тууллаа. Амжилтууд цэснээс аяллын гэрчилгээгээ татаарай.':first?'✦ Даалгавар биеллээ! +'+(m.boss?200:100)+' XP · Дараагийн буудал нээгдлээ.':'✓ Дахин зөв хийлээ! Давтлага чадварыг бататгадаг.';$('next').hidden=m.id===29;$('finishMap').hidden=false;if(!out)$('output').textContent='✓ Тоглоомын командууд амжилттай биеллээ.'}
 function execute(){if(busy)return;if(!$('code').value.trim())return toast('Эхлээд Python кодоо бичээрэй.');stash();const mode=view,m=MISSIONS[current],code=$('code').value;$('ambush').hidden=true;if(mode==='quest'){state.attempts[current]=(state.attempts[current]||0)+1;persist()}stdout=[];$('output').textContent=ready?'Код ажиллаж байна…':'Python ачаалж байна… Анхны удаа бага зэрэг хүлээнэ үү.';$('feedback').textContent='';$('next').hidden=true;$('finishMap').hidden=true;setBusy(true);const send=()=>{clearTimeout(timer);$('runtime').textContent='Ажиллаж байна';timer=setTimeout(()=>terminate('Код 5 секундээс удаан ажиллалаа. Давталтын зогсох нөхцөлөө шалгаад дахин оролдоорой.'),5000);worker.postMessage({code,check:mode==='quest'?m.check:'',game:mode==='quest'?m.game:null})};const handler=async({data})=>{if(data.type==='ready'){ready=true;send()}else if(data.type==='fatal'){terminate(data.error)}else if(data.type==='stdout'){stdout.push(data.text);$('output').textContent=stdout.join('\n');$('output').scrollTop=$('output').scrollHeight}else if(data.type==='result'){await result(data,m,mode)}};if(worker&&ready){worker.onmessage=handler;send();return}try{worker=new Worker('worker.js?v=3');worker.onmessage=handler;worker.onerror=e=>terminate('Тоглоомын Python хөдөлгүүр ажиллаж чадсангүй. '+(e.message||'Хуудсаа шинэчлээд кодоо дахин ажиллуулна уу.'));$('runtime').textContent='Python ачаалж байна';timer=setTimeout(()=>terminate('Python-ийг 90 секундэд ачаалж чадсангүй. Дахин ажиллуулж үзнэ үү.'),90000)}catch{terminate('Python ажиллуулах боломжгүй байна. Тоглоомыг веб холбоосоор нээгээрэй.')}}
-function renderJournal(){const q=$('search').value.toLowerCase();const matches=MISSIONS.filter(m=>(m.title+' '+m.concept+' '+m.info).toLowerCase().includes(q));$('journalCards').innerHTML=matches.map(m=>`<details class="journal-card"><summary><span>${WORLDS[m.world].icon} ${m.concept}</span><small>${m.title}</small></summary><p>${m.info}</p><pre>${esc(m.solution)}</pre>${m.id<=state.done.length?`<button class="secondary" data-review="${m.id}">Дасгалыг нээх</button>`:'<p class="muted">Өмнөх даалгавруудыг дуусгаад дасгалыг нээнэ.</p>'}</details>`).join('')||'<p>Тохирох ойлголт олдсонгүй.</p>';document.querySelectorAll('[data-review]').forEach(b=>b.onclick=()=>openMission(+b.dataset.review))}
+function renderJournal() {
+    const q = $('search').value.trim().toLowerCase();
+    const saved = state.journalBookmarks;
+    const onlySaved = $('journalSaved').checked;
+    $('journalSavedCount').textContent = String(saved.length);
+    const matches = MISSIONS.filter(m => (!onlySaved || saved.includes(m.id)) &&
+        (m.title+' '+m.concept+' '+m.info).toLowerCase().includes(q));
+    const cards = $('journalCards');
+    cards.innerHTML = matches.map((m,i) => `<details class="journal-card" ${i===0?'open':''}>
+        <summary><span>${WORLDS[m.world].icon} ${esc(m.concept)}</span><small>${esc(m.title)}</small></summary>
+        <p>${esc(m.info)}</p><pre>${esc(m.solution)}</pre>
+        <div class="jl-links"><button class="jl-try" data-try="${m.id}">▶ Жишээг өөрчлөөд турш</button>
+        <button class="secondary jl-pin" data-pin="${m.id}" aria-pressed="${saved.includes(m.id)}">${saved.includes(m.id)?'★ Тэмдэглэсэн':'☆ Тэмдэглэх'}</button>
+        ${m.id<=state.done.length?`<button class="secondary" data-review="${m.id}">Дасгалыг нээх</button>`:''}</div></details>`).join('')
+        || (onlySaved && !saved.length ? '<p>Тэмдэглэсэн жишээ алга. Шүүлтүүрээ унтраагаад давтах сэдвийнхээ ☆ товчийг дараарай.</p>' : '<p>Тохирох ойлголт олдсонгүй.</p>');
+    $('journalSaved').onchange = renderJournal;
+    cards.onclick = event => {
+        const button = event.target.closest('button');
+        if (!button) return;
+        if (button.hasAttribute('data-pin')) {
+            const id = Number(button.dataset.pin);
+            const bookmarks = state.journalBookmarks;
+            const pinned = !bookmarks.includes(id);
+            state.journalBookmarks = pinned ? [...bookmarks,id] : bookmarks.filter(value => value !== id);
+            persist(false);
+            if (onlySaved) { renderJournal(); $('journalSaved').focus(); }
+            else {
+                button.setAttribute('aria-pressed', String(pinned));
+                button.textContent = pinned ? '★ Тэмдэглэсэн' : '☆ Тэмдэглэх';
+                $('journalSavedCount').textContent = String(state.journalBookmarks.length);
+            }
+            return;
+        }
+        if (button.hasAttribute('data-review')) return openMission(Number(button.dataset.review));
+        if (!button.hasAttribute('data-try')) return;
+        const mission = MISSIONS[Number(button.dataset.try)];
+        journalTopic = mission.id;
+        if (rememberActivity()) persist(false);
+        const drafts = state.journalDrafts;
+        JournalLab.open(mission, drafts[mission.id], value => {
+            if (value === mission.solution) delete drafts[mission.id];
+            else drafts[mission.id] = value;
+            persist(false);
+        });
+    };
+}
 function streak(){let n=0,d=new Date();if(!state.days.includes(today()))d.setDate(d.getDate()-1);for(let i=0;i<367;i++){if(!state.days.includes(d.toLocaleDateString('en-CA')))break;n++;d.setDate(d.getDate()-1)}return n}
 function awards(){return [{icon:'🌟',title:'Анхны мөр',desc:'Эхний даалгавраа дуусгах',earned:state.done.length>0},...WORLDS.map((w,i)=>({icon:w.icon,title:w.name+' · эзэн',desc:'Бүлгийн 6 даалгаврыг дуусгах',earned:state.done.includes(i*6+5)})),{icon:'🔥',title:'Тууштай аялагч',desc:'3 өөр өдөр суралцах',earned:state.days.length>=3},{icon:'🏆',title:'Python аялагч',desc:'Бүх 30 даалгаврыг дуусгах',earned:state.done.length===30},...relicAwards()]}
 function renderAwards(){$('summaryStats').innerHTML=`<div><b>${xp()}</b><span>Нийт XP</span></div><div><b>${state.done.length}/30</b><span>Даалгавар</span></div><div><b>${streak()}</b><span>Дараалсан өдөр</span></div><div><b>${awards().filter(a=>a.earned).length}/${awards().length}</b><span>Тэмдэг</span></div>`;$('awardCards').innerHTML=awards().map(a=>`<article class="award ${a.earned?'earned':''}"><span>${a.icon}</span><h3>${a.title}</h3><p>${a.desc}</p><small>${a.earned?'✓ Авсан':'Түгжээтэй'}</small></article>`).join('');$('certificate').hidden=state.done.length!==30;$('certificate').innerHTML=`<div class="eyebrow">АЯЛЛЫН ГЭРЧИЛГЭЭ</div><h2>${esc(state.name)}</h2><p>«Кодын нүүдэл» тоглоомын анхан шатны 30 даалгаврыг дуусгалаа.</p><small>Тоглоомын амжилтын дурсгал · Албан ёсны мэргэжлийн гэрчилгээ биш</small><br><button id="downloadCertificate">Гэрчилгээ татах</button>`;if($('downloadCertificate'))$('downloadCertificate').onclick=certificate}
@@ -214,7 +273,7 @@ function replaceDisplayedPlayer(next) {
     if ($('profile').open) $('profile').close();
     const route = view;
     switchView('map', false);
-    for (const id of ['academyView','makerView','levelView','workshopsView','battleView','localProfiles']) $(id).replaceChildren();
+    for (const id of ['academyView','makerView','levelView','workshopsView','battleView','duelView','weeklyView','localProfiles']) $(id).replaceChildren();
     $('code').value = '';
     $('output').textContent = '';
     state = next;

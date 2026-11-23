@@ -54,18 +54,23 @@
         const {error} = await service().auth.signOut({scope: 'local'});
         if (error) throw error;
     }
-    async function leaderboard(period, join, expectedUserId) {
+    async function playerRpc(name, params, expectedUserId) {
         const active = await session();
         if (!active || active.user.id !== expectedUserId) {
             throw Object.assign(Error('account_changed'), {status: 401});
         }
-        // Keep an opt-in or opt-out attached to the pupil who pressed the button,
-        // even if a different tab switches the shared computer's session.
-        const result = await service().rpc('pq_leaderboard', {p_period: period, p_join: join})
+        // Bind the action to the pupil who started it on a shared computer.
+        const result = await service().rpc(name, params)
             .setHeader('Authorization', 'Bearer ' + active.access_token)
             .abortSignal(AbortSignal.timeout(15000));
         if (result.error) throw Object.assign(Error(result.error.message), {status: result.status});
         return result.data;
+    }
+    function leaderboard(period, join, expectedUserId) {
+        return playerRpc('pq_leaderboard', {p_period:period, p_join:join}, expectedUserId);
+    }
+    function duel(action, code, traces, expectedUserId) {
+        return playerRpc('pq_robot_duel', {p_action:action, p_code:code ?? null, p_traces:traces ?? null}, expectedUserId);
     }
     async function api(path, method, body, key, enrollment) {
         if (!await session()) {
@@ -83,5 +88,5 @@
             return result.data;
         } finally { clearTimeout(timeout); }
     }
-    window.PQUsernameAccount = {api, identify, signOut, userId, validUsername, watch, leaderboard};
+    window.PQUsernameAccount = {api, identify, signOut, userId, validUsername, watch, leaderboard, duel};
 })();
