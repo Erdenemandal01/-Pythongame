@@ -93,6 +93,7 @@
         const labels={
             practice:['Чөлөөт талбар','Python код'],maker:['Бүтээлийн тайз','Миний бүтээл'],
             journal:['Мэдлэгийн дэвтэр','Жишээг өөрчилж турших'],
+            exam:['Төгсгөлийн сорил','Python кодоор бодох гурван бодлого'],
             weekly:['Долоо хоногийн сорил','Энэ долоо хоногийн Python бодлого'],
             duel:['Роботын халз сорил','Роботынхоо дүрмийг кодоор бичих'],
             level:['Миний түвшин',({edit:'Зургаа засах',pair:'Хосын сорил',play:'Түвшнээ тоглох'})[r.mode]]
@@ -205,7 +206,9 @@
         const recent = recentWork(context);
         const choices = recent ? [recent, suggested.find(route=>route.kind!==recent.kind) || suggested[1]] : suggested;
         choices.forEach((route, i) => options.append(routeCard(route, i === 0)));
-        camp.append(hero, options, studyLinks(context));
+        const overview = element('div', 'ph-course-overview');
+        CourseOverview.mount(overview);
+        camp.append(hero, overview, options, studyLinks(context));
         root.replaceChildren(camp);
         if (previousFocus) root.querySelector('[data-camp-control="' + previousFocus + '"]')?.focus({preventScroll: true});
     }

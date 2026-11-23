@@ -12,7 +12,7 @@
         if (current.hash === '#academy' && Number.isInteger(lesson) && lesson >= 1 && lesson <= 66) {
             link.searchParams.set('lesson', String(lesson));
         }
-        const views = ['map','quest','battle','duel','weekly','practice','journal','awards','leaderboard','academy','maker','level','workshops','greenhouse','dragon','music','detective','city'];
+        const views = ['map','quest','battle','duel','weekly','exam','practice','journal','awards','leaderboard','academy','maker','level','workshops','greenhouse','dragon','music','detective','city'];
         if (current.hash) link.hash = views.includes(current.hash.slice(1)) ? current.hash : 'map';
         return link.href;
     }

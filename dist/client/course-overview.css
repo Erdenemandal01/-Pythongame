@@ -1,0 +1,90 @@
+.co-overview {
+    container: course-overview / inline-size;
+    min-width: 0;
+}
+
+.co-facts {
+    display: grid;
+    grid-template-columns: repeat(5, minmax(0, 1fr));
+    overflow: hidden;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+    border: 1px solid #d2ded8;
+    border-radius: 14px;
+    background: #fff;
+    color: #172736;
+    box-shadow: 0 2px 7px #142c2312;
+    font-family: "Segoe UI", sans-serif;
+    text-align: center;
+}
+
+.co-fact {
+    display: flex;
+    min-width: 0;
+}
+
+.co-fact + .co-fact {
+    border-inline-start: 1px solid #dbe3df;
+}
+
+.co-fact-body {
+    display: grid;
+    grid-template-rows: auto auto 1fr;
+    justify-items: center;
+    align-content: start;
+    width: 100%;
+    padding: clamp(14px, 1.8cqw, 22px) clamp(4px, 1cqw, 12px);
+    color: inherit;
+    text-decoration: none;
+}
+
+.co-fact-body img {
+    display: block;
+    width: clamp(23px, 3.1cqw, 33px);
+    height: clamp(23px, 3.1cqw, 33px);
+    margin-block-end: 8px;
+}
+
+.co-value {
+    font-size: clamp(13px, 1.8cqw, 20px);
+    font-weight: 700;
+    line-height: 1.2;
+    letter-spacing: -.015em;
+    text-wrap: balance;
+}
+
+.co-caption {
+    margin-block-start: 4px;
+    color: #51635c;
+    font-size: clamp(11px, 1.35cqw, 14px);
+    line-height: 1.35;
+    text-wrap: balance;
+}
+
+a.co-fact-body:hover,
+a.co-fact-body:focus-visible {
+    background: #ecf7f1;
+}
+
+a.co-fact-body:hover .co-value,
+a.co-fact-body:focus-visible .co-value {
+    color: #0a6241;
+    text-decoration: underline;
+    text-underline-offset: .15em;
+}
+
+a.co-fact-body:focus-visible {
+    outline: 2px solid #0b6746;
+    outline-offset: -3px;
+}
+
+@container course-overview (max-width: 430px) {
+    .co-facts { grid-template-columns: repeat(6, minmax(0, 1fr)); }
+    .co-fact { grid-column: span 2; }
+    .co-fact:nth-child(n + 4) {
+        grid-column: span 3;
+        border-block-start: 1px solid #dbe3df;
+    }
+    .co-fact:nth-child(4) { border-inline-start: 0; }
+}

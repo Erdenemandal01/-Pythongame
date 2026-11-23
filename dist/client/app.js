@@ -1,6 +1,6 @@
 const $=id=>document.getElementById(id),KEY='pythonQuestFullMN_v1';
-const fresh=()=>({version:1,name:'Аялагч',done:[],drafts:{},journalDrafts:{},journalBookmarks:[],weeklyPython:WeeklyPython.readSave(null),attempts:{},hints:{},practice:'# Өөрийн санааг энд туршаарай\nprint("Сайн уу, ертөнц!")',days:[],sound:false,battles:readCampaign(null),academy:readAcademy(null)});
-function validState(s){if(!s||s.version!==1||!Array.isArray(s.done))throw Error('Тохирох хадгаламж биш байна.');const t=fresh();t.weeklyPython=WeeklyPython.readSave(s.weeklyPython);if(Array.isArray(s.journalBookmarks))t.journalBookmarks=MISSIONS.filter(m=>s.journalBookmarks.includes(m.id)).map(m=>m.id);t.name=typeof s.name==='string'?s.name.slice(0,24)||'Аялагч':t.name;const done=new Set(s.done);for(let i=0;i<MISSIONS.length&&done.has(i);i++)t.done.push(i);for(let i=0;i<MISSIONS.length;i++){if(typeof s.journalDrafts?.[i]==='string')t.journalDrafts[i]=s.journalDrafts[i].slice(0,20000);if(typeof s.drafts?.[i]==='string')t.drafts[i]=s.drafts[i].slice(0,20000);for(const k of ['attempts','hints'])if(Number.isInteger(s[k]?.[i])&&s[k][i]>=0)t[k][i]=Math.min(s[k][i],10000)}if(typeof s.practice==='string')t.practice=s.practice.slice(0,20000);t.days=Array.isArray(s.days)?[...new Set(s.days.filter(d=>typeof d==='string'&&/^\d{4}-\d{2}-\d{2}$/.test(d)))].sort().slice(-366):[];t.sound=s.sound===true;t.battles=readCampaign(s.battles);t.academy=readAcademy(s.academy);const bookmark=readBookmark(s.resume,t.done.length);if(bookmark)t.resume=bookmark;return t}
+const fresh=()=>({version:1,name:'Аялагч',done:[],drafts:{},journalDrafts:{},journalBookmarks:[],weeklyPython:WeeklyPython.readSave(null),courseExam:CourseExam.readSave(null),attempts:{},hints:{},practice:'# Өөрийн санааг энд туршаарай\nprint("Сайн уу, ертөнц!")',days:[],sound:false,battles:readCampaign(null),academy:readAcademy(null)});
+function validState(s){if(!s||s.version!==1||!Array.isArray(s.done))throw Error('Тохирох хадгаламж биш байна.');const t=fresh();t.weeklyPython=WeeklyPython.readSave(s.weeklyPython);t.courseExam=CourseExam.readSave(s.courseExam);if(Array.isArray(s.journalBookmarks))t.journalBookmarks=MISSIONS.filter(m=>s.journalBookmarks.includes(m.id)).map(m=>m.id);t.name=typeof s.name==='string'?s.name.slice(0,24)||'Аялагч':t.name;const done=new Set(s.done);for(let i=0;i<MISSIONS.length&&done.has(i);i++)t.done.push(i);for(let i=0;i<MISSIONS.length;i++){if(typeof s.journalDrafts?.[i]==='string')t.journalDrafts[i]=s.journalDrafts[i].slice(0,20000);if(typeof s.drafts?.[i]==='string')t.drafts[i]=s.drafts[i].slice(0,20000);for(const k of ['attempts','hints'])if(Number.isInteger(s[k]?.[i])&&s[k][i]>=0)t[k][i]=Math.min(s[k][i],10000)}if(typeof s.practice==='string')t.practice=s.practice.slice(0,20000);t.days=Array.isArray(s.days)?[...new Set(s.days.filter(d=>typeof d==='string'&&/^\d{4}-\d{2}-\d{2}$/.test(d)))].sort().slice(-366):[];t.sound=s.sound===true;t.battles=readCampaign(s.battles);t.academy=readAcademy(s.academy);const bookmark=readBookmark(s.resume,t.done.length);if(bookmark)t.resume=bookmark;return t}
 let state=fresh(),lastActiveSave=null;
 try{lastActiveSave=localStorage.getItem(KEY);if(lastActiveSave)state=validState(JSON.parse(lastActiveSave))}catch{}
 let current=state.resume?.view==='quest'?state.resume.mission:Math.min(state.done.length,29),view='map',worker=null,ready=false,busy=false,timer,animationId=0,stdout=[],hintIndex=0,toastTimer,audio;
@@ -27,7 +27,7 @@ function readBookmark(raw, unlocked) {
     if (raw.view==='level') return {view:'level',mode:['edit','pair'].includes(raw.mode)?raw.mode:'play'};
     if (raw.view==='journal') return Number.isInteger(raw.mission) && MISSIONS[raw.mission]
         ? {view:'journal',mission:raw.mission} : {view:'journal'};
-    if (['practice','academy','battle','maker','weekly','duel'].includes(raw.view) || Workshops.has(raw.view)) return {view:raw.view};
+    if (['practice','academy','battle','maker','weekly','duel','exam'].includes(raw.view) || Workshops.has(raw.view)) return {view:raw.view};
     return null;
 }
 let restoringPlayer=false, levelModeInUse='play', journalTopic=null;
@@ -55,7 +55,7 @@ function sound(win){if(!state.sound)return;try{audio??=new(window.AudioContext||
 function updateHeader() {
     $('xp').textContent='✦ '+xp()+' XP';
     $('level').textContent='LV. '+(1+Math.floor(xp()/300));
-    const classroom=['academy','maker','level','workshops',...Workshops.names].includes(view);
+    const classroom=['exam','academy','maker','level','workshops',...Workshops.names].includes(view);
     const completed=classroom ? state.academy.won.length : state.done.length;
     const total=classroom ? ACADEMY.length : MISSIONS.length;
     $('journeyLabel').textContent=classroom?'Урлангийн ахиц':'Аяллын ахиц';
@@ -80,8 +80,9 @@ function switchView(requestedView,savePrevious=true,levelMode='play') {
     if (view === 'journal') JournalLab.close();
     if (view === 'duel') RobotDuelUI.leave();
     if (view === 'weekly') WeeklyPython.leave();
+    if (view === 'exam') CourseExam.leave();
     if (Workshops.has(view)) Workshops.leave();
-    const pages = ['map','quest','battle','duel','weekly','practice','journal','awards','leaderboard','academy','maker','level','workshops',...Workshops.names];
+    const pages = ['map','quest','battle','duel','weekly','exam','practice','journal','awards','leaderboard','academy','maker','level','workshops',...Workshops.names];
     view = pages.includes(requestedView) ? requestedView : 'map';
     document.querySelectorAll('.view').forEach(el => el.hidden = el.id !== view + 'View');
     if(view==='workshops'||Workshops.has(view)){
@@ -135,6 +136,10 @@ function switchView(requestedView,savePrevious=true,levelMode='play') {
         if (levelMode === 'saved' || target) $('search').value = '';
         renderJournal();
         if (journalTopic !== null) $('journalCards').querySelector('[data-try="'+journalTopic+'"]')?.click();
+    }
+    if (view === 'exam') {
+        CourseExam.mount($('examView'), {getSave: () => state.courseExam, save: persist});
+        window.scrollTo({top:0,behavior:'instant'});
     }
     if (view === 'duel') RobotDuelUI.mount($('duelView'), {openAccount: () => GameAccount.open()});
     if (view === 'weekly') WeeklyPython.mount($('weeklyView'), {getSave: () => state.weeklyPython, save: persist});
@@ -273,7 +278,7 @@ function replaceDisplayedPlayer(next) {
     if ($('profile').open) $('profile').close();
     const route = view;
     switchView('map', false);
-    for (const id of ['academyView','makerView','levelView','workshopsView','battleView','duelView','weeklyView','localProfiles']) $(id).replaceChildren();
+    for (const id of ['academyView','makerView','levelView','workshopsView','battleView','duelView','weeklyView','examView','localProfiles']) $(id).replaceChildren();
     $('code').value = '';
     $('output').textContent = '';
     state = next;

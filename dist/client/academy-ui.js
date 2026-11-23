@@ -173,6 +173,9 @@
         catalogue() {
             const drawer = node('details', 'ac-library');
             drawer.append(node('summary', '', 'Бүлэг, хичээл сонгох'));
+            const overview = node('div', 'ac-course-overview');
+            CourseOverview.mount(overview);
+            drawer.append(overview);
             const filters = node('div', 'ac-filters');
             const group = node('select', 'ac-select');
             group.append(option('all', 'Бүх бүлэг'));
