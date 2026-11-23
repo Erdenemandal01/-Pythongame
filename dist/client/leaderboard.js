@@ -68,7 +68,7 @@ window.Leaderboard = (() => {
                 if (!document.hidden && this.phase === 'member' && window.PQUsernameAccount &&
                     !this.busy && Date.now() - this.lastFetch >= 60000) void this.load();
             };
-            const panel = element('section', 'lb-shell');
+            const panel = element('section', 'lb-ranking');
             const header = element('header', 'lb-hero');
             const chest = element('img', 'lb-chest');
             chest.src = 'art/chest.png'; chest.alt = ''; chest.width = 80; chest.height = 80;
