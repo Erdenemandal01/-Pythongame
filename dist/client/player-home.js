@@ -213,5 +213,5 @@
         if (previousFocus) root.querySelector('[data-camp-control="' + previousFocus + '"]')?.focus({preventScroll: true});
     }
 
-    window.PlayerHome = {mount};
+    window.PlayerHome = {mount, recentWork};
 })();

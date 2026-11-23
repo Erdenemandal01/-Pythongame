@@ -176,35 +176,9 @@
             const overview = node('div', 'ac-course-overview');
             CourseOverview.mount(overview);
             drawer.append(overview);
-            const filters = node('div', 'ac-filters');
-            const group = node('select', 'ac-select');
-            group.append(option('all', 'Бүх бүлэг'));
-            ACADEMY_CHAPTERS.forEach((chapter, i) => group.append(option(String(i), chapter.title)));
-            group.value = String(ACADEMY_CHAPTERS.indexOf(this.chapter));
-            const search = node('input','ac-search');
-            search.type = 'search';
-            search.placeholder = 'Жишээ нь: луу';
-            filters.append(wrappedLabel('Бүлэг', group), wrappedLabel('Хичээл хайх', search));
-            const list = node('div', 'ac-lessons');
-            const display = () => {
-                list.replaceChildren();
-                const query = search.value.trim().toLocaleLowerCase();
-                ACADEMY.forEach((lesson, i) => {
-                    if (group.value !== 'all' && academyChapter(i) !== ACADEMY_CHAPTERS[Number(group.value)]) return;
-                    if (query && !(lesson.title + ' ' + lesson.intro + ' ' + (i+1)).toLocaleLowerCase().includes(query)) return;
-                    const done = this.save.won.includes(i);
-                    const item = button('', 'ac-lesson-item', () => this.openLesson(i));
-                    item.append(node('small','ac-num', String(i+1).padStart(2,'0')), node('span','',lesson.title));
-                    if (done) item.append(node('span','ac-stamp','✓'));
-                    if (i === this.index) item.setAttribute('aria-current','true');
-                    list.append(item);
-                });
-                if (!list.childElementCount) list.append(node('p','ac-muted','Хичээл олдсонгүй. Хайлтын үгээ сольж үзээрэй.'));
-            };
-            group.onchange = display;
-            search.oninput = () => { if (search.value) group.value = 'all'; display(); };
-            display();
-            drawer.append(filters, list);
+            const picker = node('div');
+            CourseCatalog.mount(picker, {won:this.save.won, selected:this.index, openLesson:i => this.openLesson(i), compact:true});
+            drawer.append(picker);
             return drawer;
         }
 
@@ -337,7 +311,7 @@
             const project=this.lesson.projects[choice];
             let code=drafts['p'+choice] ?? project.starter;
             let stdin=this.record.inputData || '';
-            brief.append(node('h3','',game?project.title:'Найзтайгаа турш'),node('p','ac-prose',this.lesson.stretch));
+            brief.append(node('h3','',game?project.title:'Өөр утгаар турших'),node('p','ac-prose',this.lesson.stretch));
             if (game) {
                 const previous=capstone.carryPrevious?this.save.lessons[this.index-1]:null;
                 const inherited=previous?.drafts[key];
@@ -349,7 +323,7 @@
             const inputs=node('details','ac-hint');
             inputs.open=Boolean(game);
             inputs.append(node('summary','','Гараас утга оруулах · input()'),
-                node('p','ac-prose','Найзынхаа хариулт бүрийг тусдаа мөрөнд бич. Кодын input() дуудлага бүр дараагийн мөрийг уншина.'));
+                node('p','ac-prose','Турших утга бүрээ тусдаа мөрөнд бичээрэй. Кодын input() дуудлага бүр дараагийн мөрийг уншина.'));
             const replies=node('textarea','ac-reply-input');
             replies.rows=3;
             replies.maxLength=4000;

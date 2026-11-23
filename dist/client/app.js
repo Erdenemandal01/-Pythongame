@@ -55,10 +55,10 @@ function sound(win){if(!state.sound)return;try{audio??=new(window.AudioContext||
 function updateHeader() {
     $('xp').textContent='✦ '+xp()+' XP';
     $('level').textContent='LV. '+(1+Math.floor(xp()/300));
-    const classroom=['exam','academy','maker','level','workshops',...Workshops.names].includes(view);
+    const classroom=['home','courses','exam','academy','maker','level','workshops',...Workshops.names].includes(view);
     const completed=classroom ? state.academy.won.length : state.done.length;
     const total=classroom ? ACADEMY.length : MISSIONS.length;
-    $('journeyLabel').textContent=classroom?'Урлангийн ахиц':'Аяллын ахиц';
+    $('journeyLabel').textContent=classroom?'Хичээлийн ахиц':'Аяллын ахиц';
     $('count').textContent=completed+' / '+total;
     $('progress').max=total;
     $('progress').value=completed;
@@ -82,14 +82,18 @@ function switchView(requestedView,savePrevious=true,levelMode='play') {
     if (view === 'weekly') WeeklyPython.leave();
     if (view === 'exam') CourseExam.leave();
     if (Workshops.has(view)) Workshops.leave();
-    const pages = ['map','quest','battle','duel','weekly','exam','practice','journal','awards','leaderboard','academy','maker','level','workshops',...Workshops.names];
-    view = pages.includes(requestedView) ? requestedView : 'map';
+    const from = view;
+    const pages = ['home','courses','map','quest','battle','duel','weekly','exam','practice','journal','awards','leaderboard','academy','maker','level','workshops',...Workshops.names];
+    view = pages.includes(requestedView) ? requestedView : 'home';
+    document.body.toggleAttribute('data-study-page', view === 'home' || view === 'courses');
     document.querySelectorAll('.view').forEach(el => el.hidden = el.id !== view + 'View');
     if(view==='workshops'||Workshops.has(view)){
         $('workshopsView').hidden=false;
         Workshops.mount($('workshopsView'),view,state.academy.workshops,levelMode);
         window.scrollTo({top:0,behavior:'instant'});
     }
+    if (view === 'home') renderStudyHome();
+    if (view === 'courses') CourseCatalog.mount($('coursesView'), {won:state.academy.won, selected:state.resume?.view==='academy' ? state.academy.selected : null, openLesson:enterClass});
     if (view === 'map') renderMap();
     if (view === 'quest') renderMission();
     if (view === 'battle') {
@@ -152,8 +156,12 @@ function switchView(requestedView,savePrevious=true,levelMode='play') {
         url.searchParams.delete('train');
         url.searchParams.delete('trainLesson');
     }
+    const publicRoute = ['home','courses'].includes(from) || ['home','courses'].includes(view);
+    const push = savePrevious && !restoringPlayer && publicRoute && location.hash && location.hash !== '#' + view;
     url.hash = view;
-    history.replaceState(null, '', url.href);
+    if (push) history.pushState(null, '', url.href);
+    else history.replaceState(null, '', url.href);
+    if (publicRoute && from !== view) window.scrollTo({top:0,behavior:'instant'});
     if (savePrevious && rememberActivity()) persist(false);
 }
 function openMission(i){if(i<0||i>=MISSIONS.length||i>state.done.length||busy)return;stash(false);current=i;switchView('quest',false);persist();window.scrollTo({top:0,behavior:'smooth'})}
@@ -217,7 +225,7 @@ function awards(){return [{icon:'🌟',title:'Анхны мөр',desc:'Эхни�
 function renderAwards(){$('summaryStats').innerHTML=`<div><b>${xp()}</b><span>Нийт XP</span></div><div><b>${state.done.length}/30</b><span>Даалгавар</span></div><div><b>${streak()}</b><span>Дараалсан өдөр</span></div><div><b>${awards().filter(a=>a.earned).length}/${awards().length}</b><span>Тэмдэг</span></div>`;$('awardCards').innerHTML=awards().map(a=>`<article class="award ${a.earned?'earned':''}"><span>${a.icon}</span><h3>${a.title}</h3><p>${a.desc}</p><small>${a.earned?'✓ Авсан':'Түгжээтэй'}</small></article>`).join('');$('certificate').hidden=state.done.length!==30;$('certificate').innerHTML=`<div class="eyebrow">АЯЛЛЫН ГЭРЧИЛГЭЭ</div><h2>${esc(state.name)}</h2><p>«Кодын нүүдэл» тоглоомын анхан шатны 30 даалгаврыг дуусгалаа.</p><small>Тоглоомын амжилтын дурсгал · Албан ёсны мэргэжлийн гэрчилгээ биш</small><br><button id="downloadCertificate">Гэрчилгээ татах</button>`;if($('downloadCertificate'))$('downloadCertificate').onclick=certificate}
 function download(filename,text,type){const url=URL.createObjectURL(new Blob([text],{type}));const a=document.createElement('a');a.href=url;a.download=filename;a.click();setTimeout(()=>URL.revokeObjectURL(url),1000)}
 function certificate(){const svg=`<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="800"><rect width="1200" height="800" fill="#151824"/><rect x="32" y="32" width="1136" height="736" rx="20" fill="none" stroke="#b8ef83" stroke-width="3"/><g text-anchor="middle" font-family="Arial, sans-serif"><text x="600" y="170" font-size="30" fill="#b8ef83">КОДЫН НҮҮДЭЛ</text><text x="600" y="270" font-size="50" fill="white">АЯЛЛЫН ГЭРЧИЛГЭЭ</text><text x="600" y="395" font-size="56" fill="#d3baff">${esc(state.name)}</text><text x="600" y="485" font-size="25" fill="white">5 ертөнц · 30 даалгавар · ${xp()} XP</text><text x="600" y="550" font-size="23" fill="#b8ef83">Python-ийн анхан шатны аяллаа дуусгалаа.</text><text x="600" y="670" font-size="17" fill="#a7a9bb">${esc(today())} · Тоглоомын амжилтын дурсгал</text></g></svg>`;download('python-quest-certificate.svg',svg,'image/svg+xml')}
-document.querySelectorAll('[data-view]').forEach(b=>b.onclick=()=>switchView(b.dataset.view));document.querySelector('.brand').onclick=e=>{e.preventDefault();switchView('map')};$('continueBtn').onclick=()=>openMission(Math.min(state.done.length,29));$('backMap').onclick=()=>switchView('map');$('finishMap').onclick=()=>switchView('map');$('next').onclick=()=>openMission(current+1);$('run').onclick=execute;$('stop').onclick=()=>terminate('Кодыг зогсоолоо. Засварлаад дахин ажиллуулж болно.');$('code').oninput=()=>{lines();stash()};$('code').onscroll=()=>{$('lineNumbers').scrollTop=$('code').scrollTop};$('code').onkeydown=e=>{if(e.key==='Tab'){e.preventDefault();if(busy)return;const t=e.target;t.setRangeText('    ',t.selectionStart,t.selectionEnd,'end');t.dispatchEvent(new Event('input'))}else if(e.key==='Enter'&&(e.ctrlKey||e.metaKey)){e.preventDefault();execute()}else if(e.key==='Enter'&&!busy){e.preventDefault();const t=e.target,before=t.value.slice(0,t.selectionStart),line=before.split('\n').pop(),indent=line.match(/^ */)[0]+(line.trimEnd().endsWith(':')?'    ':'');t.setRangeText('\n'+indent,t.selectionStart,t.selectionEnd,'end');t.dispatchEvent(new Event('input'))}};
+document.querySelectorAll('[data-view]').forEach(b=>b.onclick=()=>switchView(b.dataset.view));document.querySelector('.brand').onclick=e=>{if(e.ctrlKey||e.metaKey||e.shiftKey||e.altKey)return;e.preventDefault();switchView('home')};$('continueBtn').onclick=()=>openMission(Math.min(state.done.length,29));$('backMap').onclick=()=>switchView('map');$('finishMap').onclick=()=>switchView('map');$('next').onclick=()=>openMission(current+1);$('run').onclick=execute;$('stop').onclick=()=>terminate('Кодыг зогсоолоо. Засварлаад дахин ажиллуулж болно.');$('code').oninput=()=>{lines();stash()};$('code').onscroll=()=>{$('lineNumbers').scrollTop=$('code').scrollTop};$('code').onkeydown=e=>{if(e.key==='Tab'){e.preventDefault();if(busy)return;const t=e.target;t.setRangeText('    ',t.selectionStart,t.selectionEnd,'end');t.dispatchEvent(new Event('input'))}else if(e.key==='Enter'&&(e.ctrlKey||e.metaKey)){e.preventDefault();execute()}else if(e.key==='Enter'&&!busy){e.preventDefault();const t=e.target,before=t.value.slice(0,t.selectionStart),line=before.split('\n').pop(),indent=line.match(/^ */)[0]+(line.trimEnd().endsWith(':')?'    ':'');t.setRangeText('\n'+indent,t.selectionStart,t.selectionEnd,'end');t.dispatchEvent(new Event('input'))}};
 $('hintBtn').onclick=()=>{const m=MISSIONS[current];$('hint').hidden=false;$('hint').textContent=m.hints[Math.min(hintIndex,m.hints.length-1)];hintIndex++;state.hints[current]=(state.hints[current]||0)+1;$('hintBtn').textContent=hintIndex<m.hints.length?'✧ Дараагийн санаа':'✧ Санааг давтах';$('solutionBtn').hidden=hintIndex<m.hints.length;persist()};$('solutionBtn').onclick=()=>{$('hint').textContent='Жишээ шийдэл:\n'+MISSIONS[current].solution+'\n\nУчрыг нь ойлгоод өөрөө бичиж туршаарай.'};$('reset').onclick=()=>{if(confirm('Энэ талбарын кодыг эхний загварт буцаах уу?')){$('code').value=view==='practice'?fresh().practice:MISSIONS[current].start;lines();stash();clearConsole()}};$('downloadCode').onclick=()=>download('adventure.py',$('code').value,'text/x-python');$('search').oninput=renderJournal;
 const examples={greet:'name = "Ану"\nprint(f"Сайн уу, {name}!")',loop:'for n in range(1, 6):\n    print("★" * n)',function:'def square(n):\n    return n * n\n\nfor n in range(1, 6):\n    print(n, square(n))'};document.querySelectorAll('.example').forEach(b=>b.onclick=()=>{if(busy)return;if(confirm('Чөлөөт талбарын кодыг энэ жишээгээр солих уу?')){$('code').value=examples[b.dataset.example];lines();stash()}});
 $('sound').onclick=()=>{state.sound=!state.sound;persist();updateHeader();sound(true)};$('profileBtn').onclick=()=>GameAccount.open();$('saveName').onclick=()=>{state.name=$('playerName').value.trim()||'Аялагч';persist();updateHeader();if(view==='map')renderPlayerCamp();if(view==='awards')renderAwards();$('profileMessage').textContent='Нэр хадгалагдлаа.'};$('exportSave').onclick=()=>{stash();download('python-quest-progress.json',JSON.stringify(state,null,2),'application/json')};$('importSave').onchange=async e=>{
@@ -246,16 +254,45 @@ $('resetAll').onclick=()=>{
         toast('Шинэ аялал эхэллээ.');
     } else {$('profileMessage').textContent=$('toast').textContent;}
 };
-function renderPlayerCamp() {
-    PlayerHome.mount($('playerCamp'), {
+function playerNavigation() {
+    return {
         state, account: GameAccount.status(), openAccount: () => GameAccount.open(),
         openMission, openClass: enterClass, openBattle: enterBattle, openWorkshops: () => switchView('workshops'),
         openActivity: (route,mode) => switchView(route,true,mode)
+    };
+}
+function renderPlayerCamp() {
+    PlayerHome.mount($('playerCamp'), playerNavigation());
+}
+function renderStudyHome() {
+    const navigation = playerNavigation();
+    const account = navigation.account;
+    const recent = PlayerHome.recentWork(navigation);
+    const done = new Set(state.academy.won);
+    const next = ACADEMY.findIndex((_, index) => !done.has(index));
+    const units = ACADEMY_CHAPTERS.map(chapter => {
+        const ids = Array.from({length:chapter.count}, (_, offset) => chapter.first + offset);
+        return {id:chapter.first, title:chapter.title, total:chapter.count,
+            meta:chapter.count + ' хичээл · ' + academyDuration(chapter.minutes * chapter.count),
+            completed:ids.filter(id => done.has(id)).length,
+            next:ids.find(id => !done.has(id)) ?? chapter.first};
+    });
+    SelfStudy.render($('homeView'), {
+        name:account.profile?.name, signedIn:account.phase === 'member', authAvailable:account.authAvailable,
+        total:ACADEMY.length, completed:done.size, hasProgress:!!state.resume || done.size > 0 || state.done.length > 0,
+        resumeLabel:recent?.title || ACADEMY[next]?.title || 'Төгсгөлийн сорил',
+        onResume:recent?.visit || (next >= 0 ? () => enterClass(next) : () => switchView('exam')),
+        onStart:() => enterClass(0), onBrowse:() => switchView('courses'),
+        onRegister:() => GameAccount.open('signup'), onLogin:() => GameAccount.open('signin'),
+        onPractice:() => switchView('practice'), onAdventure:() => switchView('map'),
+        onReference:event => ReferenceAccess.open({opener:event.currentTarget}),
+        units, onUnit:id => enterClass(units.find(unit => unit.id === id).next)
     });
 }
 function updateAccountButton() {
     const {profile, phase, sync, newer} = GameAccount.status();
     const button = $('profileBtn');
+    $('progressStorage').textContent = profile ? 'Ахицын төлөвийг бүртгэлээсээ харна уу.' : 'Зочны ахиц энэ хөтөч дээр хадгалагдана.';
     const title = profile?.name || ({offline:'Миний профайл', enroll:'Бүртгүүлэх', guest:'Нэвтрэх', loading:'Миний бүртгэл', error:'Миний бүртгэл'}[phase] || 'Миний бүртгэл');
     if (button.textContent !== title) button.textContent = title;
     button.classList.toggle('needs-attention', newer || sync === 'conflict' || sync === 'error');
@@ -280,7 +317,7 @@ function replaceDisplayedPlayer(next) {
     if ($('profile').open) $('profile').close();
     const route = view;
     switchView('map', false);
-    for (const id of ['academyView','makerView','levelView','workshopsView','battleView','duelView','weeklyView','examView','localProfiles']) $(id).replaceChildren();
+    for (const id of ['homeView','coursesView','academyView','makerView','levelView','workshopsView','battleView','duelView','weeklyView','examView','localProfiles']) $(id).replaceChildren();
     $('code').value = '';
     $('output').textContent = '';
     state = next;
@@ -312,18 +349,21 @@ function restoreDeviceSave() {
 window.addEventListener('beforeunload',()=>{if(!busy)stash(false)});readAssignedLesson();
 ReferenceAccess.init({profile:() => state, save:() => persist(false), view:() => view});
 const linkedReference = ReferenceAccess.match(location.hash);
-switchView(linkedReference ? 'map' : location.hash.slice(1) || (window.PQ_CLASSROOM_KIT ? 'academy' : 'map'));
+switchView(linkedReference ? 'map' : location.hash.slice(1) || 'home');
 if (linkedReference) ReferenceAccess.open({shared:linkedReference});
 let campIdentity = '';
 GameAccount.init({
     getState: () => state, fresh, replace: useCloudSave, restoreGuest: restoreDeviceSave,
-    canRefresh: () => view==='map' && !busy && !ReferenceAccess.isOpen(),
+    canRefresh: () => ['map','home'].includes(view) && !busy && !ReferenceAccess.isOpen(),
     showLocalProfile: showDeviceProfile,
     download: save => download('python-quest-progress.json', JSON.stringify(save, null, 2), 'application/json'),
     onStatus: status => {
         updateAccountButton();
         const identity = JSON.stringify([status.phase, status.profile?.name, status.profile?.avatar]);
-        if (view === 'map' && campIdentity !== identity) renderPlayerCamp();
+        if (campIdentity !== identity) {
+            if (view === 'map') renderPlayerCamp();
+            if (view === 'home') renderStudyHome();
+        }
         campIdentity = identity;
     }
 });
@@ -331,6 +371,6 @@ window.addEventListener('hashchange', () => {
     const shared = ReferenceAccess.match(location.hash);
     if (shared) return ReferenceAccess.open({shared});
     ReferenceAccess.close(false);
-    const route = location.hash.slice(1) || 'map';
+    const route = location.hash.slice(1) || 'home';
     if (route !== view) switchView(route);
 });

@@ -10,9 +10,9 @@ window.GameAccount = (() => {
     let generation = 0, committed = '', pending = null, timer = 0, checking = null;
     let newerRevision = 0;
     let syncMessage = '', formBusy = false, authNotice = '', editing = false, leaving = false, switching = false;
-    let authMode = 'login', usernameValue = '', authUser, authReady = false, authStarting;
+    let authMode = 'signin', usernameValue = '', authUser, authReady = false, authStarting;
 
-    function status() { return {phase, sync, profile: profile && {...profile}, cloud, offline, newer: newerRevision > revision}; }
+    function status() { return {phase, sync, profile: profile && {...profile}, cloud, offline, authAvailable: !offline, newer: newerRevision > revision}; }
     function notify() {
         const detail = status();
         hooks?.onStatus?.(detail);
@@ -137,10 +137,10 @@ window.GameAccount = (() => {
     }
     async function useIdentity(id) {
         if (id === authUser) return checking;
-        if (authUser !== undefined) { authMode = 'login'; authNotice = ''; }
+        if (authUser !== undefined) { authMode = 'signin'; authNotice = ''; }
         authUser = id;
         resetSession();
-        if (id === null) { authMode = 'login'; usernameValue = ''; }
+        if (id === null) usernameValue = '';
         setPhase('loading');
         const at = generation;
         if (checking) await checking;
@@ -353,14 +353,15 @@ window.GameAccount = (() => {
             weak_password: 'Илүү урт, таахад хэцүү нууц үг сонгоорой.',
             over_request_rate_limit: 'Хэт олон удаа оролдлоо. Түр хүлээгээд дахин оролдоорой.',
             signup_disabled: 'Шинэ бүртгэл одоогоор хаалттай байна.',
-            signup_unavailable: 'Бүртгэл үүсгэх тохиргоог багшаараа шалгуулаарай.'
+            signup_unavailable: 'Бүртгэлээр нэвтэрч чадсангүй. Дахин оролдоод, асуудал хэвээр байвал сайтын хариуцагчтай холбогдоорой.'
         };
         return messages[error?.code] || (error?.status === 429 ? messages.over_request_rate_limit : 'Хүсэлтийг гүйцэтгэж чадсангүй. Холболтоо шалгаад дахин оролдоорой.');
     }
     function usernameForm() {
         const signup = authMode === 'signup';
         const form = node('form', 'account-form');
-        heading.textContent = signup ? 'Тоглогчийн бүртгэл үүсгэх' : 'Аяллаа үргэлжлүүлэх';
+        heading.textContent = signup ? 'Шинээр бүртгүүлэх' : 'Бүртгэлээрээ нэвтрэх';
+        if (signup) form.append(note('Хэрэглэгчийн нэр, нууц үгээ сонгоод Python хичээлээ бие даан эхлүүлээрэй. Та өөр компьютер дээр ч бүртгэлээрээ нэвтэрч ахицаа үргэлжлүүлж болно.'));
         const label = node('label', 'account-name', 'Хэрэглэгчийн нэр');
         const username = node('input');
         username.type = 'text'; username.name = 'username'; username.required = true;
@@ -385,7 +386,7 @@ window.GameAccount = (() => {
         const submit = node('button', '', signup ? 'Бүртгэл үүсгэх' : 'Нэвтрэх');
         submit.type = 'submit';
         const toggle = action(signup ? 'Нэвтрэх рүү буцах' : 'Шинээр бүртгүүлэх', () => {
-            authMode = signup ? 'login' : 'signup';
+            authMode = signup ? 'signin' : 'signup';
             authNotice = '';
             render();
             body.querySelector('input')?.focus();
@@ -406,7 +407,7 @@ window.GameAccount = (() => {
             try {
                 const id = await usernameAccount.identify(signup, username.value, password.value);
                 password.value = '';
-                authMode = 'login';
+                authMode = 'signin';
                 authNotice = '';
                 await useIdentity(id);
             } catch (error) {
@@ -466,7 +467,7 @@ window.GameAccount = (() => {
             }
             form.append(origin);
         }
-        const submit = node('button', '', enroll ? 'Тоглогчийн бүртгэл үүсгэх' : 'Өөрчлөлт хадгалах');
+        const submit = node('button', '', enroll ? 'Аялагчаа үүсгэх' : 'Өөрчлөлт хадгалах');
         submit.type = 'submit';
         const row = actions(submit);
         if (!enroll) row.append(action('Буцах', () => { editing = false; render(); }, true));
@@ -582,7 +583,7 @@ window.GameAccount = (() => {
                 const copy = node('div'); copy.append(node('h3', '', profile.name), note(avatars[profile.avatar]));
                 badge.append(portrait(profile.avatar), copy);
                 body.append(badge, syncPanel(), actions(action('Баатраа засах', () => { editing = true; render(); }, true), action('Ахиц татах', download, true)), authLink(true));
-                if (usernameAccount) body.append(note('Ангийн компьютер дээр тоглож дуусаад бүртгэлээсээ гараарай.'));
+                if (usernameAccount) body.append(note('Дундын компьютер ашиглаж байгаа бол хичээлээ дуусгаад бүртгэлээсээ гараарай.'));
             }
         } else if (phase === 'enroll') {
             heading.textContent = 'Аялагчаа үүсгэе';
@@ -590,7 +591,7 @@ window.GameAccount = (() => {
         } else if (phase === 'guest' && usernameAccount) {
             body.append(usernameForm(), offerLocal());
         } else if (phase === 'guest') {
-            heading.textContent = 'Аяллаа үргэлжлүүлээрэй';
+            heading.textContent = authMode === 'signup' ? 'Шинээр бүртгүүлэх' : 'Аяллаа үргэлжлүүлээрэй';
             body.append(note('ChatGPT-ээр нэвтэрч өөрийн тоглогчийн бүртгэл үүсгээрэй. Хичээл, бичсэн код, бүтээлүүдээ өөр компьютероос нээж болно.'), actions(authLink()), note('13-аас доош насны сурагч төхөөрөмжийн профайлаар тоглоно. 13–17 настай бол ChatGPT-д эцэг эх, асран хамгаалагчийн зөвшөөрлөөр нэвтэрнэ.'), offerLocal());
         } else if (phase === 'offline') {
             heading.textContent = 'Төхөөрөмж дээрх аялагч';
@@ -605,13 +606,19 @@ window.GameAccount = (() => {
         }
         updateSyncUI();
     }
-    function open() {
+    function open(mode) {
         if (!hooks) return;
         if (!dialog) makeDialog();
-        if (dialog.open) return;
+        const chooseMode = (mode === 'signup' || mode === 'signin') &&
+            !offline && !formBusy && ['loading', 'guest', 'error'].includes(phase);
+        if (chooseMode) {
+            if (dialog.open && authMode === mode) return;
+            authMode = mode;
+            if (phase === 'guest') authNotice = '';
+        } else if (dialog.open) return;
         editing = false;
         render();
-        dialog.showModal();
+        if (!dialog.open) dialog.showModal();
         if (cloud && !formBusy) void check();
     }
     async function init(callbacks) {

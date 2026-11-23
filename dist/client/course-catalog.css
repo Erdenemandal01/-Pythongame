@@ -1,0 +1,20 @@
+.course-library {max-width: 1080px; margin: 0 auto 3rem;}
+.course-library h1 {margin: 0 0 .4rem; font-size: clamp(1.9rem, 3vw, 3rem);}
+.catalog-intro, .catalog-status {color: #b9b9cc;}
+.course-library .ac-filters {max-width: 760px; margin: 1rem 0; padding: 1rem; border: 1px solid #393b4b; background: #1c2030; border-radius: .85rem;}
+.course-library .ac-label {min-width: 0;}
+.course-library .ac-search, .course-library .ac-select {width: 100%;}
+.catalog-status {font-size: .85rem; margin: .75rem 0;}
+.catalog-groups {display: grid; gap: 1.6rem;}
+.catalog-chapter h2 {font-size: 1.15rem; margin: 0 0 .55rem;}
+.catalog-rows {display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 260px), 1fr)); gap: .4rem;}
+.course-library .ac-lesson-item {display: flex; align-items: center; gap: .7rem; padding: .75rem .9rem; background: #1d2130; border: 1px solid #363949; border-radius: .5rem; color: #f3f2fa;}
+.course-library .ac-lesson-item:hover {border-color: #a497c6; background: #282939;}
+.course-library .ac-num {color: #acb0c3; font-variant-numeric: tabular-nums;}
+.ac-lesson-item {text-decoration: none;}
+.course-library .ac-stamp {color: #b8ef83; margin-left: auto;}
+body[data-study-page] .side-worlds {display: none;}
+body[data-study-page] .content > footer {display: none;}
+.main-nav #openPythonReference {display: flex; align-items: center; gap: 12px; padding: 11px 14px; text-align: left; background: transparent; border: 1px solid transparent; color: #b1b3c5; font-size: 15px; font-weight: 500;}
+.main-nav #openPythonReference:hover {background: #242332; color: #efebfa;}
+body[data-study-page] .main-nav button:is([data-view="academy"],[data-view="quest"],[data-view="level"],[data-view="battle"],[data-view="duel"],[data-view="maker"]) {display: none;}

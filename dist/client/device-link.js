@@ -1,6 +1,6 @@
 (() => {
     const site = location.protocol === 'file:' || window.PQ_CLASSROOM_KIT
-        ? 'https://python-quest-mn-1120.sleek-lake-4148.chatgpt.site/' : new URL('/', location.href).href;
+        ? 'https://kodyn-nuudel.vercel.app/' : new URL('/', location.href).href;
     let dialog;
     let opener;
 

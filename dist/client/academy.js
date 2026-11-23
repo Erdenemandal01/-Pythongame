@@ -23,7 +23,7 @@ const ACADEMY_CHAPTERS = (() => {
         ['Тоглоомын дүрэм',5,'battles/arena-dragon.webp'],
         ['Зам ба стратеги',5,'battles/arena-wolf.webp'],
         ['Туршилтын талбай',4,'battles/arena-golem.webp'],
-        ['Ангийн наадам',2,'avatars/camp.webp',JAM_TIMING]
+        ['Тоглоомын наадам',2,'avatars/camp.webp',JAM_TIMING]
     ].map(([title,count,scene,timing=ACADEMY_TIMING])=>{
         const minutes=timing.reduce((sum,phase)=>sum+phase[1],0);
         const chapter={title,first,count,scene,timing,minutes};
