@@ -1,0 +1,12 @@
+{
+  "name": "python-quest-mn",
+  "private": true,
+  "scripts": {
+    "build": "node build-vercel.mjs",
+    "build:vercel": "node build-vercel.mjs",
+    "test": "node --test tests/desktop-entry.test.cjs test-*.cjs"
+  },
+  "dependencies": {
+    "@supabase/supabase-js": "2.119.2"
+  }
+}

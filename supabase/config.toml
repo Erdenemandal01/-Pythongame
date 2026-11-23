@@ -1,0 +1,25 @@
+project_id = "kodyn-nuudel"
+
+[auth]
+site_url = "https://kodyn-nuudel.vercel.app"
+additional_redirect_urls = []
+enable_signup = true
+minimum_password_length = 8
+
+# The game authenticates classroom usernames. Only the hook's reserved aliases can register.
+[auth.email]
+enable_signup = true
+enable_confirmations = false
+max_frequency = "1m"
+otp_length = 8
+
+[auth.mfa.totp]
+enroll_enabled = true
+verify_enabled = true
+
+[auth.hook.before_user_created]
+enabled = true
+uri = "pg-functions://postgres/public/pq_before_user_created"
+
+[storage.vector]
+enabled = false

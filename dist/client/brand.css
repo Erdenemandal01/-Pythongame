@@ -1,0 +1,66 @@
+.brand.quest-brand {
+    display: inline-flex;
+    align-items: center;
+    flex: 0 0 auto;
+    gap: 0.65rem;
+    min-block-size: 44px;
+    border-radius: 6px;
+    color: #f6f3ed;
+    font-family: "Segoe UI Variable Display", "Segoe UI", sans-serif;
+    font-size: clamp(1.3rem, 2.2vw, 1.75rem);
+    font-weight: 800;
+    letter-spacing: -0.045em;
+    line-height: 1.05;
+    text-decoration: none;
+}
+.quest-brand .quest-mark {
+    display: block;
+    flex: none;
+    inline-size: 48px;
+    block-size: 48px;
+    image-rendering: pixelated;
+}
+.quest-brand .quest-wordmark { white-space: nowrap; }
+.quest-brand .quest-wordmark strong { color: #b9ee92; font-weight: inherit; }
+.quest-brand:hover .quest-wordmark strong { color: #d6ffae; }
+.quest-brand:focus-visible { outline: 3px solid #ffc975; outline-offset: 4px; }
+
+@media (max-width: 650px) {
+    .brand.quest-brand { gap: 0.42rem; font-size: 1.23rem; }
+    .quest-brand .quest-mark { inline-size: 32px; block-size: 32px; }
+}
+@media (max-width: 460px) {
+    body > header {
+        flex-wrap: wrap;
+        block-size: auto;
+        min-block-size: 68px;
+        padding: 0.45rem 0.75rem;
+        gap: 0.3rem 0.46rem;
+    }
+    body > header .stats {
+        display: grid;
+        grid-template-columns: max-content auto;
+        grid-template-areas: "level profile" "xp profile";
+        justify-items: end;
+        align-items: center;
+        gap: 2px 0.48rem;
+        line-height: 1.15;
+        white-space: nowrap;
+    }
+    body > header #level { grid-area: level; }
+    body > header #xp { grid-area: xp; }
+    body > header #profileBtn {
+        grid-area: profile;
+        max-inline-size: clamp(5rem, 24vw, 6.25rem);
+        min-block-size: 44px;
+        padding-inline: 0.55rem;
+    }
+}
+@media (max-width: 360px) {
+    .brand.quest-brand { gap: 0.32rem; font-size: 1.12rem; }
+}
+@media (max-width: 340px) {
+    body > header { padding-inline: 0.5rem; column-gap: 0.25rem; }
+    body > header .stats { column-gap: 0.25rem; }
+    body > header .stats #profileBtn { max-inline-size: 4.7rem; }
+}

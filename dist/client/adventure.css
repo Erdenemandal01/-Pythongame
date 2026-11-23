@@ -1,0 +1,29 @@
+.world, .scene {isolation:isolate;position:relative;overflow:hidden;border:3px solid #353042;border-radius:12px;box-shadow:0 4px 0 #090c17;background:#74b9e8}
+.world::before,.scene::before {content:"";position:absolute;inset:0;z-index:-2;background:url("art/skylands.webp") center / 100% 100% no-repeat}
+.world {aspect-ratio:2.5;min-height:265px;align-items:flex-end}
+.world .world-label {padding:22px 24px;margin:18px;min-width:0;background:#131725ed;border:2px solid #aaa5ba;border-radius:5px;max-width:45%;box-shadow:3px 4px #222039}
+.world h1 {font-size:clamp(20px,2.2vw,33px);margin:5px 0}.world .pill {padding:0;border:0;color:#ffd572}.world p {color:#e0e8ed}
+.world #continueBtn {margin-top:8px}.world .map-chest {position:absolute;right:7%;bottom:18%;width:8%;image-rendering:pixelated}
+.world .map-hero {position:absolute;left:57%;bottom:16%;width:6.8%;image-rendering:pixelated}
+.scene {aspect-ratio:2.5;padding:0;min-height:0}
+.scene[data-world="1"]::before {filter:hue-rotate(-11deg) saturate(.96)}
+.scene[data-world="2"]::before {filter:saturate(.95) contrast(1.06)}
+.scene[data-world="3"]::before {filter:hue-rotate(14deg) brightness(.83)}
+.scene[data-world="4"]::before {filter:sepia(.2) saturate(1.16)}
+.scene-hud {position:absolute;top:4%;left:2%;right:2%;display:flex;gap:8px;align-items:center;pointer-events:none}
+.hud-chip,.scene-copy,.scene-dialog {background:#141724f2;color:#fff;border:2px solid #504d5f;border-radius:5px;box-shadow:2px 3px #202030}
+.hud-chip {display:flex;align-items:center;gap:8px;font:700 clamp(12px,1.2vw,17px) Consolas,monospace;padding:4px 9px}
+.hud-chip img {width:14px;image-rendering:pixelated}.hud-chip:last-child {margin-left:auto}.hud-chip strong {color:#ffe079}.hud-chip em {font-style:normal;color:#b9ef89}
+.scene-copy {position:absolute;top:18%;left:2%;padding:6px 11px}.scene-copy .eyebrow {font-size:10px;letter-spacing:1px;color:#ffc664}.scene-copy h2 {font-size:clamp(15px,1.65vw,22px);margin:0}.scene-copy p {margin:0;font-size:13px;color:#d8e7e4}
+.scene-dialog {position:absolute;right:2%;top:22%;width:25%;padding:9px 11px;font-size:clamp(12px,1.15vw,16px);line-height:1.4;max-height:39%;overflow:auto}.scene-dialog b {display:block;color:#c5acfb;font:700 12px Consolas,monospace;margin-bottom:4px}.scene-dialog samp {white-space:pre-wrap;overflow-wrap:anywhere;font-family:inherit}
+#gameBoard {display:block;position:absolute;inset:0 3%;margin:0;padding:0;max-width:none;pointer-events:none}
+.sprite {position:absolute;bottom:18.5%;transform:translateX(-50%);display:block;image-rendering:pixelated;background-size:100% 100%;background-repeat:no-repeat}
+.sprite-hero {width:6.5%;aspect-ratio:32/40;background-image:url("art/hero-0.png");z-index:4;transition:left .29s linear;filter:drop-shadow(1px 1px 0 #20232f)}
+.sprite-hero.walking {animation:stride .13s step-end 3}.sprite-hero.jumping {animation:leap .31s ease-in-out}.sprite-hero.collecting {animation:glint .3s}
+.sprite-coin {width:2%;aspect-ratio:14/19;bottom:29%;background-image:url("art/coin.png");animation:float-coin 1.6s ease-in-out infinite}
+.sprite-chest {width:6%;aspect-ratio:33/27;background-image:url("art/chest.png")}
+.sprite-pit {width:9%;height:8%;background:repeating-linear-gradient(135deg,#272037 0 5px,#4e3846 5px 8px);bottom:12%;border:3px solid #79583b;border-radius:50%}
+.scene.victory .scene-dialog {animation:glint 1s}.scene.victory .sprite-chest {filter:drop-shadow(0 0 4px #ffd442)}
+@keyframes stride {50% {background-image:url("art/hero-1.png")}}@keyframes leap {50% {transform:translate(-50%,-60%)}}@keyframes glint {50% {filter:brightness(1.7)}}@keyframes float-coin {50% {translate:0 -4px}}
+@media(max-width:750px){.scene-copy {top:26%;padding:3px 7px}.scene-copy p,.scene-dialog {display:none}.scene {aspect-ratio:2.25}.world {min-height:210px}.world .world-label {margin:10px;padding:10px;max-width:54%}.world-label h1 {font-size:18px}.world-label p {display:none}.world .pill {font-size:9px}.world #continueBtn {font-size:12px;padding:7px 10px}.hud-chip {padding:2px 5px;gap:5px}.hud-chip img {width:10px}.sprite-hero {width:8%}.scene-copy .eyebrow {font-size:9px}.scene-copy h2 {font-size:14px}}
+@media(prefers-reduced-motion:reduce){.sprite-hero {transition:none}}

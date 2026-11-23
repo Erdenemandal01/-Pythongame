@@ -1,0 +1,48 @@
+.device-link-dialog {
+    width: min(27rem, calc(100% - 1.5rem));
+    max-height: calc(100vh - 2rem);
+    max-height: calc(100dvh - 2rem);
+    padding: 0;
+    overflow: auto;
+    color: #f3f0fb;
+    background: #191c2b;
+    border: 1px solid #655c7f;
+    border-radius: 14px;
+    box-shadow: 0 18px 70px #060812a0;
+}
+.device-link-dialog::backdrop { background: #080a14bc; }
+.device-link-heading {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: .75rem;
+    padding: .75rem 1rem .75rem 1.25rem;
+    border-bottom: 1px solid #3c3c52;
+}
+.device-link-heading h2 { margin: 0; font-size: clamp(1.05rem, 4.4vw, 1.35rem); line-height: 1.25; }
+.device-link-heading .device-link-close {
+    flex: none;
+    width: 44px;
+    height: 44px;
+    padding: 0;
+    border: 1px solid #575367;
+    background: #232636;
+    color: #f2edf9;
+    font-size: 1.5rem;
+    line-height: 1;
+}
+.device-link-body { display: grid; gap: .65rem; padding: 1rem 1.25rem 1.25rem; }
+.device-link-body p { margin: 0; line-height: 1.5; }
+.device-link-qr { justify-self: center; display: block; width: min(100%, 216px); height: auto; image-rendering: pixelated; }
+.device-link-body label { display: block; color: #ddd6eb; font-weight: 600; font-size: .88rem; }
+.device-link-controls { display: grid; grid-template-columns: minmax(0,1fr) auto; gap: .5rem; }
+.device-link-controls input, .device-link-controls button { min-height: 44px; }
+.device-link-controls input { width: 100%; background: #10131e; color: #eae5f4; border: 1px solid #58516c; border-radius: 6px; padding: .5rem .65rem; font-size: 1rem; }
+.device-link-controls button { color: #142415; background: #b8ef83; font-weight: 700; }
+.device-link-status { color: #c6eda3; font-size: .92rem; }
+.device-link-status:empty { display: none; }
+.device-link-note { padding-top: .7rem; border-top: 1px solid #3c3c52; color: #bbb8cd; font-size: .9rem; }
+@media (max-width: 400px) {
+    .device-link-controls { grid-template-columns: minmax(0,1fr); }
+    .device-link-body { padding: .85rem 1rem 1rem; }
+}

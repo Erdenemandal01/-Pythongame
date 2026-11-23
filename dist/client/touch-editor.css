@@ -1,0 +1,28 @@
+@media (any-pointer: coarse) {
+    body textarea:is(#code,.ac-code,.bq-code,.dr-code,.mu-code,.dt-code,.ct-code,.lv-code,.mk-code) {
+        font-size: max(16px, 1rem);
+    }
+    .touch-indent-controls {
+        display:flex;
+        flex-wrap:wrap;
+        align-items:center;
+        gap:.4rem;
+        padding:.25rem .55rem;
+        background:#191c2a;
+    }
+    .touch-indent-controls button {
+        flex:none;
+        margin:0;
+        min-height:44px;
+        padding:.25rem .7rem;
+        border:1px solid #52566e;
+        border-radius:.45rem;
+        background:#292d40;
+        color:#e2e6f9;
+        font:600 .875rem/1.2 'Segoe UI',sans-serif;
+        touch-action:manipulation;
+    }
+    .touch-indent-controls button:disabled { opacity:.5; }
+    .touch-indent-controls small { color:#ffc879; }
+    .touch-indent-controls small:empty { display:none; }
+}

@@ -1,0 +1,41 @@
+.mu-shell{--mu-line:#454961;--mu-panel:#1d2233;--mu-pale:#eee9ff;--mu-muted:#bdc7db;--mu-light:#bbed9a;min-width:0;color:var(--mu-pale);padding-bottom:15px}
+.mu-shell *{box-sizing:border-box}
+.mu-shell [hidden]{display:none!important}
+.mu-shell :is(button,textarea,select,input,summary):focus-visible,.mu-scroll:focus-visible{outline:3px solid #c5aaf7;outline-offset:2px}
+.mu-head,.mu-bar,.mu-transport,.mu-tabs,.mu-control,.mu-pads,.mu-file,.mu-trackhead,.mu-guess,.mu-listens{display:flex;align-items:center;gap:9px;flex-wrap:wrap}
+.mu-head,.mu-bar,.mu-trackhead,.mu-file{justify-content:space-between}
+.mu-head{margin-bottom:14px}.mu-head h1{margin:0}
+.mu-head p,.mu-assignment p,.mu-duel p,.mu-transcript{color:var(--mu-muted)}.mu-head p{margin:5px 0}
+.mu-shell button{font:inherit;cursor:pointer;background:#2b3043;color:var(--mu-pale);border:1px solid #535a73;border-radius:7px;padding:7px 11px;font-weight:600}
+.mu-shell button:hover{border-color:#c8b4f0}.mu-shell button:disabled{opacity:.5;cursor:default}
+.mu-shell .mu-tabs{gap:2px;border:1px solid #47485f;background:#151929;padding:3px;border-radius:8px}
+.mu-shell .mu-tabs button{border:1px solid transparent;background:transparent;padding:5px 10px;color:#c3c7dd;font-size:.93rem}
+.mu-shell .mu-tabs button[aria-pressed="true"]{background:#3c3453;border-color:#756090;color:#eee0ff}
+.mu-bar{margin:0 0 14px;padding:8px 12px;background:#202638;border:1px solid var(--mu-line);border-radius:8px}
+.mu-control{font-weight:600}.mu-control select,.mu-code{background:#121725;border:1px solid #51576e;color:var(--mu-pale);border-radius:5px;padding:7px;font:inherit;max-width:100%}
+.mu-control input{width:112px;accent-color:#bcabff}.mu-bpm,.mu-position,.mu-transcript,.mu-y-label{font-variant-numeric:tabular-nums}
+.mu-bpm{min-width:69px}.mu-desk{display:grid;grid-template-columns:minmax(0,1.19fr) minmax(0,1fr);gap:14px;align-items:stretch}
+.mu-panel,.mu-assignment{border:1px solid var(--mu-line);border-radius:11px;background:var(--mu-panel);min-width:0}
+.mu-instrument{background:linear-gradient(140deg,#302c43,#1b2131 78%);padding:14px}
+.mu-trackhead h2,.mu-assignment h2,.mu-duel h2{font-size:1.12rem;margin:0}.mu-position{font:600 .87rem Consolas,monospace;color:#b5edcf;background:#1b332e;padding:5px 9px;border:1px solid #365b48;border-radius:4px}
+.mu-pads{margin:15px 0;display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:7px}
+.mu-shell .mu-pad{padding:6px 2px;background:#26283b;border:1px solid #54546a;border-bottom:4px solid var(--voice);color:var(--voice);border-radius:7px;min-width:0}
+.mu-pad strong,.mu-pad small{display:block}.mu-pad strong{font:700 1.03rem/1.4 Consolas,monospace;letter-spacing:.06em}.mu-pad small{font-size:.77rem;font-weight:500;color:#e9e2ef}
+.mu-scroll{background:#121827;border:1px solid #424a60;border-radius:6px;overflow:auto;max-width:100%;padding:7px 4px}
+.mu-grid{display:grid;grid-template-columns:58px minmax(0,1fr);gap:4px 0;align-items:center}
+.mu-y-label{position:sticky;left:0;z-index:2;background:#121827;color:#c5cce1;font-size:.73rem;align-self:stretch;display:flex;align-items:center;padding:1px 3px}
+.mu-scale{display:grid;color:#a6b0c9;font:11px/1.3 Consolas,monospace}.mu-lane{position:relative;height:22px;background-color:#20283a;background-image:linear-gradient(to right,#465068 1px,transparent 1px);border-radius:2px}
+.mu-mark{position:absolute;top:2px;bottom:2px;border:1px solid #151927;border-radius:4px;box-shadow:inset 0 -4px #0002;background:var(--voice);color:#201f2c;overflow:hidden;font:bold 11px/16px Consolas,monospace;text-align:center}
+.mu-cursor{position:absolute;height:100%;width:2px;background:white;box-shadow:0 0 5px #fff;pointer-events:none}
+.mu-transcript{margin:7px 0 11px;max-height:4.6em;overflow:auto;font-size:.8rem;line-height:1.45;overflow-wrap:anywhere}
+.mu-shell .mu-primary{background:#bbed9a;color:#14281a;border-color:#8fbd70}.mu-transport{gap:6px}.mu-transport button{font-size:.9rem}
+.mu-codecard{display:flex;flex-direction:column;overflow:hidden}.mu-file{padding:9px 12px;background:#292b40;border-bottom:1px solid var(--mu-line);color:#d7c6fa}.mu-file strong{font:600 .9rem Consolas,monospace}
+.mu-shell textarea.mu-code{flex:1;margin:0;border:0;border-radius:0;padding:16px 12px;min-height:200px;width:100%;resize:vertical;line-height:1.6;font-family:Consolas,'Courier New',monospace;font-size:15px;tab-size:4;color:#ffe1a0}
+.mu-output{max-height:100px;overflow:auto;margin:0;padding:10px 12px;background:#151b27;white-space:pre-wrap}
+.mu-assignment{padding:14px 16px;margin-top:14px}.mu-assignment p,.mu-duel p{margin:.4em 0 .85em}
+.mu-assignment details{margin-top:8px}.mu-assignment summary{cursor:pointer;color:#d9c6fd}
+.mu-status{margin:12px 0 0;min-height:1.5em;color:#bfe7ae}.mu-status.mu-error{color:#ffb7a3;white-space:pre-wrap}
+.mu-duel{padding:clamp(16px,3vw,30px);background:linear-gradient(120deg,#302c43,#1c2434)}.mu-duel h2{font-size:1.45rem}
+.mu-listens,.mu-guess,.mu-duel .mu-transport{margin-top:15px}.mu-guess{border-top:1px solid #4d4b62;padding-top:14px}
+@media(max-width:980px){.mu-desk{grid-template-columns:1fr}.mu-shell textarea.mu-code{min-height:184px}}
+@media(max-width:520px){.mu-control input{width:min(90px,26vw)}.mu-bar{gap:9px}.mu-head{align-items:flex-start}.mu-instrument{padding:10px}.mu-shell .mu-pad{padding-inline:1px}.mu-y-label{font-size:.72rem}.mu-transport button{padding:7px 9px}}

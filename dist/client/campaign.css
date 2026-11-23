@@ -1,0 +1,44 @@
+.battle-gate {
+    --arena: none;
+    position: relative;
+    isolation: isolate;
+    display: grid;
+    grid-template-columns: minmax(62px, 12%) 1fr auto;
+    align-items: center;
+    gap: clamp(12px, 2vw, 26px);
+    padding: clamp(16px, 2vw, 28px);
+    margin-top: 20px;
+    border: 1px solid #67617f;
+    border-radius: 12px;
+    overflow: hidden;
+    color: #fff;
+    background: #22263e;
+}
+.battle-gate::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+    background: linear-gradient(95deg,#1623319e,#181b2aeb 36%,#2b2133e8),var(--arena) center 60% / cover;
+    image-rendering: pixelated;
+}
+.battle-gate img {width:100%;max-height:90px;object-fit:contain;image-rendering:pixelated}
+.battle-gate .eyebrow {color:#ffcf80}
+.battle-gate h2 {margin:3px 0;font-size:clamp(19px,2vw,26px)}
+.battle-gate p {margin:0;max-width:56ch;color:#d9dce9;line-height:1.5}
+.battle-gate button {background:#ffd581;color:#302229}
+.scene .ambush {
+    position:absolute;z-index:5;bottom:18%;right:18%;padding:0;background:transparent;
+    display:flex;flex-direction:column;align-items:center;color:white;
+    animation:enemy-arrives .42s ease-out both;
+}
+.ambush img {width:clamp(40px,6vw,90px);height:clamp(36px,5vw,72px);object-fit:contain;image-rendering:pixelated;order:2}
+.ambush span {background:#261d30f2;border:1px solid #ffcc87;border-radius:4px;padding:1px 7px;color:#ffe3a2;font-size:12px}
+.scene .ambush:hover img {filter:brightness(1.25)}
+@keyframes enemy-arrives {from{opacity:0;translate:24px 0}to{opacity:1;translate:0 0}}
+@media(max-width:650px){
+    .battle-gate {grid-template-columns:55px 1fr;gap:10px;padding:15px}
+    .battle-gate p {font-size:14px}
+    .battle-gate button {grid-column:2;justify-self:start}
+    .ambush span {font-size:11px}
+}

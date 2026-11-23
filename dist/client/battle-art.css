@@ -1,0 +1,118 @@
+.battle-stage {
+    --hero-x: 21%;
+    --enemy-x: 74%;
+    --feet: 19.5%;
+    --enemy-height: 23%;
+    position: relative;
+    isolation: isolate;
+    overflow: hidden;
+    width: 100%;
+    aspect-ratio: 2.5;
+    background: #273248 center / 100% 100% no-repeat;
+    border: 3px solid #423e52;
+    border-radius: 12px;
+    box-shadow: 0 4px #10101c;
+}
+.battle-stage[data-kind="slime"] { background-image: url("art/battles/arena-slime.webp"); }
+.battle-stage[data-kind="wolf"] { --enemy-height: 28%; background-image: url("art/battles/arena-wolf.webp"); }
+.battle-stage[data-kind="golem"] { --enemy-height: 36%; background-image: url("art/battles/arena-golem.webp"); }
+.battle-stage[data-kind="wraith"] { --enemy-height: 32%; background-image: url("art/battles/arena-wraith.webp"); }
+.battle-stage[data-kind="dragon"] { --enemy-height: 40%; background-image: url("art/battles/arena-dragon.webp"); }
+.battle-stage .battle-actors {
+    position: absolute;
+    z-index: 1;
+    pointer-events: none;
+    inset: 0;
+}
+.battle-stage .battle-actors::before,
+.battle-stage .battle-actors::after {
+    content: "";
+    position: absolute;
+    bottom: calc(var(--feet) - 1.15%);
+    height: 2.7%;
+    width: 8%;
+    left: var(--hero-x);
+    transform: translateX(-50%);
+    background: #2121347a;
+    border-radius: 55%;
+}
+.battle-stage .battle-actors::after { left: var(--enemy-x); width: 12%; }
+.battle-stage .battle-hero, .battle-stage .battle-enemy {
+    z-index: 2;
+    display: block;
+    position: absolute;
+    bottom: var(--feet);
+    left: var(--hero-x);
+    height: 27%;
+    max-width: 33%;
+    width: auto;
+    object-fit: contain;
+    object-position: center bottom;
+    image-rendering: pixelated;
+    transform: translateX(-50%);
+    transform-origin: center bottom;
+    filter: drop-shadow(1px 1px 0 #191629);
+}
+.battle-stage .battle-enemy {
+    left: var(--enemy-x);
+    height: var(--enemy-height);
+    animation: bq-breathe 2.3s steps(3,end) infinite;
+}
+.battle-stage[data-kind="slime"] .battle-enemy { animation: bq-slime 2s ease-in-out infinite; }
+.battle-stage[data-kind="wraith"] .battle-enemy { animation: bq-hover 2.2s ease-in-out infinite; }
+.battle-stage.battle-turn[data-action="strike"] .battle-hero { animation: bq-lunge .38s ease-out; }
+.battle-stage.battle-turn[data-action="guard"] .battle-hero { animation: bq-brace .46s ease-out; }
+.battle-stage.battle-turn[data-action="heal"] .battle-hero { animation: bq-mend .52s ease-out; }
+.battle-stage.battle-turn[data-counter="true"] .battle-enemy { animation: bq-counter .55s ease-out; }
+.battle-stage .battle-enemy.battle-hit { animation: bq-hit .42s steps(4,end); }
+.battle-stage .battle-effect { position: absolute; inset: 0; z-index: 3; pointer-events: none; }
+.battle-stage.battle-turn .battle-effect::before {
+    content: "";
+    position: absolute;
+    bottom: calc(var(--feet) + 4%);
+    left: var(--enemy-x);
+    width: 6%; height: 16%;
+    background: #fff59d;
+    opacity: 0;
+}
+.battle-stage.battle-turn[data-action="strike"] .battle-effect::before {
+    clip-path: polygon(55% 0,51% 35%,91% 14%,66% 46%,100% 53%,67% 59%,78% 96%,48% 70%,19% 100%,31% 66%,0 72%,22% 49%,6% 19%,38% 37%);
+    animation: bq-impact .36s ease-out;
+}
+.battle-stage.battle-turn[data-action="guard"] .battle-effect::before {
+    left: calc(var(--hero-x) + 1%);
+    bottom: calc(var(--feet) + 2%);
+    width: 6%; height: 23%;
+    background: repeating-linear-gradient(135deg,#aafaff 0 5px,#50d0f3 5px 10px,#b2f7ff 10px 15px);
+    clip-path: polygon(0 13%,50% 0,100% 13%,92% 68%,50% 100%,10% 70%);
+    animation: bq-shield .45s ease-out;
+}
+.battle-stage.battle-turn[data-action="heal"] .battle-effect::before {
+    left: calc(var(--hero-x) - 2%); bottom: calc(var(--feet) + 20%);
+    width: 3%; height: 8%; background: #b6ff97;
+    clip-path: polygon(30% 0,70% 0,70% 30%,100% 30%,100% 70%,70% 70%,70% 100%,30% 100%,30% 70%,0 70%,0 30%,30% 30%);
+    animation: bq-restore .55s ease-out;
+}
+.battle-stage.battle-won .battle-enemy { animation: bq-retire .55s forwards; }
+.battle-stage.battle-lost .battle-hero { filter: grayscale(.9) brightness(.7); }
+@keyframes bq-breathe { 50% {transform: translateX(-50%) scaleY(.978)} }
+@keyframes bq-slime { 45% {transform: translateX(-50%) scale(1.045,.92)} 65% {transform: translate(-50%,-4%) scale(.975,1.035)} }
+@keyframes bq-hover { 50% {transform: translate(-50%,-6%)} }
+@keyframes bq-lunge { 15% {transform: translateX(-60%) rotate(-5deg)} 46% {transform: translateX(68%) rotate(5deg)} }
+@keyframes bq-brace { 25%,68% {transform: translateX(-54%) scale(1.08,.91)} }
+@keyframes bq-mend { 45% {filter: brightness(1.4) drop-shadow(0 0 5px #8aff8f)} }
+@keyframes bq-counter { 38% {transform: translateX(-40%)} 67% {transform: translateX(-90%) rotate(-4deg)} }
+@keyframes bq-hit { 24% {transform: translateX(-32%); filter: brightness(1.8)} 60% {transform: translateX(-58%)} }
+@keyframes bq-impact { 18% {opacity:0; transform:translate(-50%,0) scale(.3)} 38%,65% {opacity:1;transform:translate(-50%,0) scale(1.1)} 100% {opacity:0; transform:translate(-50%,0) scale(1.25)} }
+@keyframes bq-shield { 10%,75% {opacity:.85} }
+@keyframes bq-restore { 15% {opacity:1} 85% {opacity:.75;transform: translateY(-65%)} }
+@keyframes bq-retire { 30% {transform: translateX(-43%); filter: brightness(1.6)} 100% {transform: translateX(-35%); filter: grayscale(.7);opacity:.28} }
+@media(max-width:650px) {
+    .battle-stage { aspect-ratio: 1.75; background-size: auto 100%; }
+    .battle-stage .battle-hero { height: 25%; }
+    .battle-stage .battle-enemy { max-width: 35%; }
+}
+@media(prefers-reduced-motion:reduce) {
+    .battle-stage .battle-hero,.battle-stage .battle-enemy,.battle-stage .battle-effect::before { animation:none!important; }
+    .battle-stage.battle-won .battle-enemy { opacity:.32; }
+}

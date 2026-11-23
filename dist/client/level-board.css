@@ -1,0 +1,120 @@
+.lb-shell {
+    --lb-gutter: 1.25rem;
+    display: grid;
+    grid-template-columns: var(--lb-gutter) minmax(0, 1fr);
+    grid-template-rows: var(--lb-gutter) auto;
+    width: 100%;
+    min-width: 0;
+    box-sizing: border-box;
+    padding: .35rem .48rem .75rem .16rem;
+    overflow: hidden;
+    border: 1px solid #374d4d;
+    border-radius: 8px;
+    background: #283e40;
+    background-image: linear-gradient(120deg, #263a39, #31474a 60%, #273d41);
+}
+.lb-axis-x,.lb-axis-y {
+    display: grid;
+    user-select: none;
+    color: #e1dbc1;
+    font: 600 .76rem/1 Consolas,"Courier New",monospace;
+    font-variant-numeric: tabular-nums;
+}
+.lb-axis-x {grid-template-columns: repeat(9, 1fr);}
+.lb-axis-y {grid-template-rows: repeat(6, 1fr);}
+.lb-axis-x span,.lb-axis-y span {place-self: center;}
+.lb-field {
+    position: relative;
+    isolation: isolate;
+    width: 100%;
+    min-width: 0;
+    overflow: hidden;
+    aspect-ratio: 9 / 6;
+    border-radius: 2px;
+    background: #8fb367;
+    box-shadow: 0 2px #b1a673, 0 4px #7f7455, 0 6px #435047;
+}
+.lb-canvas {display: block;width: 100%;height: 100%;image-rendering: pixelated;}
+.lb-editor {display: grid;gap: .72rem;min-width: 0;}
+.lb-name {display: grid;gap: .34rem;font-size: 1rem;font-weight: 650;color: #e7ebdf;}
+.lb-editor .lb-name-input {
+    width: 100%;
+    min-width: 0;
+    box-sizing: border-box;
+    padding: .68rem .8rem;
+    border: 1px solid #62657a;
+    border-radius: 6px;
+    color: #f1f3ed;
+    background: #151c26;
+    font: inherit;
+    font-weight: 500;
+}
+.lb-tools {
+    display: grid;
+    grid-template-columns: repeat(auto-fit,minmax(min(100%,6.6rem),1fr));
+    gap: .4rem;
+}
+.lb-editor button.lb-tool {
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+    gap: .28rem;
+    min-width: 0;
+    min-height: 42px;
+    padding: .23rem .34rem;
+    border: 1px solid #545e68;
+    border-radius: 6px;
+    background: #27303a;
+    color: #ebede6;
+    box-shadow: none;
+    font-family: inherit;
+    font-size: .88rem;
+    font-weight: 600;
+    line-height: 1.2;
+    text-align: left;
+}
+.lb-editor button.lb-tool[aria-pressed="true"] {
+    border-color: #e4c780;
+    background: #514a37;
+    color: #fff0c5;
+    box-shadow: inset 0 -2px #d8b673;
+}
+.lb-editor .lb-tool span {min-width: 0;overflow-wrap: anywhere;}
+.lb-editor .lb-tool-icon {width: 2rem;height: 2rem;flex-shrink: 0;image-rendering: pixelated;}
+.lb-editor p.lb-instruction {margin: 0;color: #bec8cc;font-size: .9rem;line-height: 1.45;}
+.lb-cell-overlay {
+    position: absolute;
+    inset: 0;
+    display: grid;
+    grid-template-columns: repeat(9,minmax(0,1fr));
+    grid-template-rows: repeat(6,minmax(0,1fr));
+}
+.lb-editor button.lb-cell {
+    z-index: 0;
+    min-width: 0;
+    min-height: 0;
+    padding: 0;
+    margin: 0;
+    box-sizing: border-box;
+    border: none;
+    border-radius: 0;
+    background: transparent;
+    box-shadow: inset -1px -1px rgba(48,66,44,.29);
+    transition: none;
+    transform: none;
+    cursor: crosshair;
+    touch-action: manipulation;
+}
+.lb-editor button.lb-cell:hover,.lb-editor button.lb-cell:focus-visible {
+    z-index: 1;
+    outline: 0;
+    background: transparent;
+    box-shadow: inset 0 0 0 2px #fff4ba,inset 0 0 0 4px #4c705e;
+}
+.lb-editor :is(.lb-name-input,.lb-tool):focus-visible {outline: 3px solid #eddb9b;outline-offset: 2px;}
+@media(max-width: 480px) {
+    .lb-shell {--lb-gutter: 1rem;padding: .2rem .35rem .65rem .08rem;}
+    .lb-tools {grid-template-columns: repeat(3,minmax(0,1fr));}
+    .lb-editor button.lb-tool {font-size: .8rem;padding: .2rem .16rem;gap: .05rem;}
+    .lb-editor .lb-tool-icon {width: 1.55rem;height: 1.55rem;}
+}

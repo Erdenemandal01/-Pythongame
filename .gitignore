@@ -1,0 +1,9 @@
+node_modules/
+dist/.openai/
+dist/server/
+dist/vercel/
+.vercel/
+.env
+.env.*
+supabase/.temp/
+supabase/.branches/

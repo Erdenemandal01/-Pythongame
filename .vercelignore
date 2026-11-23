@@ -1,0 +1,12 @@
+.openai/
+dist/.openai/
+dist/server/
+dist/vercel/
+node_modules/
+supabase/
+db/
+drizzle/
+server/
+tests/
+.env
+.env.*

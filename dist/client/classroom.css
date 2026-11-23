@@ -1,0 +1,12 @@
+.school-entry {
+    margin: 19px 0;
+    padding: clamp(16px, 2vw, 28px);
+    border: 1px solid #424860;
+    border-radius: 12px;
+    color: #e6e9f8;
+    background: linear-gradient(90deg,#192534f5 35%,#19253475), url("art/battles/arena-golem.webp") center 55% / cover;
+}
+.school-entry h2 { margin-top: 0; }
+.school-entry p { max-width: 55ch; color: #bec9dc; }
+.school-actions { display: flex; flex-wrap: wrap; align-items: center; gap: 10px; margin-top: 10px; }
+.school-entry button { display: inline-block; padding: 8px 14px; border-radius: 7px; background: #b8ef8b; color: #162422; font-weight: 650; }
