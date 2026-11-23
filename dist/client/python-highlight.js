@@ -2,7 +2,7 @@
 (() => {
     'use strict';
 
-    const editorSelector = 'textarea:is(#code,.ac-code,.bq-code,.ct-code,.dr-code,.dt-code,.gh-code,.jl-code,.ce-code,.lv-code,.mk-code,.mu-code,.rd-code,.wk-code)';
+    const editorSelector = 'textarea:is(#code,.ac-code,.bq-code,.ct-code,.dr-code,.dt-code,.gh-code,.jl-code,.ce-code,.lv-code,.mk-code,.mu-code,.rd-code,.wk-code,.ref-code)';
     const keywords = new Set(('False None True and as assert async await break class continue def del elif else '
         + 'except finally for from global if import in is lambda nonlocal not or pass raise return try while with yield').split(' '));
     const builtins = new Set(('abs aiter all anext any ascii bin bool breakpoint bytearray bytes callable chr classmethod '
@@ -130,6 +130,7 @@
             if (focused) field.focus({preventScroll:true});
         }
         if (mounted.has(field)) return;
+        window.ReferenceAccess?.attach(field);
         mounted.add(field);
         editor.paint();
         measure(field);

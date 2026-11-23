@@ -7,13 +7,13 @@
     function transferLink() {
         const current = new URL(location.href);
         const file = current.protocol === 'file:';
-        const link = new URL(file ? 'https://python-quest-mn-1120.sleek-lake-4148.chatgpt.site/' : current.origin + current.pathname);
+        const link = new URL(file ? 'https://kodyn-nuudel.vercel.app/' : current.origin + current.pathname);
         const lesson = Number(current.searchParams.get('lesson'));
         if (current.hash === '#academy' && Number.isInteger(lesson) && lesson >= 1 && lesson <= 66) {
             link.searchParams.set('lesson', String(lesson));
         }
         const views = ['map','quest','battle','duel','weekly','exam','practice','journal','awards','leaderboard','academy','maker','level','workshops','greenhouse','dragon','music','detective','city'];
-        if (current.hash) link.hash = views.includes(current.hash.slice(1)) ? current.hash : 'map';
+        if (current.hash) link.hash = views.includes(current.hash.slice(1)) || /^#reference(?:\/[a-z0-9-]+)?$/.test(current.hash) ? current.hash : 'map';
         return link.href;
     }
 

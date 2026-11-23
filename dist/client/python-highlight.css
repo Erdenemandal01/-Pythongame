@@ -64,6 +64,23 @@
 .py-token-builtin { color: #96deef; }
 .py-token-operator { color: #edf0f5; }
 
+button.reference-trigger {
+    align-self: center;
+    padding: .36rem .7rem;
+    border: 1px solid #50516b;
+    border-radius: .45rem;
+    background: #212437;
+    color: #dfd3ff;
+    font-family: inherit;
+    font-size: .85rem;
+    font-weight: 600;
+    line-height: 1.4;
+    white-space: nowrap;
+    cursor: pointer;
+}
+button.reference-trigger:hover { border-color: #bdacf3; }
+button.reference-trigger:focus-visible { outline: 2px solid #dbcaff; outline-offset: 2px; }
+
 @media (forced-colors: active), print {
     .py-editor-wrap > .py-editor-mirror { display: none; }
     .py-editor-wrap > textarea.py-editor-input {

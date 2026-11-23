@@ -1,6 +1,6 @@
 const $=id=>document.getElementById(id),KEY='pythonQuestFullMN_v1';
-const fresh=()=>({version:1,name:'Аялагч',done:[],drafts:{},journalDrafts:{},journalBookmarks:[],weeklyPython:WeeklyPython.readSave(null),courseExam:CourseExam.readSave(null),attempts:{},hints:{},practice:'# Өөрийн санааг энд туршаарай\nprint("Сайн уу, ертөнц!")',days:[],sound:false,battles:readCampaign(null),academy:readAcademy(null)});
-function validState(s){if(!s||s.version!==1||!Array.isArray(s.done))throw Error('Тохирох хадгаламж биш байна.');const t=fresh();t.weeklyPython=WeeklyPython.readSave(s.weeklyPython);t.courseExam=CourseExam.readSave(s.courseExam);if(Array.isArray(s.journalBookmarks))t.journalBookmarks=MISSIONS.filter(m=>s.journalBookmarks.includes(m.id)).map(m=>m.id);t.name=typeof s.name==='string'?s.name.slice(0,24)||'Аялагч':t.name;const done=new Set(s.done);for(let i=0;i<MISSIONS.length&&done.has(i);i++)t.done.push(i);for(let i=0;i<MISSIONS.length;i++){if(typeof s.journalDrafts?.[i]==='string')t.journalDrafts[i]=s.journalDrafts[i].slice(0,20000);if(typeof s.drafts?.[i]==='string')t.drafts[i]=s.drafts[i].slice(0,20000);for(const k of ['attempts','hints'])if(Number.isInteger(s[k]?.[i])&&s[k][i]>=0)t[k][i]=Math.min(s[k][i],10000)}if(typeof s.practice==='string')t.practice=s.practice.slice(0,20000);t.days=Array.isArray(s.days)?[...new Set(s.days.filter(d=>typeof d==='string'&&/^\d{4}-\d{2}-\d{2}$/.test(d)))].sort().slice(-366):[];t.sound=s.sound===true;t.battles=readCampaign(s.battles);t.academy=readAcademy(s.academy);const bookmark=readBookmark(s.resume,t.done.length);if(bookmark)t.resume=bookmark;return t}
+const fresh=()=>({version:1,name:'Аялагч',done:[],drafts:{},journalDrafts:{},referenceDrafts:{},journalBookmarks:[],weeklyPython:WeeklyPython.readSave(null),courseExam:CourseExam.readSave(null),attempts:{},hints:{},practice:'# Өөрийн санааг энд туршаарай\nprint("Сайн уу, ертөнц!")',days:[],sound:false,battles:readCampaign(null),academy:readAcademy(null)});
+function validState(s){if(!s||s.version!==1||!Array.isArray(s.done))throw Error('Тохирох хадгаламж биш байна.');const t=fresh();t.referenceDrafts=ReferenceAccess.readDrafts(s.referenceDrafts);t.weeklyPython=WeeklyPython.readSave(s.weeklyPython);t.courseExam=CourseExam.readSave(s.courseExam);if(Array.isArray(s.journalBookmarks))t.journalBookmarks=MISSIONS.filter(m=>s.journalBookmarks.includes(m.id)).map(m=>m.id);t.name=typeof s.name==='string'?s.name.slice(0,24)||'Аялагч':t.name;const done=new Set(s.done);for(let i=0;i<MISSIONS.length&&done.has(i);i++)t.done.push(i);for(let i=0;i<MISSIONS.length;i++){if(typeof s.journalDrafts?.[i]==='string')t.journalDrafts[i]=s.journalDrafts[i].slice(0,20000);if(typeof s.drafts?.[i]==='string')t.drafts[i]=s.drafts[i].slice(0,20000);for(const k of ['attempts','hints'])if(Number.isInteger(s[k]?.[i])&&s[k][i]>=0)t[k][i]=Math.min(s[k][i],10000)}if(typeof s.practice==='string')t.practice=s.practice.slice(0,20000);t.days=Array.isArray(s.days)?[...new Set(s.days.filter(d=>typeof d==='string'&&/^\d{4}-\d{2}-\d{2}$/.test(d)))].sort().slice(-366):[];t.sound=s.sound===true;t.battles=readCampaign(s.battles);t.academy=readAcademy(s.academy);const bookmark=readBookmark(s.resume,t.done.length);if(bookmark)t.resume=bookmark;return t}
 let state=fresh(),lastActiveSave=null;
 try{lastActiveSave=localStorage.getItem(KEY);if(lastActiveSave)state=validState(JSON.parse(lastActiveSave))}catch{}
 let current=state.resume?.view==='quest'?state.resume.mission:Math.min(state.done.length,29),view='map',worker=null,ready=false,busy=false,timer,animationId=0,stdout=[],hintIndex=0,toastTimer,audio;
@@ -274,6 +274,8 @@ function displayPlayer(next) {
     try { replaceDisplayedPlayer(next); } finally { restoringPlayer=false; }
 }
 function replaceDisplayedPlayer(next) {
+    const sharedReference = ReferenceAccess.isOpen() && ReferenceAccess.match(location.hash);
+    ReferenceAccess.close(false);
     if (busy) terminate('Бүртгэл солигдлоо.');
     if ($('profile').open) $('profile').close();
     const route = view;
@@ -284,6 +286,7 @@ function replaceDisplayedPlayer(next) {
     state = next;
     current = next.resume?.view==='quest'?next.resume.mission:Math.min(next.done.length, MISSIONS.length - 1);
     switchView(route, false,route==='level' && next.resume?.view==='level'?next.resume.mode:'play');
+    if (sharedReference) ReferenceAccess.open({shared:sharedReference});
 }
 const assignedUrl = new URL(location.href);
 const assignedLesson = assignedUrl.hash === '#academy' ? Number(assignedUrl.searchParams.get('lesson')) : 0;
@@ -306,11 +309,15 @@ function restoreDeviceSave() {
     } catch {}
     displayPlayer(saved);
 }
-window.addEventListener('beforeunload',()=>{if(!busy)stash(false)});readAssignedLesson();switchView(location.hash.slice(1)||(window.PQ_CLASSROOM_KIT?'academy':'map'));
+window.addEventListener('beforeunload',()=>{if(!busy)stash(false)});readAssignedLesson();
+ReferenceAccess.init({profile:() => state, save:() => persist(false), view:() => view});
+const linkedReference = ReferenceAccess.match(location.hash);
+switchView(linkedReference ? 'map' : location.hash.slice(1) || (window.PQ_CLASSROOM_KIT ? 'academy' : 'map'));
+if (linkedReference) ReferenceAccess.open({shared:linkedReference});
 let campIdentity = '';
 GameAccount.init({
     getState: () => state, fresh, replace: useCloudSave, restoreGuest: restoreDeviceSave,
-    canRefresh: () => view==='map' && !busy,
+    canRefresh: () => view==='map' && !busy && !ReferenceAccess.isOpen(),
     showLocalProfile: showDeviceProfile,
     download: save => download('python-quest-progress.json', JSON.stringify(save, null, 2), 'application/json'),
     onStatus: status => {
@@ -321,6 +328,9 @@ GameAccount.init({
     }
 });
 window.addEventListener('hashchange', () => {
+    const shared = ReferenceAccess.match(location.hash);
+    if (shared) return ReferenceAccess.open({shared});
+    ReferenceAccess.close(false);
     const route = location.hash.slice(1) || 'map';
     if (route !== view) switchView(route);
 });
