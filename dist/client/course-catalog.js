@@ -21,8 +21,10 @@ window.CourseCatalog = (() => {
         const previous = compact ? null : root.querySelector('.ac-filters');
         const panel = element('section', compact ? 'catalog-switcher' : 'course-library');
         if (!compact) {
+            const previousGuide = root.querySelector('.pace-guide');
             panel.append(element('h1', '', 'Python хичээлүүд'),
-                element('p', 'catalog-intro', ACADEMY_CHAPTERS.length + ' бүлэг · ' + ACADEMY.length + ' хичээл · ' + academyDuration(ACADEMY_TOTAL_MINUTES)));
+                element('p', 'catalog-intro', ACADEMY_CHAPTERS.length + ' бүлэг · ' + ACADEMY.length + ' хичээл'),
+                StudyPace.create({expanded:previousGuide?.open ?? true}));
         }
         const filters = element('div', 'ac-filters');
         const group = element('select', 'ac-select');

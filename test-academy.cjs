@@ -8,13 +8,16 @@ const {loadPyodide} = require(path.join(dist,'runtime/pyodide.js'));
 
 async function verify() {
     const files=['academy-a.js','academy-author.js','academy-b.js','academy-c.js','academy-d.js','academy-e.js','academy.js'];
-    const {course,chapters,total}=vm.runInNewContext(files.map(read).join('\n')+'; ({course:ACADEMY,chapters:ACADEMY_CHAPTERS,total:ACADEMY_TOTAL_MINUTES})');
+    const {course,chapters}=vm.runInNewContext(files.map(read).join('\n')+'; ({course:ACADEMY,chapters:ACADEMY_CHAPTERS})');
     assert.equal(course.length,66);
     assert.equal(new Set(course.map(l=>l.title)).size,course.length);
     assert.equal(chapters.reduce((sum,c)=>sum+c.count,0),course.length);
-    assert.equal(total,3000);
-    assert.equal(chapters.at(-1).first,64);
-    assert.equal(chapters.at(-1).minutes,60);
+    for (const chapter of chapters) {
+        assert.equal(chapter.timing.length,6);
+        assert.ok(chapter.timing.every(([label,minutes]) => label && Number.isFinite(minutes) && minutes > 0));
+        assert.equal(chapter.minutes,chapter.timing.reduce((sum,[,minutes]) => sum + minutes,0));
+    }
+    assert.equal(chapters.at(-1).first + chapters.at(-1).count,course.length);
     const py = await loadPyodide({indexURL:path.join(dist,'runtime')+path.sep});
     const runner = read('academy-runner.py');
     async function assess(code, check, extras={}) {
@@ -66,6 +69,6 @@ async function verify() {
     assert.ok(story.ok);
     assert.equal(story.output,'Нэр? Од\nТоо? 2\nОд 3\n');
     assert.equal((await assess('input()','',{sandbox:true,stdin:''})).ok,false);
-    console.log(tested+' solutions, '+course.length+' broken programs, 2 capstone paths, lanterns, 3 maker modes and '+total+' scheduled minutes verified in bundled CPython.');
+    console.log(tested+' solutions, '+course.length+' broken programs, 2 capstone paths, lanterns and 3 maker modes verified in bundled CPython.');
 }
 verify().catch(e=>{console.error(e);process.exitCode=1;});

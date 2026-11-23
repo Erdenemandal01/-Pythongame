@@ -1,0 +1,70 @@
+.pace-guide {
+    container: study-pace / inline-size;
+    min-width: 0;
+    margin-block: 18px;
+    border: 1px solid #43545c;
+    border-radius: 12px;
+    background: #1b2732;
+    color: #f5f2e9;
+    font: 400 15px/1.5 "Segoe UI Variable Text", "Segoe UI", sans-serif;
+    text-align: start;
+    overflow-wrap: anywhere;
+}
+
+.pace-summary {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 18px;
+    min-height: 48px;
+    box-sizing: border-box;
+    padding: 12px 20px;
+    border-radius: inherit;
+    font-weight: 650;
+    list-style: none;
+    cursor: pointer;
+}
+.pace-summary::-webkit-details-marker { display: none; }
+.pace-summary::after {
+    content: "";
+    flex: none;
+    width: 7px;
+    height: 7px;
+    margin-inline-end: 3px;
+    border: solid #bce89b;
+    border-width: 0 2px 2px 0;
+    transform: translateY(-2px) rotate(45deg);
+}
+.pace-guide[open] .pace-summary::after { transform: translateY(2px) rotate(225deg); }
+.pace-summary:hover { background: #25343e; }
+.pace-summary:focus-visible { outline: 3px solid #ffcf84; outline-offset: -3px; }
+.pace-note { margin: 0; padding: 0 20px 14px; color: #becbd0; font-size: 14px; }
+
+.pace-stages {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    margin: 0;
+    padding: 0;
+    list-style: none;
+    border-block-start: 1px solid #3b4954;
+}
+.pace-stage { min-width: 0; padding: 16px 20px 18px; }
+.pace-stage + .pace-stage { border-inline-start: 1px solid #3b4954; }
+.pace-hours {
+    display: block;
+    color: #bce89b;
+    font-size: 19px;
+    font-weight: 700;
+    font-variant-numeric: tabular-nums;
+    line-height: 1.2;
+}
+.pace-title { display: block; margin-block-start: 5px; font-size: 16px; line-height: 1.35; }
+.pace-topics, .pace-project { margin: 7px 0 0; color: #c2cbd1; font-size: 14px; }
+.pace-project { margin-block-start: 12px; }
+.pace-project-label { color: #e7e5d9; font-weight: 600; }
+
+@container study-pace (max-width: 670px) {
+    .pace-stages { grid-template-columns: minmax(0, 1fr); }
+    .pace-stage + .pace-stage { border-inline-start: 0; border-block-start: 1px solid #3b4954; }
+    .pace-project { margin-block-start: 7px; }
+}

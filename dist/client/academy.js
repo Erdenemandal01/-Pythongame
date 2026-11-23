@@ -34,11 +34,6 @@ const ACADEMY_CHAPTERS = (() => {
 function academyChapter(id) {
     return ACADEMY_CHAPTERS.find(c=>id>=c.first && id<c.first+c.count);
 }
-function academyDuration(minutes) {
-    const hours=Math.floor(minutes/60), remainder=minutes%60;
-    return [hours && hours+' цаг',remainder && remainder+' минут'].filter(Boolean).join(' ');
-}
-const ACADEMY_TOTAL_MINUTES=ACADEMY_CHAPTERS.reduce((sum,c)=>sum+c.count*c.minutes,0);
 const ACADEMY_XP = 150;
 const ACADEMY_TASKS = ['lab','p0','p1','debug'];
 

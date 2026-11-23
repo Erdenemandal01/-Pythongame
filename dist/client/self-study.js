@@ -166,11 +166,15 @@
     function render(root, options) {
         const focused = document.activeElement;
         const restore = root.contains(focused) ? focused.closest('[data-study-action]') : null;
+        const previousGuide = root.querySelector('.pace-guide');
+        const guide = StudyPace.create({expanded:!!previousGuide?.open});
+        const guideFocused = previousGuide?.querySelector('summary') === focused;
         const home = element('div', 'ss-home');
         const sections = element('div', 'ss-sections');
         sections.append(learningPath(options), tools(options));
-        home.append(hero(options), sections);
+        home.append(hero(options), guide, sections);
         root.replaceChildren(home);
+        if (guideFocused) guide.querySelector('summary').focus({preventScroll:true});
         if (restore) {
             const next = Array.from(home.querySelectorAll('[data-study-action]')).find(button =>
                 button.dataset.studyAction === restore.dataset.studyAction &&

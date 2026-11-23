@@ -148,7 +148,7 @@
             const meta = node('div', 'ac-meta');
             meta.append(
                 node('span', '', 'Хичээл ' + (this.index + 1) + ' / ' + ACADEMY.length),
-                node('span', '', chapter.minutes + ' минут')
+                node('span', '', 'Ойролцоогоор ' + chapter.minutes + ' минут')
             );
             this.count = node('span', 'ac-count');
             meta.append(this.count);
@@ -160,7 +160,7 @@
             this.nav.setAttribute('aria-label', 'Хичээлийн алхмууд');
             this.steps = this.phases.map(([label, minutes], index) => {
                 const step = button('', 'ac-step', () => this.selectPhase(index));
-                step.append(node('span', 'ac-step-mark'), node('span', 'ac-step-name', label), node('small', '', minutes + ' мин'));
+                step.append(node('span', 'ac-step-mark'), node('span', 'ac-step-name', label), node('small', '', '≈ ' + minutes + ' мин'));
                 this.nav.append(step);
                 return step;
             });
@@ -200,7 +200,7 @@
                 step.firstElementChild.textContent = finished[index] ? '✓' : String(index + 1);
                 if (index === this.phase) step.setAttribute('aria-current','step');
                 else step.removeAttribute('aria-current');
-                step.setAttribute('aria-label',this.phases[index][0] + ', ' + this.phases[index][1] + ' минут' + (finished[index] ? ', биелсэн' : ''));
+                step.setAttribute('aria-label',this.phases[index][0] + ', ойролцоогоор ' + this.phases[index][1] + ' минут' + (finished[index] ? ', биелсэн' : ''));
             });
             if (this.finishButton) {
                 this.finishButton.disabled = this.completed || !finished.every(Boolean);

@@ -50,7 +50,7 @@
         };
         const lesson = classId >= 0 && {
             kind:'academy', icon: 'journal.png', label: 'Ангийн урлан', title: ACADEMY[classId].title,
-            detail: (classId + 1) + '-р хичээл · '+academyChapter(classId).minutes+' минут',
+            detail: (classId + 1) + '-р хичээл · ойролцоогоор '+academyChapter(classId).minutes+' минут',
             action: startedClass >= 0 ? 'Хичээлээ үргэлжлүүлэх' : 'Хичээлээ эхлэх',
             visit: () => openClass(classId)
         };

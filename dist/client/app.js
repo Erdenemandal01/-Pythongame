@@ -273,7 +273,7 @@ function renderStudyHome() {
     const units = ACADEMY_CHAPTERS.map(chapter => {
         const ids = Array.from({length:chapter.count}, (_, offset) => chapter.first + offset);
         return {id:chapter.first, title:chapter.title, total:chapter.count,
-            meta:chapter.count + ' хичээл · ' + academyDuration(chapter.minutes * chapter.count),
+            meta:chapter.count + ' хичээл',
             completed:ids.filter(id => done.has(id)).length,
             next:ids.find(id => !done.has(id)) ?? chapter.first};
     });
