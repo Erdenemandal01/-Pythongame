@@ -89,6 +89,10 @@
             hasProgress ? options.onResume : options.onStart);
         primary.append(arrow());
         controls.append(primary);
+        const chooser = action('languages', GameLocale.lang === 'en' ? 'Choose programming language' : 'Сурах хэл сонгох',
+            'ss-secondary', () => CourseCatalog.chooseLanguage(chooser));
+        chooser.setAttribute('aria-haspopup', 'dialog');
+        controls.append(chooser);
         if (!signedIn && authAvailable) {
             controls.append(action('register', 'Бүртгүүлэх', 'ss-secondary', options.onRegister),
                 action('login', 'Нэвтрэх', 'ss-link', options.onLogin));

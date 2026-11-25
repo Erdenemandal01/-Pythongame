@@ -27,7 +27,7 @@
         },
         3: {
             sprite:'pathfinder', name:t('Мөрөн', 'Mörön'), meet:t('Мөрөнтэй уулзах','Meet Mörön'), role:t('Жингийн хөтөч', 'Caravan pathfinder'),
-            portrait:t('Үсээ дээш шууж, улаан алчуур зүүсэн Мөрөнгийн хувцасны хормой хөх ногоон өнгөтэй.','Mörön has dark hair tied high, a red neck scarf and a teal coat panel.'),
+            portrait:t('Хөх дээл, шар бүс, улаан оройтой малгай, ээтэн хоншоортой монгол гутал өмссөн Мөрөн саравчлан алсыг харж байна.','Mörön shades his eyes to scout the trail. He wears a blue Mongolian deel, a saffron sash, a red-tipped hat and upturned leather boots.'),
             title:t('Богцоо задалъя', 'Unpacking the saddlebag'),
             story:t('Богцоо яг жагсаалтын дарааллаар багласан. Эхэнд нь хийсэн зүйлээ доороос нь ухалгүй мэдэж болох уу?',
                 'I packed my saddlebag in the order shown here. Can you find the first thing I packed without digging to the bottom?'),

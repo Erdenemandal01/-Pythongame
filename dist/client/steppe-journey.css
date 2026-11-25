@@ -21,9 +21,54 @@
     background-size: var(--trail-size);
     filter: none;
 }
-#questView .scene .sprite { bottom: 8%; }
-#questView .scene .sprite-coin { bottom: 18.5%; }
-#questView .scene .sprite-pit { bottom: 4%; }
+#questView .scene {
+    --road-paint: url("art/battles/arena-slime.webp");
+    --ground-line: 11.5%;
+}
+#questView .scene[data-world="0"] { --ground-line: 16%; }
+#questView .scene[data-world="1"] { --road-paint: url("art/battles/arena-wolf.webp"); }
+#questView .scene[data-world="2"] { --road-paint: url("art/battles/arena-golem.webp"); }
+#questView .scene[data-world="3"] { --road-paint: url("art/battles/arena-wraith.webp"); }
+#questView .scene[data-world="4"] { --road-paint: url("art/battles/arena-dragon.webp"); }
+/* The painted road occupies the lowest fifth of each battle landscape.
+   Put it behind the board so every logical cell shares the same ground. */
+#questView .scene::after {
+    content: "";
+    position: absolute;
+    z-index: -1;
+    inset: auto 0 0;
+    height: 28%;
+    background: var(--road-paint) center bottom / 100% 470% no-repeat;
+    image-rendering: pixelated;
+    mask-image: linear-gradient(to bottom, transparent, #000 23%);
+    pointer-events: none;
+}
+#questView .scene .sprite { bottom: var(--ground-line); }
+#questView .scene .sprite-coin { bottom: calc(var(--ground-line) + 13%); z-index: 2; }
+#questView .scene .sprite-pit {
+    bottom: calc(var(--ground-line) - 3%);
+    border: 0;
+    border-radius: 0;
+    clip-path: polygon(0 46%,8% 22%,19% 22%,23% 10%,42% 4%,67% 7%,78% 19%,91% 21%,100% 48%,92% 70%,85% 75%,78% 89%,48% 100%,23% 91%,16% 78%,5% 69%);
+    background: #382921;
+    box-shadow: inset 0 4px #674b32, inset 0 8px #241e1c, inset 0 -3px #926b42;
+}
+#questView .sprite-hero::before, #questView .sprite-chest::before {
+    content: "";
+    position: absolute;
+    z-index: -1;
+    left: 15%;
+    right: 13%;
+    bottom: 0;
+    height: 6%;
+    border-radius: 50%;
+    background: #36281773;
+}
+#questView .sprite-hero.story-walk { transition: none; animation: stride .22s step-end infinite; }
+#questView .sprite-hero.jumping::before { opacity: 0; }
+@media (prefers-reduced-motion: reduce) {
+    #questView .scene .sprite { transition: none; animation: none; }
+}
 #questView .scene-dialog { border-color: #98805d; }
 #questView .scene-dialog b { color: #f1c382; }
 

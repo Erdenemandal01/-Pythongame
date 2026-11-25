@@ -1,5 +1,7 @@
 // Game positions are logical cells. The same coordinates drive the hero,
 // pickups and obstacles so their locations agree with the Python runner.
+let activeTreasureWalk = null;
+
 function drawBoard(game, frame) {
     const board = document.getElementById('gameBoard');
     const scene = board.closest('.scene');
@@ -16,6 +18,10 @@ function drawBoard(game, frame) {
     };
     let hero = board.querySelector('.sprite-hero');
     if (!hero || !frame) {
+        if (activeTreasureWalk) {
+            activeTreasureWalk.cancel();
+            activeTreasureWalk = null;
+        }
         hero = sprite('hero', position, 'Аялагч');
         board.replaceChildren(hero);
     }
@@ -56,7 +62,27 @@ function celebrateScene(m, output) {
     const scene = document.querySelector('.scene');
     if (!m.game) {
         const game = {width:8, start:m.id % 6, coins:[7], goal:7};
-        drawBoard(game, {pos:game.start + 1, coins:game.coins, action:'move'});
+        drawBoard(game, null);
+        const hero = scene.querySelector('.sprite-hero');
+        const start = hero.style.left;
+        const arrive = () => {
+            hero.classList.remove('story-walk');
+            drawBoard(game, {pos:game.goal, coins:[], action:'collect'});
+        };
+        if (matchMedia('(prefers-reduced-motion: reduce)').matches) {
+            arrive();
+        } else {
+            hero.classList.add('story-walk');
+            drawBoard(game, {pos:game.goal, coins:game.coins, action:'move'});
+            const walk = hero.animate([{left:start}, {left:hero.style.left}], (game.goal - game.start) * 190);
+            activeTreasureWalk = walk;
+            walk.onfinish = () => {
+                if (activeTreasureWalk !== walk) return;
+                activeTreasureWalk = null;
+                if (view === 'quest' && current === m.id && hero.isConnected) arrive();
+                else hero.classList.remove('story-walk');
+            };
+        }
     }
     const line = document.getElementById('sceneLine');
     const english = GameLocale.lang === 'en';

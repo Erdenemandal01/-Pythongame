@@ -1,0 +1,40 @@
+.relay-scene {
+    margin: .9rem 0;
+    position: relative;
+    isolation: isolate;
+    display: flex;
+    align-items: flex-end;
+    justify-content: flex-end;
+    min-height: 9.5rem;
+    padding: .75rem;
+    overflow: hidden;
+    background: #294b48 url("assets/steppe-camp.webp") center 70% / cover;
+    border: 1px solid #9a8b68;
+    border-radius: .4rem;
+}
+.relay-shagai, .relay-river {background-image: url("assets/steppe-routes.webp"); background-position: left top; background-size: 200% 200%;}
+.relay-river {background-position: right top;}
+.relay-bridge {background-position: right bottom;}
+.relay-rider {
+    position: absolute;
+    left: 23%;
+    bottom: 8%;
+    width: 3.25rem;
+    max-width: 18%;
+    image-rendering: pixelated;
+    animation: relay-arrive .9s ease-out both;
+}
+.relay-scene figcaption {
+    position: relative;
+    max-width: 64%;
+    overflow-wrap: anywhere;
+    padding: .4rem .7rem;
+    color: #fff1cb;
+    background: #122c2a;
+    border: 1px solid #d8bd86;
+    border-radius: .3rem;
+    font-size: .94rem;
+}
+.relay-scene q {display: block; color: #fff; white-space: pre-wrap;}
+@keyframes relay-arrive {from {transform: translateX(-160%);} to {transform: translateX(0);}}
+@media (prefers-reduced-motion: reduce) {.relay-rider {animation: none;}}

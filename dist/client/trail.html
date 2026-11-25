@@ -1,0 +1,87 @@
+<!doctype html>
+<html lang="mn">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#102b2e">
+  <title>Орхоны өртөө — Кодын нүүдэл</title>
+  <link rel="icon" href="art/brand/steppe-horse-32.png">
+  <link rel="stylesheet" href="steppe-trail.css">
+  <link rel="stylesheet" href="steppe-scene.css">
+  <link rel="stylesheet" href="trail-picker.css">
+  <script defer src="steppe-lessons.js"></script>
+  <script defer src="steppe-compiler.js"></script>
+  <script defer src="steppe-scene.js"></script>
+  <script defer src="trail-picker.js"></script>
+  <script defer src="steppe-trail-ui.js"></script>
+</head>
+<body>
+  <a class="skip-link" href="#mission" data-copy="skip"></a>
+  <header class="mast">
+    <div class="mast-inner">
+      <a class="brand" id="home" href="./index.html#home"><img src="art/brand/steppe-horse-32.png" width="34" height="34" alt=""><strong data-copy="brand"></strong></a>
+      <div class="mast-tools">
+        <a id="catalog" href="./index.html#courses"><span aria-hidden="true">←</span> <span data-copy="catalog"></span></a>
+        <select id="locale" aria-label="Хэл / Language"><option value="mn" lang="mn">Монгол</option><option value="en" lang="en">English</option></select>
+      </div>
+    </div>
+  </header>
+  <main class="trail-page">
+    <section class="panorama" aria-labelledby="trail-title">
+      <div class="hero-copy">
+        <h1 id="trail-title" data-copy="trail"></h1>
+        <p data-copy="intro"></p>
+      </div>
+    </section>
+    <div class="trail-layout">
+      <aside class="trail-nav">
+        <span id="track-label" data-copy="track"></span>
+        <button type="button" id="track" aria-haspopup="dialog" aria-labelledby="track-label track"><span id="track-name"></span><span aria-hidden="true">⌄</span></button>
+        <div class="route-title"><h2 data-copy="stops"></h2><span id="count"></span></div>
+        <nav id="stops"></nav>
+        <p id="save-note" class="save-note"></p>
+      </aside>
+      <article id="mission" tabindex="-1">
+        <div class="mission-head">
+          <div><p id="concept" class="eyebrow"></p><h2 id="title"></h2></div>
+          <img class="guide" src="assets/temuulen-guide.webp" width="72" height="72" alt="">
+        </div>
+        <p id="story" class="story"></p>
+        <section class="predict">
+          <h3 data-copy="predict"></h3>
+          <fieldset><legend id="question"></legend><div id="choices"></div></fieldset>
+          <p id="prediction-feedback" role="status" hidden></p>
+        </section>
+        <section class="workbench">
+          <h3 data-copy="yourCode"></h3>
+          <p id="task"></p>
+          <details id="hint-wrap"><summary data-copy="hint"></summary><p id="hint"></p></details>
+          <div class="editor-shell">
+            <div class="file-bar"><label for="code" id="filename"></label><button type="button" id="download" data-copy="download"></button></div>
+            <div class="editor">
+              <pre aria-hidden="true" id="highlight"><code></code></pre>
+              <textarea id="code" aria-describedby="task" spellcheck="false" autocorrect="off" autocapitalize="off" wrap="off"></textarea>
+            </div>
+            <div class="editor-foot">
+              <div id="input-wrap"><label for="stdin" data-copy="stdin"></label><input id="stdin" type="text" inputmode="numeric" maxlength="3" autocomplete="off" pattern="[0-9]{1,3}" required></div>
+              <button type="button" id="try-code" data-copy="practice"></button>
+              <button type="button" id="run" class="primary" data-copy="run"></button>
+              <button type="button" id="stop" hidden data-copy="stop"></button>
+            </div>
+          </div>
+          <p class="runtime-note" data-copy="downloadNote"></p>
+          <div id="result" class="result" hidden>
+            <strong id="run-status" role="status"></strong>
+            <div id="sample-output" hidden><h4 id="output-title"></h4><pre id="stdout"></pre></div>
+            <div id="diagnostic" hidden><h4 id="detail-title"></h4><pre id="details"></pre></div>
+            <p id="outcome" hidden></p>
+            <div id="scene"></div>
+            <button type="button" class="primary" id="next" hidden></button>
+          </div>
+        </section>
+      </article>
+    </div>
+    <noscript>Энэ хичээлд JavaScript асаана уу. Enable JavaScript to open this lesson.</noscript>
+  </main>
+</body>
+</html>

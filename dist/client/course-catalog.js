@@ -17,12 +17,34 @@ window.CourseCatalog = (() => {
         return {lesson, chapter, index, words};
     });
 
+    function chooseLanguage(trigger) {
+        TrailPicker.open({track:'python', lang:GameLocale.lang, trigger, onSelect(track) {
+            if (track === 'python' && location.hash === '#courses') {
+                if (location.protocol !== 'file:') {
+                    const current = new URL(location.href);
+                    current.searchParams.set('track', 'python');
+                    history.replaceState(history.state, '', current);
+                }
+                return;
+            }
+            const url = new URL(track === 'python' ? 'index.html' : 'trail.html', location.href);
+            url.searchParams.set('track', track);
+            url.searchParams.set('lang', GameLocale.lang);
+            if (track === 'python') url.hash = 'courses';
+            location.assign(url.href);
+        }});
+    }
+
     function mount(root, {won, selected, openLesson, compact = false}) {
         const previous = compact ? null : root.querySelector('.ac-filters');
         const panel = element('section', compact ? 'catalog-switcher' : 'course-library');
         if (!compact) {
             const previousGuide = root.querySelector('.pace-guide');
-            panel.append(element('h1', '', 'Python хичээлүүд'),
+            const chooser = element('button', 'catalog-change', GameLocale.lang === 'en' ? 'Choose programming language' : 'Сурах хэл сонгох');
+            chooser.type = 'button';
+            chooser.setAttribute('aria-haspopup', 'dialog');
+            chooser.addEventListener('click', () => chooseLanguage(chooser));
+            panel.append(chooser, element('h1', '', 'Python хичээлүүд'),
                 element('p', 'catalog-intro', ACADEMY_CHAPTERS.length + ' бүлэг · ' + ACADEMY.length + ' хичээл'),
                 StudyPace.create({expanded:previousGuide?.open ?? true}));
         }
@@ -95,5 +117,5 @@ window.CourseCatalog = (() => {
         root.replaceChildren(panel);
         draw();
     }
-    return {mount};
+    return {mount, chooseLanguage};
 })();

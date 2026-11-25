@@ -1,0 +1,140 @@
+:root {
+  color-scheme: dark;
+  --ink: #f6ecd9;
+  --muted: #c1cec5;
+  --deep: #11262b;
+  --panel: #19363a;
+  --edge: #536962;
+  --gold: #f3c27c;
+  --aqua: #9be2d1;
+  --serif: Georgia, Cambria, "Times New Roman", serif;
+  font: 100%/1.55 "Segoe UI", system-ui, sans-serif;
+}
+* { box-sizing: border-box; }
+body { margin: 0; color: var(--ink); background: radial-gradient(ellipse at top left, #254546, transparent 45rem), var(--deep); }
+a { color: var(--aqua); }
+button, select, input { font: inherit; }
+button, select, input {
+  color: var(--ink); background: #153137; border: 1px solid #688077;
+  border-radius: .35rem; padding: .45rem .8rem;
+}
+button, select, summary { cursor: pointer; }
+button:hover, select:hover { background: #29464a; }
+button:disabled { opacity: .65; cursor: wait; }
+:focus-visible { outline: 3px solid #ffe0a7; outline-offset: 3px; }
+[hidden] { display: none !important; }
+.skip-link { position: absolute; top: .6rem; left: .6rem; z-index: 3; padding: .5rem; background: var(--deep); transform: translateY(-165%); }
+.skip-link:focus { transform: translateY(0); }
+.mast { background: #132e31; border-bottom: 1px solid #9b845c; }
+.mast-inner, .trail-page { width: min(72rem, 94%); margin-inline: auto; }
+.mast-inner { display: flex; align-items: center; justify-content: space-between; gap: 1rem; min-height: 4.5rem; }
+.mast-tools, .brand { display: flex; align-items: center; gap: .85rem; }
+.brand { color: var(--ink); text-decoration: none; font: bold clamp(1.05rem, 3.5vw, 1.55rem)/1.1 var(--serif); }
+.brand img { image-rendering: pixelated; }
+.mast-tools a { font-weight: 600; text-underline-offset: .25em; }
+.trail-page { padding-block: 1.5rem 3rem; }
+.panorama {
+  display: flex; align-items: flex-end; min-height: clamp(10.5rem, 23vw, 16rem);
+  border: 1px solid #8c7953; border-radius: .65rem; overflow: hidden;
+  background: linear-gradient(85deg, #102527fa 4%, #142d30d4 27%, #172c2d38 67%),
+    url("assets/steppe-camp.webp") center 57% / cover, var(--panel);
+}
+.hero-copy { max-width: 31rem; padding: clamp(1.1rem, 3.8vw, 2.6rem); }
+.hero-copy h1, .mission-head h2, .trail-nav h2 { font-family: var(--serif); }
+.hero-copy h1 { margin: 0; font-size: clamp(2.25rem, 5.5vw, 4.3rem); line-height: 1; }
+.hero-copy p { margin: .8rem 0 0; color: #f2eee3; }
+.trail-layout { display: grid; grid-template-columns: minmax(13rem, 17rem) minmax(0, 1fr); align-items: start; gap: clamp(1rem, 2.6vw, 2.2rem); margin-top: 1.2rem; }
+.trail-nav, #mission { border: 1px solid var(--edge); background: var(--panel); border-radius: .55rem; }
+.trail-nav { padding: 1.1rem; }
+#track-label { display: block; margin-bottom: .3rem; font-size: .9rem; color: var(--muted); }
+#track { display: flex; justify-content: space-between; align-items: center; gap: .8rem; width: 100%; color: var(--gold); font-weight: 700; }
+.route-title { display: flex; gap: .5rem; align-items: baseline; justify-content: space-between; margin: 1.4rem 0 .5rem; }
+.route-title h2 { margin: 0; font-size: 1.25rem; }
+#count { font-size: .85rem; color: var(--aqua); white-space: nowrap; }
+#stops { display: grid; gap: .35rem; }
+#stops button { display: flex; align-items: center; gap: .65rem; text-align: left; width: 100%; border-color: transparent; background: transparent; line-height: 1.3; padding: .6rem .45rem; }
+#stops button:hover { background: #294347; }
+#stops button[aria-current="step"] { border-color: #c39b64; background: #344044; }
+.stop-mark { flex: none; display: grid; place-items: center; width: 1.72rem; height: 1.72rem; border: 1px solid #85998c; border-radius: 50%; font-size: .82rem; color: var(--muted); }
+[aria-current="step"] .stop-mark { color: #203033; background: var(--gold); border-color: var(--gold); }
+.stop-mark.done { background: var(--aqua); border-color: var(--aqua); color: var(--deep); }
+.save-note, .runtime-note { color: var(--muted); font-size: .86rem; }
+.save-note { margin: 1rem 0 0; padding-top: .8rem; border-top: 1px solid var(--edge); }
+#mission { min-width: 0; padding: clamp(1rem, 3vw, 2rem); scroll-margin-top: 1rem; }
+.mission-head { display: flex; align-items: center; justify-content: space-between; gap: 1rem; }
+.mission-head h2 { font-size: clamp(1.65rem, 3.4vw, 2.5rem); line-height: 1.15; margin: 0; }
+.eyebrow { margin: 0 0 .32rem; font-size: .85rem; color: var(--gold); font-weight: 650; }
+.guide { width: 3.8rem; height: 3.8rem; object-fit: cover; object-position: center 18%; border: 1px solid #ba9768; border-radius: 50%; }
+.story { color: #dae4da; margin: .8rem 0 1.35rem; max-width: 65ch; }
+h3 { margin: 0; font-size: 1.15rem; }
+.predict { border-block: 1px solid var(--edge); padding: 1rem 0; }
+.predict h3 { color: var(--aqua); }
+fieldset { margin: 0; padding: 0; border: 0; min-width: 0; }
+legend { padding: 0; margin: .3rem 0 .65rem; white-space: pre-line; }
+#choices { display: flex; flex-wrap: wrap; gap: .5rem; }
+#choices label { display: inline-flex; align-items: center; gap: .35rem; padding: .4rem .75rem; border: 1px solid #698178; border-radius: .35rem; background: #142c31; cursor: pointer; }
+#choices label:has(input:checked) { border-color: var(--aqua); }
+#choices input { accent-color: #9be2d1; }
+#prediction-feedback { color: var(--gold); font-size: .92rem; margin: .65rem 0 0; }
+#prediction-feedback.correct { color: var(--aqua); }
+.workbench { margin-top: 1.2rem; }
+#task { margin: .38rem 0; }
+#hint-wrap { margin: .5rem 0 .8rem; color: var(--muted); font-size: .92rem; }
+summary { width: fit-content; color: var(--gold); }
+#hint { margin: .35rem 0 0; }
+.editor-shell { background: #0d1c23; border: 1px solid #526c66; border-radius: .45rem; overflow: hidden; }
+.file-bar, .editor-foot { display: flex; align-items: center; justify-content: space-between; gap: .7rem; background: #142a2f; padding: .45rem .8rem; }
+.file-bar { border-bottom: 1px solid #3f5a54; }
+#filename { color: var(--aqua); font: .86rem/1.4 "Cascadia Code", Consolas, monospace; }
+#download { background: transparent; color: var(--muted); padding: .26rem .45rem; font-size: .8rem; }
+.editor { position: relative; background: #101e28; }
+.editor textarea, .editor pre {
+  width: 100%; height: clamp(14rem, 36vh, 22rem); display: block; margin: 0; padding: 1rem;
+  font: .92rem/1.6 "Cascadia Code", Consolas, "Courier New", monospace; font-variant-ligatures: none;
+  white-space: pre; tab-size: 4; border: 0; border-radius: 0; overflow: auto; text-align: left;
+}
+.editor pre { position: absolute; inset: 0; pointer-events: none; color: #f6efdf; scrollbar-width: none; }
+.editor pre::-webkit-scrollbar { display: none; }
+.editor code { font: inherit; }
+.editor textarea { position: relative; color: transparent; caret-color: #fff2d4; background: transparent; resize: none; }
+.editor textarea:focus-visible { outline-offset: -3px; }
+.editor textarea::selection { background: #5a728388; }
+.tk-comment { color: #a0b5b3; }
+.tk-preamble, .tk-number { color: #f2bf78; }
+.tk-string { color: #a2deac; }
+.tk-key { color: #eaaac0; }
+.tk-name { color: #b6c9ff; }
+.editor-foot { border-top: 1px solid #3f5a54; justify-content: flex-end; flex-wrap: wrap; }
+#input-wrap { margin-right: auto; display: flex; align-items: center; gap: .5rem; font-size: .9rem; color: var(--muted); }
+#stdin { width: 5.5rem; font-family: monospace; }
+.primary { background: #e7bd7e; color: #172b2a; border-color: #e7bd7e; font-weight: 750; }
+.primary:hover { background: #fbd6a2; }
+.runtime-note { margin: .5rem 0 0; }
+.result { margin-top: 1rem; padding: .9rem 1rem; border-left: .23rem solid var(--gold); background: #11282d; }
+.result[data-kind="success"] { border-color: var(--aqua); }
+.result h4 { color: var(--muted); margin: .7rem 0 .15rem; font-size: .85rem; }
+.result pre { margin: 0; overflow-wrap: anywhere; white-space: pre-wrap; font: .9rem/1.6 Consolas, monospace; }
+#outcome { color: var(--aqua); margin: .6rem 0; }
+#next { margin: .45rem 0 0; }
+@media (max-width: 48rem) {
+  .trail-layout { grid-template-columns: 1fr; }
+  .trail-nav { display: grid; grid-template-columns: 1fr auto; align-items: center; gap: .4rem .75rem; }
+  #track-label { margin: 0; }
+  .route-title, #stops, .save-note { grid-column: 1 / -1; }
+  .route-title { margin: .5rem 0 0; }
+  #stops { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+  #stops button { flex-direction: column; align-items: flex-start; justify-content: flex-start; font-size: .85rem; overflow-wrap: anywhere; }
+  .save-note { margin: 0; padding-top: .5rem; }
+  .mast-tools { gap: .4rem; font-size: .85rem; }
+  .mast-inner { gap: .4rem; }
+}
+@media (max-width: 25rem) {
+  .mast-inner { flex-wrap: wrap; padding-block: .55rem; }
+  .mast-tools { flex-grow: 1; justify-content: flex-end; }
+  .hero-copy { background: #13282c55; }
+}
+@media (forced-colors: active) {
+  .editor textarea { color: CanvasText; caret-color: auto; background: Canvas; }
+  .editor pre { display: none; }
+  .stop-mark.done, .primary { border: 1px solid ButtonText; }
+}
