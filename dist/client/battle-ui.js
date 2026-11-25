@@ -4,6 +4,13 @@
 
   const fighterIcons = {slime:'I', wolf:'II', golem:'III', wraith:'IV', dragon:'V'};
   const actions = {strike:'Довтолгоо',guard:'Хамгаалалт',heal:'Эдгээх'};
+  const text = source => globalThis.GameLocale?.text(source) ?? source;
+  function traceText(frame) {
+    const actions = frame.text.split(/(?<=[.!?]) /).map(text);
+    if (frame.phase === 1 && frame.nextPhase === 2)
+      actions.push(text('Мангас догширлоо. Дараагийн ээлжээс нүүдлийн дараалал солигдоно.'));
+    return actions.join(' ');
+  }
   const sleep = ms => new Promise(resolve=>setTimeout(resolve, ms));
   const el = (tag, className, text) => {
     const item = document.createElement(tag);
@@ -48,6 +55,7 @@
     let worker = null, loadTimer, runTimer, token = 0;
     let running = false, playing = false, skip = false;
     const m = selected;
+    const starter = m.starter.split('\n').map(line => line.trimStart().startsWith('#') ? text(line) : line).join('\n');
     function cancel() {
       token++;
       clearTimeout(loadTimer);
@@ -71,7 +79,7 @@
     root.append(shell);
     const header = el('header','bq-heading');
     const labels = el('div');
-    const title = el('h1','bq-title','Тулааны талбар');
+    const title = el('h1','bq-title','Домгийн дэвжээ');
     title.tabIndex = -1;
     labels.append(title);
     const count = el('span','bq-count',save.won.length+' / '+BATTLES.length+' ялалт');
@@ -99,7 +107,7 @@
     battlefield.setAttribute('aria-label',m.title);
     const intro = el('div','bq-encounter');
     const introText = el('div');
-    introText.append(el('span','bq-chapter','ТУЛААН '+fighterIcons[m.kind]),el('h2','',m.title));
+    introText.append(el('span','bq-chapter','ТУЛААН '+fighterIcons[m.kind]),el('h2','',m.title),el('p','bq-story',m.story));
     intro.append(introText, el('span','bq-reward','✦ '+m.reward+' XP'));
     battlefield.append(intro);
     const stage = el('div','battle-stage');
@@ -125,6 +133,8 @@
     const intentText=el('strong');
     intentGroup.append(intentText);
     const counters=el('div','bq-counters');
+    const phaseText=m.secondPhase ? el('strong','bq-phase') : null;
+    if (phaseText) counters.append(phaseText);
     const turnText=el('span'),potionsText=el('span');
     counters.append(turnText,potionsText);
     status.append(intentGroup,counters);
@@ -143,16 +153,25 @@
 
     const body=el('div','bq-body');
     const brief=el('section','bq-instructions');
-    brief.append(el('h3','','Таны зорилго'),el('p','bq-story',m.story),el('p','bq-lesson',m.lesson));
+    brief.append(el('h3','','Таны зорилго'),el('p','bq-lesson',m.lesson));
     function intentLabel(intent) {
-      const name=BATTLE_INTENTS[intent] || intent;
+      const name=text(BATTLE_INTENTS[intent] || intent);
       return m.commands.includes('sense') ? name+' · "'+intent+'"' : name;
     }
     const pattern=el('details','bq-pattern');
     pattern.append(el('summary','','Дайсны нүүдлийн дараалал'));
-    const order=el('ol');
-    m.patterns.forEach(intent=>order.append(el('li','',intentLabel(intent))));
-    pattern.append(order,el('p','','Сүүлийн нүүдлийн дараа эхнээсээ давтагдана.'));
+    function appendPattern(moves) {
+      const order=el('ol');
+      moves.forEach(intent=>order.append(el('li','',intentLabel(intent))));
+      pattern.append(order);
+    }
+    if (m.secondPhase) pattern.append(el('strong','','Эхний үе'));
+    appendPattern(m.patterns);
+    if (m.secondPhase) {
+      pattern.append(el('strong','','Дайсны амь '+m.secondPhase.atHP+' буюу түүнээс бага болоход'));
+      appendPattern(m.secondPhase.patterns);
+    }
+    pattern.append(el('p','','Сүүлийн нүүдлийн дараа эхнээсээ давтагдана.'));
     brief.append(pattern);
     const commands=el('details','bq-reference');
     commands.open=m.commands.length<=3 || !window.matchMedia('(max-width: 930px)').matches;
@@ -169,13 +188,13 @@
     const editHeader=el('div','bq-editor-header');
     editHeader.append(el('span','','battle.py'));
     const restore=button('Эхний код','bq-link',()=>{
-      if (running || input.value === m.starter) return;
-      if (!confirm('Энэ тулааны кодыг эхний загварт буцаах уу?')) return;
-      input.value=m.starter;saveCode();focusEditor();
+      if (running || input.value === starter) return;
+      if (!confirm(text('Энэ тулааны кодыг эхний загварт буцаах уу?'))) return;
+      input.value=starter;saveCode();focusEditor();
     });
     editHeader.append(restore);
     const input=el('textarea','bq-code');
-    input.value=save.drafts[m.id]??m.starter;
+    input.value=save.drafts[m.id]??starter;
     input.spellcheck=false;
     input.setAttribute('autocapitalize','off');
     input.setAttribute('autocomplete','off');
@@ -236,6 +255,7 @@
       syncHealth(playerPanel,frame.playerHP,m.playerHP);
       syncHealth(foePanel,frame.enemyHP,m.hp);
       const intent=frame.nextIntent ?? m.patterns[0];
+      if (phaseText) phaseText.textContent=text((frame.nextPhase ?? frame.phase)===2 ? 'Догширсон үе' : 'Эхний үе');
       intentText.textContent=terminalFrame?'Тулаан дууссан':intentLabel(intent);
       intentGroup.dataset.intent=intent;
       turnText.textContent='Ээлж '+Math.min((frame.turn||0)+(terminalFrame?0:1),m.maxTurns)+' / '+m.maxTurns;
@@ -276,7 +296,7 @@
       messageWrap.dataset.tone='loss';message.textContent=text;editBtn.hidden=false;
     }
     function logTurn(frame) {
-      const li=el('li');li.append(el('strong','',actions[frame.action]||frame.action),document.createTextNode(' · '+intentLabel(frame.intent)+' · '+frame.text));logList.append(li);
+      const li=el('li');li.append(el('strong','',actions[frame.action]||frame.action),document.createTextNode(' · '+intentLabel(frame.intent)+' · '+traceText(frame)));logList.append(li);
     }
     function run() {
       if (running) return;
@@ -295,7 +315,7 @@
       message.textContent='Python бэлдэж байна…';
       if (!window.matchMedia('(prefers-reduced-motion: reduce)').matches)
         battlefield.scrollIntoView({block:'start',behavior:'smooth'});
-      try {worker=new Worker('worker.js?v=battle-1');} catch(error) {
+      try {worker=new Worker('worker.js?v=battle-2');} catch(error) {
         failure('Python эхэлж чадсангүй. '+error.message);return;
       }
       worker.onerror=event=>{if(live()) failure('Тулааны хөдөлгүүр эхэлж чадсангүй. '+(event.message||'Хуудсаа шинэчлээд дахин оролдоорой.'));};
@@ -318,7 +338,7 @@
             if(!live()) return;
             const frame=trace[i];
             update(frame,i===trace.length-1 && ['victory','loss'].includes(data.kind));
-            message.textContent='Ээлж '+frame.turn+' · '+frame.text;
+            message.textContent=text('Ээлж '+frame.turn)+' · '+traceText(frame);
             logTurn(frame);
             if(!skip) await sleep(window.matchMedia('(prefers-reduced-motion: reduce)').matches?80:640);
           }
@@ -342,14 +362,15 @@
               nodes[m.id+1].setAttribute('aria-label',BATTLES[m.id+1].enemy+' · Нээлттэй');
             }
             stage.classList.add('battle-won');messageWrap.dataset.tone='win';
-            message.textContent=(save.won.length===BATTLES.length?'Бүх тулаанд яллаа!':'Ялалт!')+(first?' +'+m.reward+' XP.':' Дахин амжилттай тулалдлаа.');
+            const outcome=(save.won.length===BATTLES.length?'Бүх тулаанд яллаа!':'Ялалт!')+(first?' +'+m.reward+' XP.':' Дахин амжилттай тулалдлаа.');
+            message.textContent=text(outcome)+' '+text(m.victory);
             nextBtn.hidden=m.id===BATTLES.length-1;
             runBtn.textContent='↻ Дахин тулалдах';
           } else {
             if(data.kind==='loss') stage.classList.add('battle-lost');
             messageWrap.dataset.tone=data.kind==='incomplete'?'incomplete':'loss';
             const label={loss:'Ялагдал. ',incomplete:'Тулаан үргэлжилнэ. ',code:'Кодын алдаа. '};
-            message.textContent=(label[data.kind]||'')+(data.error || 'Дарааллаа өөрчлөөд туршаарай.');
+            message.textContent=text(label[data.kind]||'')+text(data.error || 'Дарааллаа өөрчлөөд туршаарай.');
             editBtn.hidden=false;runBtn.textContent='▶ Дахин турших';
             if(data.kind==='code') log.open=true;
           }

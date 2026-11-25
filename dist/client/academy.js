@@ -10,16 +10,16 @@ const JAM_TIMING = [
 const ACADEMY_CHAPTERS = (() => {
     let first=0;
     return [
-        ['Анхны бүтээл',5,'skylands.webp'],
+        ['Анхны бүтээл',5,'avatars/camp.webp'],
         ['Сонголт ба нөхцөл',5,'battles/arena-slime.webp'],
         ['Хээ ба давталт',5,'battles/arena-wolf.webp'],
         ['Текст ба жагсаалт',5,'battles/arena-golem.webp'],
         ['Функц ба сорил',5,'battles/arena-wraith.webp'],
         ['Өгөгдлийн мөрдөгч',5,'battles/arena-slime.webp'],
-        ['Тор ба симуляци',5,'skylands.webp'],
+        ['Тор ба симуляци',5,'avatars/camp.webp'],
         ['Эхний том төсөл',5,'battles/arena-dragon.webp'],
         ['Дэнлүүний баяр',5,'avatars/camp.webp'],
-        ['Өгөгдлөөр түүх ярих',5,'skylands.webp'],
+        ['Өгөгдлөөр түүх ярих',5,'avatars/camp.webp'],
         ['Тоглоомын дүрэм',5,'battles/arena-dragon.webp'],
         ['Зам ба стратеги',5,'battles/arena-wolf.webp'],
         ['Туршилтын талбай',4,'battles/arena-golem.webp'],
@@ -76,7 +76,7 @@ function readAcademy(raw) {
         if (!item || typeof item !== 'object') continue;
         const drafts = {};
         const gameKeys=ACADEMY[i].capstone?['experiment0','experiment1']:[];
-        for (const key of [...ACADEMY_TASKS,'experiment',...gameKeys]) {
+        for (const key of [...ACADEMY_TASKS,'experiment','predictExample',...gameKeys]) {
             if (typeof item.drafts?.[key] === 'string') drafts[key] = text(item.drafts[key],20000);
         }
         result.lessons[i] = {
@@ -88,6 +88,13 @@ function readAcademy(raw) {
         if (Number.isInteger(item.phase) && item.phase >= 0 && item.phase < academyChapter(i).timing.length) {
             result.lessons[i].phase=item.phase;
         }
+        if (['play','sequence'].includes(item.predictActivity)) result.lessons[i].predictActivity=item.predictActivity;
+        const sequence = globalThis.AcademySequence?.read(i,item.predictSequence);
+        if (sequence) result.lessons[i].predictSequence=sequence;
+        if (typeof item.debugHypothesis === 'string') result.lessons[i].debugHypothesis=text(item.debugHypothesis,1000);
+        if (Number.isInteger(item.debugLine) && item.debugLine >= 1 && item.debugLine <= 20001) result.lessons[i].debugLine=item.debugLine;
+        const tools = globalThis.AcademyProjectTools?.read(i,item.projectTools);
+        if (tools) result.lessons[i].projectTools=tools;
         if (gameKeys.length && item.gameInputs) {
             const inputs={};
             for (const key of gameKeys) if (typeof item.gameInputs[key]==='string') inputs[key]=text(item.gameInputs[key],4000);

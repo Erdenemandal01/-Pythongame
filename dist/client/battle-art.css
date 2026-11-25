@@ -1,23 +1,22 @@
 .battle-stage {
     --hero-x: 21%;
     --enemy-x: 74%;
-    --feet: 19.5%;
-    --enemy-height: 23%;
+    --feet: 10%;
+    --enemy-height: 32%;
     position: relative;
     isolation: isolate;
     overflow: hidden;
     width: 100%;
     aspect-ratio: 2.5;
-    background: #273248 center / 100% 100% no-repeat;
-    border: 3px solid #423e52;
-    border-radius: 12px;
-    box-shadow: 0 4px #10101c;
+    background: #283e39 center / cover no-repeat;
+    border-block: 2px solid #a78958;
+    image-rendering: pixelated;
 }
 .battle-stage[data-kind="slime"] { background-image: url("art/battles/arena-slime.webp"); }
-.battle-stage[data-kind="wolf"] { --enemy-height: 28%; background-image: url("art/battles/arena-wolf.webp"); }
-.battle-stage[data-kind="golem"] { --enemy-height: 36%; background-image: url("art/battles/arena-golem.webp"); }
-.battle-stage[data-kind="wraith"] { --enemy-height: 32%; background-image: url("art/battles/arena-wraith.webp"); }
-.battle-stage[data-kind="dragon"] { --enemy-height: 40%; background-image: url("art/battles/arena-dragon.webp"); }
+.battle-stage[data-kind="wolf"] { --enemy-height: 37%; background-image: url("art/battles/arena-wolf.webp"); }
+.battle-stage[data-kind="golem"] { --feet:4%; --enemy-height:41%; background-image: url("art/battles/arena-golem.webp"); }
+.battle-stage[data-kind="wraith"] { --enemy-height: 36%; background-image: url("art/battles/arena-wraith.webp"); }
+.battle-stage[data-kind="dragon"] { --feet:4%; --enemy-height:42%; background-image: url("art/battles/arena-dragon.webp"); }
 .battle-stage .battle-actors {
     position: absolute;
     z-index: 1;
@@ -43,7 +42,7 @@
     position: absolute;
     bottom: var(--feet);
     left: var(--hero-x);
-    height: 27%;
+    height: 33%;
     max-width: 33%;
     width: auto;
     object-fit: contain;
@@ -58,7 +57,7 @@
     height: var(--enemy-height);
     animation: bq-breathe 2.3s steps(3,end) infinite;
 }
-.battle-stage[data-kind="slime"] .battle-enemy { animation: bq-slime 2s ease-in-out infinite; }
+.battle-stage[data-kind="slime"] .battle-enemy { animation: bq-hover 3.5s steps(4,end) infinite; }
 .battle-stage[data-kind="wraith"] .battle-enemy { animation: bq-hover 2.2s ease-in-out infinite; }
 .battle-stage.battle-turn[data-action="strike"] .battle-hero { animation: bq-lunge .38s ease-out; }
 .battle-stage.battle-turn[data-action="guard"] .battle-hero { animation: bq-brace .46s ease-out; }
@@ -96,7 +95,6 @@
 .battle-stage.battle-won .battle-enemy { animation: bq-retire .55s forwards; }
 .battle-stage.battle-lost .battle-hero { filter: grayscale(.9) brightness(.7); }
 @keyframes bq-breathe { 50% {transform: translateX(-50%) scaleY(.978)} }
-@keyframes bq-slime { 45% {transform: translateX(-50%) scale(1.045,.92)} 65% {transform: translate(-50%,-4%) scale(.975,1.035)} }
 @keyframes bq-hover { 50% {transform: translate(-50%,-6%)} }
 @keyframes bq-lunge { 15% {transform: translateX(-60%) rotate(-5deg)} 46% {transform: translateX(68%) rotate(5deg)} }
 @keyframes bq-brace { 25%,68% {transform: translateX(-54%) scale(1.08,.91)} }
@@ -109,7 +107,7 @@
 @keyframes bq-retire { 30% {transform: translateX(-43%); filter: brightness(1.6)} 100% {transform: translateX(-35%); filter: grayscale(.7);opacity:.28} }
 @media(max-width:650px) {
     .battle-stage { aspect-ratio: 1.75; background-size: auto 100%; }
-    .battle-stage .battle-hero { height: 25%; }
+    .battle-stage .battle-hero { height: 31%; }
     .battle-stage .battle-enemy { max-width: 35%; }
 }
 @media(prefers-reduced-motion:reduce) {

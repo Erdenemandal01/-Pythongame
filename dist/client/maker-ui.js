@@ -1,29 +1,30 @@
 (() => {
     'use strict';
+    const workshopText = globalThis.PQEnglishWorkshops?.literal || (text => text);
     const columns = 12, rows = 8, cell = 20;
     const modes = {
         garden: {
-            title:'Лууны цэцэрлэг', icon:'❧',
-            guide:'12 × 8 нүдэн дээр мод, цэцэг, нуур байрлуулж лууныхаа гэрийг бариарай.',
-            challenge:'Голыг гүүр мэт хоёр нүдээр тасалж, луунаас цэцэг хүртэл хуурай зам гаргаарай.',
-            usage:'tile(x, y, kind)', args:'x нь 0–11, y нь 0–7. Зүүн дээд булан (0, 0).',
+            title:workshopText('Лууны цэцэрлэг'), icon:'❧',
+            guide:workshopText('12 × 8 нүдэн дээр мод, цэцэг, нуур байрлуулж лууныхаа гэрийг бариарай.'),
+            challenge:workshopText('Голыг гүүр мэт хоёр нүдээр тасалж, луунаас цэцэг хүртэл хуурай зам гаргаарай.'),
+            usage:'tile(x, y, kind)', args:workshopText('x нь 0–11, y нь 0–7. Зүүн дээд булан (0, 0).'),
             values:['grass','water','tree','flower','rock','dragon'],
             example:[
-                '# Голыг зүүнээс баруун тийш зур.',
+                workshopText('# Голыг зүүнээс баруун тийш зур.'),
                 'for x in range(12):','    tile(x, 4, "water")','',
-                '# Ойн зах дагуу мод тарь.','for x in range(0, 12, 2):','    tile(x, 0, "tree")',
+                workshopText('# Ойн зах дагуу мод тарь.'),'for x in range(0, 12, 2):','    tile(x, 0, "tree")',
                 'for x in [1, 3, 5, 7, 9]:','    tile(x, 6, "flower")','',
                 'tile(8, 2, "rock")','tile(3, 2, "dragon")'
             ].join('\n')
         },
         pixel: {
-            title:'Пиксел зураг', icon:'▦',
-            guide:'Нүд бүрийн өнгийг Python-оор сонгож, жижигхэн зураг эсвэл багийн тэмдэг бүтээ.',
-            challenge:'Зүрхний хоёр талыг ижил өнгөтэй байлгаж, голд нь өөр өнгийн жижиг дүрс зураарай.',
-            usage:'dot(x, y, color)', args:'x нь 0–11, y нь 0–7. Өнгөө #RRGGBB хэлбэрээр бичээрэй.',
+            title:workshopText('Пиксел зураг'), icon:'▦',
+            guide:workshopText('Нүд бүрийн өнгийг Python-оор сонгож, жижигхэн зураг эсвэл багийн тэмдэг бүтээ.'),
+            challenge:workshopText('Зүрхний хоёр талыг ижил өнгөтэй байлгаж, голд нь өөр өнгийн жижиг дүрс зураарай.'),
+            usage:'dot(x, y, color)', args:workshopText('x нь 0–11, y нь 0–7. Өнгөө #RRGGBB хэлбэрээр бичээрэй.'),
             values:['#ff7187','#ffcf71','#93df9e','#69c9f0','#a598f3','#f0e8c8'],
             example:[
-                '# Нэг тэмдэг нэг пиксел болно.',
+                workshopText('# Нэг тэмдэг нэг пиксел болно.'),
                 'heart = [','    "..##..##..",','    ".########.",','    ".########.",',
                 '    "..######..",','    "...####...",','    "....##....",',']','',
                 'for y, line in enumerate(heart):','    for x, mark in enumerate(line):',
@@ -31,16 +32,16 @@
             ].join('\n')
         },
         bars: {
-            title:'Өгөгдлийн график', icon:'▥',
-            guide:'Тоон утгаа харьцуулахын тулд нэр, хэмжээг нь өгч баганан график босгоорой.',
-            challenge:'Дөрвөн өөр өдөр хэмжсэн нэг үзүүлэлтээ оруулаад хамгийн их утгатай өдрийг кодоор хэвлэ.',
-            usage:'bar(label, value)', args:'Нэрийг текстээр, хэмжээг 0–100 хооронд тоогоор бичнэ.',
+            title:workshopText('Өгөгдлийн график'), icon:'▥',
+            guide:workshopText('Тоон утгаа харьцуулахын тулд нэр, хэмжээг нь өгч баганан график босгоорой.'),
+            challenge:workshopText('Дөрвөн өөр өдөр хэмжсэн нэг үзүүлэлтээ оруулаад хамгийн их утгатай өдрийг кодоор хэвлэ.'),
+            usage:'bar(label, value)', args:workshopText('Нэрийг текстээр, хэмжээг 0–100 хооронд тоогоор бичнэ.'),
             values:[],
             example:[
-                '# Ангийн долоо хоногийн уншлага (хуудас).',
-                'pages = {"Даваа": 24, "Мягмар": 38, "Лхагва": 31, "Пүрэв": 52}',
+                workshopText('# Ангийн долоо хоногийн уншлага (хуудас).'),
+                workshopText('pages = {"Даваа": 24, "Мягмар": 38, "Лхагва": 31, "Пүрэв": 52}'),
                 'for day, count in pages.items():','    bar(day, count)','',
-                'print("Нийт хуудас:", sum(pages.values()))'
+                workshopText('print("Нийт хуудас:", sum(pages.values()))')
             ].join('\n')
         }
     };
@@ -159,7 +160,7 @@
         place('S',eggs[0].x-1,eggs[0].y);
         const last=eggs[eggs.length-1];
         place('C',last.x+1,last.y);
-        return {title:'Миний лууны цэцэрлэг',rows:grid.map(row=>row.join(''))};
+        return {title:workshopText('Миний лууны цэцэрлэг'),rows:grid.map(row=>row.join(''))};
     }
     function stopSession() {
         if (!active) return;
@@ -183,10 +184,10 @@
             const shell=make('section','mk-studio');
             root.replaceChildren(shell);
             const head=make('div','mk-head');
-            head.append(make('h1','','Бүтээлийн тайз'),button('Хичээл рүү буцах','mk-quiet',()=>adapter.openClassroom()));
+            head.append(make('h1','',workshopText('Бүтээлийн тайз')),button(workshopText('Хичээл рүү буцах'),'mk-quiet',()=>adapter.openClassroom()));
             shell.append(head);
             const tabs=make('nav','mk-modes');
-            tabs.setAttribute('aria-label','Бүтээл сонгох');
+            tabs.setAttribute('aria-label',workshopText('Бүтээл сонгох'));
             Object.entries(modes).forEach(([id,m])=>{
                 const b=button('','mk-mode',()=>{if(mode!==id)open(id)});
                 b.append(make('span','mk-icon',m.icon),make('span','',m.title));
@@ -204,7 +205,7 @@
             picture.setAttribute('role','img');picture.setAttribute('aria-label',item.title);
             const label=make('div','mk-board-head');
             const coord=make('small','mk-coord',mode==='bars'?'0–100':'12 × 8');
-            label.append(make('strong','','Миний бүтээл'),coord);
+            label.append(make('strong','',workshopText('Миний бүтээл')),coord);
             const artBox=make('div','mk-art-box');
             artBox.append(picture);
             if(mode!=='bars') {
@@ -222,7 +223,7 @@
             note.setAttribute('role','status');
             const consoleOut=make('pre','mk-output');
             consoleOut.hidden=true;
-            const download=button('PNG татах','mk-quiet',()=>{
+            const download=button(workshopText('PNG татах'),'mk-quiet',()=>{
                 picture.toBlob(blob=>{
                     if(!blob)return;
                     const url=URL.createObjectURL(blob),anchor=document.createElement('a');
@@ -236,40 +237,40 @@
             board.append(label,artBox,boardFoot,consoleOut);
             let exchange;
             if(mode==='garden' && adapter.openGardenLevel){
-                exchange=button('Цэцэрлэгээ түвшин болгох','mk-quiet',()=>{
+                exchange=button(workshopText('Цэцэрлэгээ түвшин болгох'),'mk-quiet',()=>{
                     const last=cache.garden;
                     if(last?.code===input.value)adapter.openGardenLevel(gardenMap(last.points));
                 });
                 exchange.disabled=true;
                 const conversion=make('div','mk-garden-level');
-                conversion.append(exchange,make('small','','9 × 6 газрын зурагт цэцэг өндөг болж, мод, ус, чулуу зам хаана. Зураг дээр эхлэл, агуйгаа зөөж болно.'));
+                conversion.append(exchange,make('small','',workshopText('9 × 6 газрын зурагт цэцэг өндөг болж, мод, ус, чулуу зам хаана. Зураг дээр эхлэл, агуйгаа зөөж болно.')));
                 board.append(conversion);
             }
             const dataTable=make('details','mk-table');
             const values=make('dl');
-            dataTable.append(make('summary','','Графикийн утгууд'),values);
+            dataTable.append(make('summary','',workshopText('Графикийн утгууд')),values);
             if(mode==='bars')board.append(dataTable);
             const edit=make('div','mk-editor');
             const editHead=make('div','mk-edithead');
             const input=make('textarea','mk-code');
-            input.setAttribute('aria-label',item.title+' · Python код');
+            input.setAttribute('aria-label',item.title+workshopText(' · Python код'));
             input.spellcheck=false;input.setAttribute('autocapitalize','off');input.setAttribute('autocomplete','off');input.setAttribute('autocorrect','off');
             input.maxLength=20000;input.value=state.drafts[mode]??item.example;
-            const reset=button('Жишээг сэргээх','mk-text',()=>{
+            const reset=button(workshopText('Жишээг сэргээх'),'mk-text',()=>{
                 if(running || input.value===item.example) return;
-                if(!confirm('Энэ бүтээлийн кодыг жишээгээр солих уу?'))return;
+                if(!confirm(workshopText('Энэ бүтээлийн кодыг жишээгээр солих уу?')))return;
                 input.value=item.example;saveText();run();
             });
             editHead.append(make('span','',mode+'.py'),reset);
             const actions=make('div','mk-actions');
-            const play=button('▶ Бүтээх','mk-play',run);
-            const stop=button('■ Зогсоох','mk-quiet',()=>{cancel();lock(false);status('Кодыг зогсоолоо.','idle');});
+            const play=button(workshopText('▶ Бүтээх'),'mk-play',run);
+            const stop=button(workshopText('■ Зогсоох'),'mk-quiet',()=>{cancel();lock(false);status(workshopText('Кодыг зогсоолоо.'),'idle');});
             stop.hidden=true;actions.append(make('small','','Ctrl / ⌘ + Enter'),play,stop);
             edit.append(editHead,input,actions);
             layout.append(board,edit);shell.append(layout);
             const brief=make('div','mk-brief');
             const commands=make('section','mk-reference');
-            commands.append(make('h3','','Команд'),make('code','',item.usage),make('p','',item.args));
+            commands.append(make('h3','',workshopText('Команд')),make('code','',item.usage),make('p','',item.args));
             if(item.values.length) {
                 const keys=make('div','mk-keys');
                 for(const value of item.values) {
@@ -281,7 +282,7 @@
                 commands.append(keys);
             }
             const challenge=make('section','mk-challenge');
-            challenge.append(make('h3','','Бүтээлээ өөрчилье'),make('p','',item.challenge));
+            challenge.append(make('h3','',workshopText('Бүтээлээ өөрчилье')),make('p','',item.challenge));
             brief.append(commands,challenge);shell.append(brief);
             function lock(value){running=value;input.readOnly=value;play.hidden=value;stop.hidden=!value;reset.disabled=value;if(exchange && value)exchange.disabled=true;}
             function status(text,tone){note.textContent=text;note.dataset.tone=tone;}
@@ -296,13 +297,13 @@
                 download.disabled=!data.length;
                 if(exchange)exchange.disabled=!data.length || cache.garden?.code!==input.value;
                 picture.setAttribute('aria-label',mode==='bars'
-                    ? 'График. '+data.map(p=>p.label+' '+p.value).join(', ')
-                    : item.title+' · '+new Set(data.map(p=>p.x+','+p.y)).size+' тэмдэглэсэн нүд');
+                    ? workshopText('График. ')+data.map(p=>p.label+' '+p.value).join(', ')
+                    : item.title+' · '+new Set(data.map(p=>p.x+','+p.y)).size+workshopText(' тэмдэглэсэн нүд'));
             }
             function saveText(){
                 state.drafts[mode]=input.value;adapter.save();
                 if(exchange)exchange.disabled=true;
-                status('Код хадгалагдлаа. Шинэ бүтээлээ харахын тулд «Бүтээх» дар.','idle');
+                status(workshopText('Код хадгалагдлаа. Шинэ бүтээлээ харахын тулд «Бүтээх» дар.'),'idle');
             }
             input.oninput=saveText;
             input.onkeydown=e=>{
@@ -320,21 +321,21 @@
             function run() {
                 if(running)return;
                 const code=input.value;
-                if(!code.trim()){status('Эхлээд Python код бичээрэй.','error');return;}
+                if(!code.trim()){status(workshopText('Эхлээд Python код бичээрэй.'),'error');return;}
                 lock(true);
-                status(ready?'Код ажиллаж байна…':'Python ачаалж байна…','idle');
+                status(ready?workshopText('Код ажиллаж байна…'):workshopText('Python ачаалж байна…'),'idle');
                 consoleOut.hidden=true;
                 const output=[];let size=0;
                 const token=generation,live=()=>active===session&&generation===token;
                 const fail=text=>{if(!live())return;cancel();lock(false);status(text,'error');};
                 const send=()=>{
                     clearTimeout(timer);
-                    timer=setTimeout(()=>fail('Код 5 секундээс удаан ажиллалаа. Давталтын нөхцөлөө шалгаарай.'),5000);
+                    timer=setTimeout(()=>fail(workshopText('Код 5 секундээс удаан ажиллалаа. Давталтын нөхцөлөө шалгаарай.')),5000);
                     worker.postMessage({code,academy:{sandbox:true,check:'',maker:mode}});
                 };
                 try {
                     if(!worker)worker=new Worker('worker.js?v=academy-1');
-                    worker.onerror=e=>fail('Python эхэлж чадсангүй. '+(e.message||'Дахин ажиллуулна уу.'));
+                    worker.onerror=e=>fail(workshopText('Python эхэлж чадсангүй. ')+(e.message||workshopText('Дахин ажиллуулна уу.')));
                     worker.onmessage=({data})=>{
                         if(!live())return;
                         if(data.type==='ready'){ready=true;send();return;}
@@ -347,24 +348,24 @@
                         if(data.type!=='result')return;
                         clearTimeout(timer);lock(false);
                         consoleOut.textContent=output.join('\n');consoleOut.hidden=!consoleOut.textContent;
-                        if(!data.ok){status(data.error||'Командаа шалгаад дахин туршаарай.','error');return;}
+                        if(!data.ok){status(data.error||workshopText('Командаа шалгаад дахин туршаарай.'),'error');return;}
                         const points=Array.isArray(data.preview)?data.preview:[];
                         cache[mode]={points,code,output:consoleOut.textContent};
                         display(points);
-                        status(points.length?'✓ Бүтээл бэлэн.':item.usage+' командыг дуудаж тайзаа дүүргээрэй.',points.length?'pass':'idle');
+                        status(points.length?workshopText('✓ Бүтээл бэлэн.'):item.usage+workshopText(' командыг дуудаж тайзаа дүүргээрэй.'),points.length?'pass':'idle');
                     };
                     if(ready)send();
-                    else timer=setTimeout(()=>fail('Python ачаалах хугацаа дууслаа. Дахин ажиллуулна уу.'),90000);
-                }catch(error){fail('Python эхэлж чадсангүй. '+error.message);}
+                    else timer=setTimeout(()=>fail(workshopText('Python ачаалах хугацаа дууслаа. Дахин ажиллуулна уу.')),90000);
+                }catch(error){fail(workshopText('Python эхэлж чадсангүй. ')+error.message);}
             }
             const last=cache[mode];
             display(last?.points||[]);
             if(last){
                 consoleOut.textContent=last.output;consoleOut.hidden=!last.output;
-                status(last.code===input.value?'Өмнөх бүтээл.':'Код өөрчлөгдсөн байна. «Бүтээх» дарж шинэчил.','idle');
+                status(last.code===input.value?workshopText('Өмнөх бүтээл.'):workshopText('Код өөрчлөгдсөн байна. «Бүтээх» дарж шинэчил.'),'idle');
             }
             else if(input.value===item.example)run();
-            else status('Хадгалсан кодоо ажиллуулж бүтээлээ хараарай.','idle');
+            else status(workshopText('Хадгалсан кодоо ажиллуулж бүтээлээ хараарай.'),'idle');
         }
         open(Object.hasOwn(modes,state.mode)?state.mode:'garden');
     }

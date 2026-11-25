@@ -11,10 +11,10 @@
         return item;
     }
 
-    function picture(name, className) {
+    function picture(name, className, directory = art) {
         const img = element('img', className);
         img.alt = '';
-        img.src = art + name;
+        img.src = directory + name;
         img.draggable = false;
         return img;
     }
@@ -25,45 +25,43 @@
             !!lesson.reflection?.trim() || !!lesson.extension?.trim() || !!lesson.inputData?.trim());
     }
 
-    function routes({state, openMission, openClass, openWorkshops}) {
-        const questDone = new Set(state.done);
+    function coreLesson({state, openClass, openActivity}) {
         const school = state.academy;
         const classDone = new Set(school.won);
-        const nextMission = MISSIONS.findIndex((_, id) => !questDone.has(id));
         const nextClass = ACADEMY.findIndex((_, id) => !classDone.has(id));
+        if (nextClass < 0) return {
+            kind:'exam', icon:'journal.png', label:'Үндсэн хичээлүүд', title:'Төгсгөлийн сорил',
+            detail:'3 Python бодлого', action:'Төгсгөлийн сорил нээх', started:true,
+            visit:() => openActivity('exam')
+        };
         const selected = school.selected;
-        const selectedActive = ACADEMY[selected] && !classDone.has(selected) &&
-            (hasLessonWork(school.lessons[selected]) || (selected > 0 && school.lessons[selected]));
+        const selectedActive = ACADEMY[selected] && !classDone.has(selected) && school.lessons[selected];
         const startedClass = selectedActive ? selected : ACADEMY.findIndex((_, id) =>
             !classDone.has(id) && hasLessonWork(school.lessons[id]));
         const classId = startedClass >= 0 ? startedClass : nextClass;
+        const started = startedClass >= 0 || classDone.size > 0;
+        return {
+            kind:'academy', icon:'journal.png', label:'Үндсэн хичээлүүд', title:ACADEMY[classId].title,
+            detail:(classId + 1) + '-р хичээл · ойролцоогоор ' + academyChapter(classId).minutes + ' минут',
+            action:started ? 'Үндсэн хичээлээ үргэлжлүүлэх' : 'Эхний хичээлээ эхлэх', started,
+            visit:() => openClass(classId)
+        };
+    }
+
+    function adventure({state, openMission}) {
+        const questDone = new Set(state.done);
+        const nextMission = MISSIONS.findIndex((_, id) => !questDone.has(id));
         const missionId = nextMission < 0 ? 0 : nextMission;
         const mission = MISSIONS[missionId];
         const adventuring = questDone.size > 0 || !!state.attempts?.[missionId] ||
             (state.drafts?.[missionId] && state.drafts[missionId] !== mission.start);
-        const quest = {
-            kind:'quest', icon: 'map.png', label: nextMission < 0 ? 'Аяллын давтлага' : 'Адал явдал',
+        return {
+            kind:'quest', icon: 'map.png', label: 'Нэмэлт дасгалууд',
             title: mission.title,
             detail: WORLDS[mission.world].name + ' · ' + mission.concept,
             action: nextMission < 0 ? 'Дахин аялах' : adventuring ? 'Аяллаа үргэлжлүүлэх' : 'Аяллаа эхлэх',
             visit: () => openMission(missionId)
         };
-        const lesson = classId >= 0 && {
-            kind:'academy', icon: 'journal.png', label: 'Ангийн урлан', title: ACADEMY[classId].title,
-            detail: (classId + 1) + '-р хичээл · ойролцоогоор '+academyChapter(classId).minutes+' минут',
-            action: startedClass >= 0 ? 'Хичээлээ үргэлжлүүлэх' : 'Хичээлээ эхлэх',
-            visit: () => openClass(classId)
-        };
-        const workshops = {
-            kind:'workshops', icon: 'journal.png', label: 'Чөлөөт урлан', title: 'Өөрийн бүтээл',
-            detail: 'Хүлэмж, хөгжим, хот, мөрдлөг, луу', action: 'Урлан сонгох', visit: openWorkshops
-        };
-        if (lesson && (startedClass >= 0 || nextMission < 0 ||
-            (classDone.size > 0 && !adventuring))) {
-            return [lesson, nextMission < 0 ? workshops : quest];
-        }
-        if (nextMission < 0 && !lesson) return [workshops, quest];
-        return [quest, lesson || workshops];
     }
 
     function recentWork({state,openMission,openClass,openBattle,openActivity}) {
@@ -167,7 +165,7 @@
         const hero = element('div', 'ph-hero');
         const scene = element('div', 'ph-illustration');
         scene.setAttribute('aria-hidden', 'true');
-        scene.append(picture('camp.webp', 'ph-landscape'), picture(avatar + '.png', 'ph-traveler'));
+        scene.append(picture('steppe-camp.webp', 'ph-landscape', 'assets/'), picture(avatar + '.png', 'ph-traveler'));
         const sparks = element('span', 'ph-sparks');
         scene.append(sparks);
         const intro = element('div', 'ph-intro');
@@ -175,7 +173,12 @@
         const star = element('i', 'ph-star');
         star.setAttribute('aria-hidden', 'true');
         location.append(star, document.createTextNode('Аялагчийн отог'));
-        const title = element('h1', '', name && (profile || name !== 'Аялагч') ? 'Сайн уу, ' + name + '!' : 'Тавтай морил!');
+        const title = element('h1');
+        if (name && (profile || name !== 'Аялагч')) {
+            const nickname = element('span', '', name);
+            nickname.translate = false;
+            title.append('Сайн уу, ', nickname, '!');
+        } else title.textContent = 'Тавтай морил!';
         title.id = 'ph-welcome';
         const record = element('div', 'ph-record');
         record.append(counter('Аяллын даалгавар', state.done.length, MISSIONS.length),
@@ -202,16 +205,13 @@
         }
         hero.append(scene, intro);
         const options = element('div', 'ph-routes');
-        const suggested = routes(context);
-        const recent = recentWork(context);
-        const choices = recent ? [recent, suggested.find(route=>route.kind!==recent.kind) || suggested[1]] : suggested;
-        choices.forEach((route, i) => options.append(routeCard(route, i === 0)));
+        options.append(routeCard(adventure(context), true), routeCard(coreLesson(context), false));
         const overview = element('div', 'ph-course-overview');
         CourseOverview.mount(overview);
-        camp.append(hero, overview, options, studyLinks(context));
+        camp.append(hero, options, overview, studyLinks(context));
         root.replaceChildren(camp);
         if (previousFocus) root.querySelector('[data-camp-control="' + previousFocus + '"]')?.focus({preventScroll: true});
     }
 
-    window.PlayerHome = {mount, recentWork};
+    window.PlayerHome = {mount, recentWork, coreLesson};
 })();

@@ -34,7 +34,12 @@
         rect(10,8,14,2,shine); rect(10,19,14,2,metal);
         rect(10,12,14,5,ink); rect(13+(dir===2?-2:dir===0?1:0),13,2,2,shine);
         rect(18+(dir===2?-2:dir===0?1:0),13,2,2,shine);
-        rect(16,5,2,3,ink); rect(15,4,4,2,shine);
+        // A pointed cap, crossed collar and brass belt keep the two couriers
+        // recognizable at the board's native 32-pixel scale.
+        rect(8,8,18,2,'#703e36'); rect(10,7,14,1,'#dbaf6c');
+        rect(13,5,8,2,metal); rect(15,3,4,2,shine); rect(16,2,2,1,'#dfb971');
+        rect(12,17,3,1,shine); rect(15,18,3,1,shine); rect(18,19,3,1,shine);
+        rect(10,20,14,2,'#844b38'); rect(17,20,3,2,'#edc271');
         const tips = [[26,13],[15,25],[1,13],[15,0]];
         const [a,b] = tips[dir];
         if (dir%2) { rect(a,b,3,3,'#fff3ba'); rect(a-2,dir===1?b:b+2,7,1,'#fff3ba'); }
@@ -47,18 +52,21 @@
         const g=canvas.getContext('2d');
         if (!g) return;
         const rect=(x,y,w,h,c)=>{g.fillStyle=c;g.fillRect(x,y,w,h);};
-        rect(0,0,canvas.width,canvas.height,'#152131');
+        rect(0,0,canvas.width,canvas.height,'#243c38');
         rows.forEach((row,y)=>[...row].forEach((cell,x)=>{
             const u=pad+x*t, v=pad+y*t;
             if (cell==='#') {
-                rect(u,v,31,31,'#233044');rect(u+1,v+1,30,23,'#506279');
-                rect(u+2,v+2,27,2,'#8291a2');rect(u+3,v+6,24,15,'#465870');
-                rect(u+14,v+6,2,8,'#3c4d63');rect(u+3,v+14,23,1,'#3c4d63');
-                rect(u+3,v+25,24,2,'#34455b');return;
+                rect(u,v,31,31,'#4e423e');rect(u+1,v+1,30,24,'#986d54');
+                rect(u+2,v+2,27,2,'#c1a17f');rect(u+3,v+7,25,13,'#765243');
+                for(const offset of [0,12]){
+                    rect(u+4+offset,v+9,9,2,'#c99967');rect(u+4+offset,v+10,2,7,'#c99967');
+                    rect(u+10+offset,v+10,3,4,'#c99967');rect(u+7+offset,v+15,3,2,'#c99967');
+                }
+                rect(u+3,v+23,24,2,'#bd8e65');return;
             }
-            rect(u,v,31,31,(x+y)%2?'#3c5665':'#425d69');
-            rect(u+1,v+1,29,1,'#56717b');rect(u+1,v+2,1,27,'#526c76');
-            rect(u+27,v+27,1,1,'#758a8d');rect(u+4,v+4,1,1,'#71858a');
+            rect(u,v,31,31,(x+y)%2?'#42645a':'#496a5b');
+            rect(u+1,v+1,29,1,'#68816f');rect(u+1,v+2,1,27,'#587661');
+            rect(u+26,v+26,2,1,'#829575');rect(u+4,v+4,1,1,'#91a47f');
         }));
         frame.remaining.forEach(([x,y])=>{
             const u=pad+x*t, v=pad+y*t;
@@ -179,7 +187,8 @@
         }
         async change(action, code=null, traces=null){
             if(!this.owner || this.mutating || !this.api)return;
-            if(action==='leave' && this.room?.status!=='finished' && !confirm('Өрөөг хоёр тоглогчид хаах уу?'))return;
+            const question = 'Өрөөг хоёр тоглогчид хаах уу?';
+            if(action==='leave' && this.room?.status!=='finished' && !confirm(globalThis.GameLocale?.text(question) ?? question))return;
             const owner=this.owner, stamp=++this.readId;
             this.reading=false;this.mutating=true;this.pollError=false;this.note('Өрөөг шинэчилж байна…');this.render();
             try {
@@ -254,9 +263,7 @@
             const headline=el('div','rd-head');
             const intro=el('div');
             intro.append(el('h1','','Роботын халз сорил'),el('p','','Робот урдах хана, хөл доорх эрдэнээ мэдэрнэ. Дараагийн үйлдлийг таны Python код сонгоно.'));
-            const emblem=el('div','rd-emblem');emblem.setAttribute('aria-hidden','true');
-            emblem.append(icon('host'),el('b','','×'),icon('guest'));
-            headline.append(intro,emblem);
+            headline.append(intro);
             const tabs=el('div','rd-tabs');
             for(const [id,title] of [['practice','Бэлтгэл хийх'],['online','Халз тоглох']]){
                 const tab=button('rd-tab',title,()=>this.setMode(id));

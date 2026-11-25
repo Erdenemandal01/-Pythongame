@@ -13,6 +13,7 @@
             link.searchParams.set('lesson', String(lesson));
         }
         const views = ['home','courses','map','quest','battle','duel','weekly','exam','practice','journal','awards','leaderboard','academy','maker','level','workshops','greenhouse','dragon','music','detective','city'];
+        if (GameLocale.lang === 'en') link.searchParams.set('lang', 'en');
         if (current.hash) link.hash = views.includes(current.hash.slice(1)) || /^#reference(?:\/[a-z0-9-]+)?$/.test(current.hash) ? current.hash : 'map';
         return link.href;
     }
@@ -22,6 +23,7 @@
         assets.remove();
         document.body.classList.add('pq-handheld');
         gate.hidden = false;
+        GameLocale.start();
         const field = gate.querySelector('input');
         const status = gate.querySelector('[role="status"]');
         field.value = transferLink();
@@ -48,6 +50,7 @@
         // Classic scripts keep their declared dependency order, including the
         // offline worker shim. Templates keep them inert on phones and tablets.
         for (const entry of assets.content.querySelectorAll('script[src]')) {
+            if (entry.hasAttribute('data-english') && GameLocale.lang !== 'en') continue;
             const script = document.createElement('script');
             script.async = false;
             script.src = entry.getAttribute('src');

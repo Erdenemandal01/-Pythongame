@@ -7,6 +7,9 @@ def run_battle(raw):
     request = json.loads(raw)
     encounter = request["battle"]
     pattern = encounter["patterns"]
+    second_phase = encounter.get("secondPhase")
+    phase = 1
+    phase_start = 0
     max_hp = encounter["playerHP"]
     limit = encounter["maxTurns"]
     player_hp = max_hp
@@ -15,14 +18,17 @@ def run_battle(raw):
     charged = False
     history = []
 
+    def intent_at(turn_index):
+        return pattern[(turn_index - phase_start) % len(pattern)]
+
     def sense():
-        return pattern[len(history) % len(pattern)]
+        return intent_at(len(history))
 
     def alive():
         return player_hp > 0 and enemy_hp > 0 and len(history) < limit
 
     def act(action):
-        nonlocal player_hp, enemy_hp, potions, charged
+        nonlocal player_hp, enemy_hp, potions, charged, phase, phase_start, pattern
         if not alive():
             return
         intent = sense()
@@ -66,9 +72,16 @@ def run_battle(raw):
             detail.append("Дайсан хуягаа хаалаа.")
 
         turn = len(history) + 1
+        played_phase = phase
+        continues = player_hp > 0 and enemy_hp > 0 and turn < limit
+        if continues and phase == 1 and second_phase and enemy_hp <= second_phase["atHP"]:
+            phase = 2
+            phase_start = turn
+            pattern = second_phase["patterns"]
         history.append({
             "turn": turn, "action": action, "intent": intent,
-            "nextIntent": pattern[turn % len(pattern)] if player_hp and enemy_hp and turn < limit else None,
+            "phase": played_phase, "nextPhase": phase if continues else None,
+            "nextIntent": intent_at(turn) if continues else None,
             "playerHP": player_hp, "enemyHP": enemy_hp, "potions": potions,
             "focus": charged, "damageTaken": previous_player + healing - player_hp,
             "damageDealt": previous_enemy - enemy_hp, "healed": healing,

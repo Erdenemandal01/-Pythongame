@@ -10,7 +10,7 @@
     ];
     const starter = [
         'def decide(on_gem, wall_ahead):',
-        '    # Эрдэнэс дээр ирвэл яах вэ?',
+        globalThis.GameLocale?.lang === 'en' ? '    # What should the robot do on a gem?' : '    # Эрдэнэс дээр ирвэл яах вэ?',
         '    if wall_ahead:',
         '        return "right"',
         '    return "move"'

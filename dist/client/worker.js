@@ -16,7 +16,7 @@ ready.then(() => postMessage({type: 'ready'})).catch(error => {
 let battleRunnerSource;
 async function runEncounter(py) {
     if (!battleRunnerSource) {
-        const response = await fetch(new URL('./battle-runner.py', self.location.href));
+        const response = await fetch(new URL('./battle-runner.py?v=2', self.location.href));
         if (!response.ok) throw Error('Тулааны дүрмийг ачаалж чадсангүй. Дахин ажиллуулна уу.');
         battleRunnerSource = await response.text();
     }
@@ -41,7 +41,7 @@ async function runLevel(py) {
 }
 async function runClassroom(py) {
     if (!academySource) {
-        const response = await fetch(new URL('./academy-runner.py?v=8', self.location.href));
+        const response = await fetch(new URL('./academy-runner.py?v=9', self.location.href));
         if (!response.ok) throw Error('Хичээлийн шалгалтыг ачаалж чадсангүй.');
         academySource = await response.text();
     }
@@ -72,7 +72,7 @@ if (data.battle) {
     return;
 }
 const result=await py.runPythonAsync(`
-import ast, json, io, contextlib, traceback
+import ast, json, io, contextlib, traceback, re, unicodedata
 def _run_quest(raw):
     req = json.loads(raw)
     trace = []
@@ -96,6 +96,14 @@ def _run_quest(raw):
     def no_input(*args):
         raise ValueError('input() дэмжихгүй. Хувьсагчид утгаа шууд бичээрэй.')
     g = {'__name__': '__main__', 'move': lambda: act('move'), 'jump': lambda: act('jump'), 'collect': lambda: act('collect'), 'can_move': lambda: pos+1 < game['width'] and pos+1 not in game.get('holes', []), 'input': no_input}
+    printed_text = False
+    if req.get('outputMode') == 'message':
+        def print_message(*values, **options):
+            nonlocal printed_text
+            if any(isinstance(value, str) and any(c.isalpha() for c in value) for value in values):
+                printed_text = True
+            return print(*values, **options)
+        g['print'] = print_message
     try:
         tree = ast.parse(req['code'])
         exec(compile(tree, 'adventure.py', 'exec'), g)
@@ -103,10 +111,14 @@ def _run_quest(raw):
         return json.dumps({'ok': False, 'error': ''.join(traceback.format_exception_only(type(e), e)), 'trace': trace, 'kind': 'code'})
     def has(name): return any(type(n).__name__ == name for n in ast.walk(tree))
     def count(name): return sum(type(n).__name__ == name for n in ast.walk(tree))
+    def matches_phrase(text, options):
+        def words(value):
+            return [re.findall(r'\\w+', unicodedata.normalize('NFC', line)) for line in value.strip().splitlines()]
+        return any(words(text) == words(option) for option in options)
     if req.get('check'):
         try:
             with contextlib.redirect_stdout(io.StringIO()):
-                exec(req['check'], {'g': g, 'tree': tree, 'ast': ast, 'has': has, 'count': count, 'contextlib': contextlib, 'io': io})
+                exec(req['check'], {'g': g, 'tree': tree, 'ast': ast, 'has': has, 'count': count, 'contextlib': contextlib, 'io': io, 'variants': req.get('variants') or [], 'matches_phrase': matches_phrase, 'printed_text': printed_text})
         except Exception as e:
             return json.dumps({'ok': False, 'error': str(e) or 'Функцийн шалгалт амжилтгүй.', 'trace': trace, 'kind': 'test'})
     if req.get('game') and (coins or pos != game['goal']):

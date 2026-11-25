@@ -48,6 +48,27 @@ async function verify() {
             tested++;
         }
     }
+    const budget = course[2].projects[0];
+    const calculations = budget.solution.split('print(')[0];
+    for (const receipt of [
+        'print("Spent:", spent)\nprint("Balance =", left)',
+        'print("Зардал:",spent,sep="")\nprint("Үлдсэн мөнгө",left)',
+        'print(spent)\nprint(left)',
+    ]) {
+        assert.ok((await assess(calculations + receipt, budget.check)).ok, receipt);
+    }
+    for (const receipt of [
+        'print(left)\nprint(spent)', 'print(spent, left)',
+        'print(-spent)\nprint(left)', 'print(spent/10)\nprint(left)',
+        'print("Зардал: 139")\nprint(left)', 'print("Нийт 130",spent)\nprint(left)',
+        'print(spent)\nprint(left)\nprint("extra")',
+    ]) {
+        assert.equal((await assess(calculations + receipt, budget.check)).ok, false, receipt);
+    }
+    const passport = course[1].projects[0];
+    const customPassport = passport.solution.replace('Нэр:', 'Name').replace('Өнгө:', 'Shade').replace('Нутаг:', 'Home');
+    assert.ok((await assess(customPassport, passport.check)).ok);
+    assert.equal((await assess(customPassport.replace('print("Shade",color)', 'print("Shade",home)'), passport.check)).ok, false);
     const lamps=['Гүүр','Зах','Цэцэрлэг','Тайз','Булаг','Асар'];
     const lab=course[40].lab;
     const full=await assess(lab.solution,lab.check,{lanterns:lamps});

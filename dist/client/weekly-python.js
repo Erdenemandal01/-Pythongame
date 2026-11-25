@@ -80,15 +80,27 @@
         return JSON.stringify(value);
     }
     function call(task,args){return task.fn+'('+args.map(python).join(', ')+')';}
+    const outputAliases = {
+        beacon:{улаан:'red', шар:'yellow', ногоон:'green'},
+        kite:{хураа:'pack', хүлээ:'wait', нисгэ:'fly'}
+    };
+    function displayExpected(fn, expected) {
+        return globalThis.GameLocale?.lang === 'en' && typeof expected === 'string'
+            ? outputAliases[fn]?.[expected] ?? expected : expected;
+    }
     function caseRequest(task,code,index) {
         const [args,expected]=task.cases[index];
+        const alias = typeof expected === 'string' ? outputAliases[task.fn]?.[expected] : undefined;
+        const english = globalThis.GameLocale?.lang === 'en';
+        const missing = english ? 'Define the function ' + task.fn + '.' : task.fn + ' нэртэй функцээ тодорхойлоорой.';
         const check=[
             'import json',
             'solve = g.get('+JSON.stringify(task.fn)+')',
-            'assert callable(solve), "'+task.fn+' нэртэй функцээ тодорхойлоорой."',
+            'assert callable(solve), '+JSON.stringify(missing),
             'got = solve(*json.loads('+JSON.stringify(JSON.stringify(args))+'))',
             'want = json.loads('+JSON.stringify(JSON.stringify(expected))+')',
-            'assert type(got) is type(want) and got == want, "Буцаасан утга: " + repr(got)[:120]'
+            'assert type(got) is type(want) and ' + (alias ? 'got in (want, '+JSON.stringify(alias)+')' : 'got == want') +
+                ', ' + JSON.stringify(english ? 'Returned value: ' : 'Буцаасан утга: ') + ' + repr(got)[:120]'
         ].join('\n');
         return {code,academy:{check}};
     }
@@ -146,13 +158,14 @@
             const dates=el('p','wk-date',this.week+' — '+iso(weekTime(this.week)+6*day));
             brief.append(dates,el('h2','',task.title),el('p','wk-skill',task.skill),this.badge,el('p','wk-task',task.task));
             const example=el('section','wk-example');
-            example.append(el('h3','','Жишээ'),el('code','',call(task,task.example[0])+' → '+python(task.example[1])),el('p','',task.example[2]));
+            example.append(el('h3','','Жишээ'),el('code','',call(task,task.example[0])+' → '+python(displayExpected(task.fn,task.example[1]))),el('p','',task.example[2]));
             brief.append(example);
             const editor=el('section','wk-editor');
             const label=el('label','wk-file','weekly.py');label.htmlFor='wk-source';
             this.field=el('textarea','wk-code');this.field.id='wk-source';this.field.rows=10;this.field.maxLength=16000;
             this.field.spellcheck=false;this.field.autocapitalize='off';this.field.autocomplete='off';
-            this.field.value=record?.code ?? ('def '+task.fn+'('+task.args+'):\n    # Шийдлээ энд бичээрэй\n    pass');
+            const comment=globalThis.GameLocale?.lang === 'en' ? '# Write your solution here' : '# Шийдлээ энд бичээрэй';
+            this.field.value=record?.code ?? ('def '+task.fn+'('+task.args+'):\n    '+comment+'\n    pass');
             const edit=()=>{this.record().code=this.field.value;this.ctx.save();this.resetFeedback();};
             this.field.oninput=edit;
             this.field.onkeydown=e=>{
@@ -175,7 +188,7 @@
             checks.append(el('h3','','Оролт бүрийн шалгалт'));
             this.rows=task.cases.map(([args,expected])=>{
                 const line=el('div','wk-row');const name=el('code','',call(task,args));
-                const goal=el('span','wk-expect','Хүлээх утга · '+python(expected));
+                const goal=el('span','wk-expect','Хүлээх утга · '+python(displayExpected(task.fn,expected)));
                 const status=el('span','wk-case-status');line.append(name,goal,status);checks.append(line);return status;
             });
             this.status=el('p','wk-status');this.status.setAttribute('role','status');
@@ -229,7 +242,7 @@
             };
         }
     }
-    window.WeeklyPython=Object.freeze({readSave,current,caseRequest,
+    window.WeeklyPython=Object.freeze({readSave,current,caseRequest,displayExpected,
         mount(root,ctx){active?.leave();active=new Weekly(root,ctx);},
         leave(){active?.leave();active=null;}
     });

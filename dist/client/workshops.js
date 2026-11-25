@@ -1,10 +1,11 @@
 const Workshops=(()=>{
+    const workshopText = globalThis.PQEnglishWorkshops?.literal || (text => text);
     const catalogue = {
-        greenhouse:['Миний хүлэмж','Нөхцөл ба давталт','Гурван саванд хоёр дусал ус хуваарилаарай. Аль саванд ус орохыг тааж, дүрмээ Python дээр турш.','GreenhouseStudio'],
-        dragon:['Луугаа сурга','Нөхцөл ба шийдвэр','Луу чинь ядарсан үедээ өндөг олбол яах вэ? Хоёр дүрэм бичээд нэг талбайд турш.','DragonStudio'],
-        music:['Хөгжмийн урлан','Жагсаалт ба давталт','Кодоор хэмнэл зохио. Нэг хэсгийг өөрчлөөд найздаа хоёр хувилбарыг сонсго.','MusicStudio'],
-        detective:['Алдааны мөрдөгч','Туршилт ба захын утга','Роботын алдаа ямар оролт дээр гардаг вэ? Нотлох жишээ олоод кодыг зас.','DetectiveStudio'],
-        city:['Ангийн хот','Функц ба хамтын төсөл','Автобус, гэрлэн дохио, гудамжны гэрлээ тус тусад нь кодлоод нэг хотод ажиллуул.','CityStudio']
+        greenhouse:[workshopText('Миний хүлэмж'),workshopText('Нөхцөл ба давталт'),workshopText('Гурван саванд хоёр дусал ус хуваарилаарай. Аль саванд ус орохыг тааж, дүрмээ Python дээр турш.'),'GreenhouseStudio'],
+        dragon:[workshopText('Луугаа сурга'),workshopText('Нөхцөл ба шийдвэр'),workshopText('Луу чинь ядарсан үедээ өндөг олбол яах вэ? Хоёр дүрэм бичээд нэг талбайд турш.'),'DragonStudio'],
+        music:[workshopText('Хөгжмийн урлан'),workshopText('Жагсаалт ба давталт'),workshopText('Кодоор хэмнэл зохио. Нэг хэсгийг өөрчлөөд найздаа хоёр хувилбарыг сонсго.'),'MusicStudio'],
+        detective:[workshopText('Алдааны мөрдөгч'),workshopText('Туршилт ба захын утга'),workshopText('Роботын алдаа ямар оролт дээр гардаг вэ? Нотлох жишээ олоод кодыг зас.'),'DetectiveStudio'],
+        city:[workshopText('Ангийн хот'),workshopText('Функц ба хамтын төсөл'),workshopText('Автобус, гэрлэн дохио, гудамжны гэрлээ тус тусад нь кодлоод нэг хотод ажиллуул.'),'CityStudio']
     };
     const moduleFor=key=>window[catalogue[key][3]];
     let active=null;
@@ -20,25 +21,25 @@ const Workshops=(()=>{
         let closed=false;
         function stop(){for(const cancel of [...pending])cancel();}
         function run(code,payload={}){
-            if(closed)return Promise.reject(Error('Урлан хаагдсан байна.'));
+            if(closed)return Promise.reject(Error(workshopText('Урлан хаагдсан байна.')));
             return new Promise((resolve,reject)=>{
                 const worker=new Worker('worker.js?v=15');
                 let timer;
                 const complete=(callback,value)=>{
                     clearTimeout(timer);worker.terminate();pending.delete(cancel);callback(value);
                 };
-                const cancel=()=>complete(reject,new DOMException('Кодыг зогсоолоо.','AbortError'));
+                const cancel=()=>complete(reject,new DOMException(workshopText('Кодыг зогсоолоо.'),'AbortError'));
                 pending.add(cancel);
                 const fail=message=>complete(reject,Error(message));
-                timer=setTimeout(()=>fail('Python ачаалах хугацаа дууслаа. Дахин ажиллуулаарай.'),90000);
-                worker.onerror=e=>fail(e.message||'Python ажиллаж чадсангүй. Дахин оролдоорой.');
+                timer=setTimeout(()=>fail(workshopText('Python ачаалах хугацаа дууслаа. Дахин ажиллуулаарай.')),90000);
+                worker.onerror=e=>fail(e.message||workshopText('Python ажиллаж чадсангүй. Дахин оролдоорой.'));
                 worker.onmessage=({data})=>{
                     if(data.type==='fatal')return fail(data.error);
                     if(data.type==='ready'){
                         clearTimeout(timer);
-                        timer=setTimeout(()=>fail('Код 5 секундээс удаан ажиллалаа. Давталтын төгсөх нөхцөлийг шалгаарай.'),5000);
+                        timer=setTimeout(()=>fail(workshopText('Код 5 секундээс удаан ажиллалаа. Давталтын төгсөх нөхцөлийг шалгаарай.')),5000);
                         worker.postMessage({code,studio:{mode:key,payload}});
-                    }else if(data.type==='result')complete(resolve,data);
+                    }else if(data.type==='result')complete(resolve,globalThis.PQEnglishWorkshops?.result(data) ?? data);
                 };
             });
         }
@@ -48,14 +49,16 @@ const Workshops=(()=>{
         const el=document.createElement(tag);if(cls)el.className=cls;if(text!==undefined)el.textContent=text;return el;
     }
     function hub(root) {
-        root.replaceChildren(element('h1','ws-title','Сонголтот урлан'));
+        root.replaceChildren(element('h1','ws-title',workshopText('Сонголтот урлан')));
         const cards=element('div','ws-cards');
         for(const [key,[name,concept,summary]] of Object.entries(catalogue)){
             const card=element('a','ws-card ws-'+key);
             card.href='#'+key;
-            const art=element('div','ws-art'), canvas=element('canvas');
-            canvas.setAttribute('aria-hidden','true');WorkshopArt.paint(canvas,key);art.append(canvas);
-            if(key==='dragon'){const sprite=element('img','ws-dragon-art');sprite.src='art/battles/enemy-dragon.png';sprite.alt='';art.append(sprite);}
+            const art=element('img','ws-art');
+            art.src='art/workshops/'+key+'.webp';
+            art.alt='';
+            art.width=625;
+            art.height=416;
             const copy=element('div','ws-copy');
             copy.append(element('small','',concept),element('h2','',name),element('p','',summary));
             card.append(art,copy);cards.append(card);
@@ -71,8 +74,8 @@ const Workshops=(()=>{
         leave();
         if(key==='workshops'){hub(root);return;}
         const studio=moduleFor(key),runtime=runner(key);
-        const top=element('nav','ws-subnav');top.setAttribute('aria-label','Сонголтот урлан');
-        const back=element('a','','Бүх урлан');back.href='#workshops';top.append(back);
+        const top=element('nav','ws-subnav');top.setAttribute('aria-label',workshopText('Сонголтот урлан'));
+        const back=element('a','',workshopText('Бүх урлан'));back.href='#workshops';top.append(back);
         const current=element('span','',catalogue[key][0]);top.append(current);
         const body=element('div','ws-body');body.id=key+'Studio';root.replaceChildren(top,body);
         if(!group[key]){group[key]=studio.normalize(null);persist();}

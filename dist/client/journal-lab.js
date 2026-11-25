@@ -1,6 +1,38 @@
 window.JournalLab = (() => {
     'use strict';
-    const experiments = [
+    const tr = (mn, en) => window.GameLocale?.lang === 'en' ? en : mn;
+    const experiments = window.GameLocale?.lang === 'en' ? [
+        "Add your name to the greeting. What gets printed?",
+        "Swap the two lines, then read the letter again.",
+        "Give name a different value and compare the output.",
+        "What happens if you replace 12 + 8 with 12 * 8?",
+        "Change the hero’s name. Which part of the greeting changes?",
+        "Remove the last collect() call and count the coins you picked up.",
+        "Try 2 keys and then 3. When does the door open?",
+        "Set energy to 1. What will the hero do?",
+        "Capitalize the first letter in the password and test it.",
+        "Set has_map to False. Now change and to or. What happens?",
+        "Try scores of 49, 50 and 80 to find all three medals.",
+        "What happens if you move one more step before collecting the coin?",
+        "What needs to change to print five steps?",
+        "Change the stop value so the loop also prints 6.",
+        "Find the sum of the numbers from 1 through 10.",
+        "Start your countdown at 5. Will the last number change?",
+        "Print the odd numbers instead of the even ones.",
+        "Run the loop one fewer time and count the coins left.",
+        "Add a fourth item to the backpack and print every item.",
+        "Which index gives you the second gem?",
+        "Append one more item and predict the new length.",
+        "Replace upper() with title() and look at the first letter in each word.",
+        "Raise the hero’s level by one and print it.",
+        "If you exclude the value 10, how does the sum change?",
+        "Call greet() twice. How many lines appear?",
+        "Give double() a negative number and predict the result.",
+        "Try a negative number as one input and check the sum.",
+        "Pass 7 instead of 6. What does the function return?",
+        "How many coins do you get when the list is empty?",
+        "Call cross() twice. How many gems are still on the map?"
+    ] : [
         'Мэндчилгээнд өөрийн нэрийг оруулбал юу хэвлэгдэх вэ?',
         'Хоёр мөрийн байрыг солиод захиагаа уншаарай.',
         'name-д өөр нэр өгөөд гаралтаа харьцуулаарай.',
@@ -38,21 +70,21 @@ window.JournalLab = (() => {
         const dialog = document.createElement('dialog');
         dialog.className = 'jl-dialog';
         dialog.setAttribute('aria-labelledby', 'jl-title');
-        dialog.innerHTML = `<div class="jl-head"><div><small>Мэдлэгийн дэвтэр</small><h2 id="jl-title"></h2></div>
-            <form method="dialog"><button class="secondary" aria-label="Дэвтэрт буцах">Хаах ✕</button></form></div>
+        dialog.innerHTML = `<div class="jl-head"><div><small>${tr('Мэдлэгийн дэвтэр', 'Python notebook')}</small><h2 id="jl-title"></h2></div>
+            <form method="dialog"><button class="secondary" aria-label="${tr('Дэвтэрт буцах', 'Back to notebook')}">${tr('Хаах ✕', 'Close ✕')}</button></form></div>
             <p class="jl-prompt"></p>
-            <div class="jl-layout"><section class="jl-editor"><label for="jl-code">Миний туршилт <span>Python</span></label>
+            <div class="jl-layout"><section class="jl-editor"><label for="jl-code">${tr('Миний туршилт', 'My experiment')} <span>Python</span></label>
             <textarea id="jl-code" class="jl-code" spellcheck="false" maxlength="20000" wrap="off"></textarea>
-            <div class="jl-actions"><button class="jl-run">▶ Ажиллуулах</button><button class="jl-stop secondary" hidden>Зогсоох</button>
-            <button class="jl-reset secondary">Эх жишээг сэргээх</button></div></section>
-            <section class="jl-results"><h3>Эх жишээний үр дүн</h3><pre class="jl-original"></pre>
-            <h3>Миний кодын үр дүн</h3><pre class="jl-output" aria-live="polite">Кодоо ажиллуулаад энд харьцуулаарай.</pre></section></div>`;
+            <div class="jl-actions"><button class="jl-run">${tr('▶ Ажиллуулах', '▶ Run')}</button><button class="jl-stop secondary" hidden>${tr('Зогсоох', 'Stop')}</button>
+            <button class="jl-reset secondary">${tr('Эх жишээг сэргээх', 'Restore example')}</button></div></section>
+            <section class="jl-results"><h3>${tr('Эх жишээний үр дүн', 'Original output')}</h3><pre class="jl-original"></pre>
+            <h3>${tr('Миний кодын үр дүн', 'My output')}</h3><pre class="jl-output" aria-live="polite">${tr('Кодоо ажиллуулаад энд харьцуулаарай.', 'Run your code to compare the results.')}</pre></section></div>`;
         const get = selector => dialog.querySelector(selector);
         const field = get('textarea'), output = get('.jl-output'), run = get('.jl-run'), stop = get('.jl-stop'), reset = get('.jl-reset');
         get('#jl-title').textContent = mission.title;
         get('.jl-prompt').textContent = experiments[mission.id];
         get('.jl-original').textContent = mission.game
-            ? `Байрлал ${mission.game.goal + 1} / ${mission.game.width} · Зоос ${mission.game.coins.length} / ${mission.game.coins.length}`
+            ? `${tr('Байрлал', 'Position')} ${mission.game.goal + 1} / ${mission.game.width} · ${tr('Зоос', 'Coins')} ${mission.game.coins.length} / ${mission.game.coins.length}`
             : mission.expected;
         field.value = draft ?? mission.solution;
         let worker = null, timeout;
@@ -65,20 +97,20 @@ window.JournalLab = (() => {
         function finish(message) { end(); output.textContent = message; }
         function execute() {
             if (worker) return;
-            if (!field.value.trim()) return finish('Турших Python кодоо бичээрэй.');
+            if (!field.value.trim()) return finish(tr('Турших Python кодоо бичээрэй.', 'Enter some Python code to try.'));
             try {
                 worker = new Worker('worker.js?v=journal-1');
                 const currentWorker = worker, lines = [];
                 field.readOnly = true; run.disabled = true; reset.disabled = true; stop.hidden = false;
-                output.textContent = 'Python ачаалж байна…';
-                timeout = setTimeout(() => finish('Python хугацаандаа ачаалсангүй. Дахин ажиллуулж үзээрэй.'), 90000);
-                worker.onerror = () => { if (worker === currentWorker) finish('Python ажиллаж чадсангүй. Дахин туршаарай.'); };
+                output.textContent = tr('Python ачаалж байна…', 'Loading Python…');
+                timeout = setTimeout(() => finish(tr('Python хугацаандаа ачаалсангүй. Дахин ажиллуулж үзээрэй.', 'Python took too long to load. Try again.')), 90000);
+                worker.onerror = () => { if (worker === currentWorker) finish(tr('Python ажиллаж чадсангүй. Дахин туршаарай.', 'Python could not start. Try again.')); };
                 worker.onmessage = ({data}) => {
                     if (worker !== currentWorker) return;
                     if (data.type === 'ready') {
                         clearTimeout(timeout);
-                        timeout = setTimeout(() => finish('Таван секунд өнгөрлөө. Давталтын нөхцөлөө шалгаарай.'), 5000);
-                        output.textContent = 'Ажиллаж байна…';
+                        timeout = setTimeout(() => finish(tr('Таван секунд өнгөрлөө. Давталтын нөхцөлөө шалгаарай.', 'The code ran for five seconds. Check the condition that ends your loop.')), 5000);
+                        output.textContent = tr('Ажиллаж байна…', 'Running…');
                         worker.postMessage({code:field.value, game:mission.game});
                     } else if (data.type === 'stdout') lines.push(data.text);
                     else if (data.type === 'result' || data.type === 'fatal') {
@@ -86,10 +118,10 @@ window.JournalLab = (() => {
                             const last = data.trace.at(-1);
                             const pos = last?.pos ?? mission.game.start;
                             const coins = (last?.coins ?? mission.game.coins).length;
-                            lines.push(`Байрлал ${pos + 1} / ${mission.game.width} · Зоос ${mission.game.coins.length-coins} / ${mission.game.coins.length}`);
+                            lines.push(`${tr('Байрлал', 'Position')} ${pos + 1} / ${mission.game.width} · ${tr('Зоос', 'Coins')} ${mission.game.coins.length-coins} / ${mission.game.coins.length}`);
                         }
                         if (data.error && data.kind !== 'test') lines.push(data.error);
-                        finish(lines.join('\n') || 'Код дууслаа. Хэвлэсэн гаралт алга.');
+                        finish(lines.join('\n') || tr('Код дууслаа. Хэвлэсэн гаралт алга.', 'Code finished with no printed output.'));
                     }
                 };
             } catch (error) { finish(error.message); }
@@ -107,10 +139,10 @@ window.JournalLab = (() => {
                 field.dispatchEvent(new Event('input',{bubbles:true}));
             }
         };
-        stop.onclick = () => finish('Зогсоолоо. Кодоо өөрчлөөд дахин туршаарай.');
+        stop.onclick = () => finish(tr('Зогсоолоо. Кодоо өөрчлөөд дахин туршаарай.', 'Stopped. Edit your code and try again.'));
         reset.onclick = () => {
-            if (field.value !== mission.solution && !confirm('Энэ туршилтын кодыг эх жишээгээр солих уу?')) return;
-            field.value = mission.solution; save(field.value); output.textContent = 'Эх жишээг сэргээв.'; field.focus();
+            if (field.value !== mission.solution && !confirm(tr('Энэ туршилтын кодыг эх жишээгээр солих уу?', 'Replace the code in this experiment with the original example?'))) return;
+            field.value = mission.solution; save(field.value); output.textContent = tr('Эх жишээг сэргээв.', 'Original example restored.'); field.focus();
         };
         run.onclick = execute;
         dialog.addEventListener('close', () => { end(); dialog.remove(); if (active === dialog) active = null; }, {once:true});

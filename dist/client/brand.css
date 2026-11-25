@@ -21,8 +21,8 @@
     image-rendering: pixelated;
 }
 .quest-brand .quest-wordmark { white-space: nowrap; }
-.quest-brand .quest-wordmark strong { color: #b9ee92; font-weight: inherit; }
-.quest-brand:hover .quest-wordmark strong { color: #d6ffae; }
+.quest-brand .quest-wordmark strong { color: #ffd28a; font-weight: inherit; }
+.quest-brand:hover .quest-wordmark strong { color: #ffe5b6; }
 .quest-brand:focus-visible { outline: 3px solid #ffc975; outline-offset: 4px; }
 
 @media (max-width: 650px) {

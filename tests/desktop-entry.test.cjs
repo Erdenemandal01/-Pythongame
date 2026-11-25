@@ -30,5 +30,5 @@ test('the desktop bootstrap and offline worker shim sit on the appropriate side 
     assert(sections[1].includes('src="battle-ui.js?'));
     assert(sections[1].includes('src="app.js?'));
     const startup = html.replace(sections[0], '');
-    assert.deepEqual([...startup.matchAll(/<script src="([^"]+)"/g)].map(a => a[1].split('?')[0]), ['device-class.js', 'desktop-only.js']);
+    assert.deepEqual([...startup.matchAll(/<script src="([^"]+)"/g)].map(a => a[1].split('?')[0]), ['game-locale.js', 'device-class.js', 'desktop-only.js']);
 });

@@ -60,8 +60,59 @@
         setTimeout(() => URL.revokeObjectURL(value), 1000);
     }
 
+    const phrase = (mn, en) => document.documentElement.lang === 'en' ? en : mn;
+
+    function doorstepScene() {
+        const panel = node('section','ac-doorstep');
+        const title = node('h3','',phrase('Гэрийн үүдэнд','At the ger door'));
+        const scene = node('div','ac-doorstep-art');
+        const visitor = node('img','ac-doorstep-visitor');
+        visitor.src = 'art/hero-0.png';
+        visitor.alt = '';
+        const caption = node('div','ac-doorstep-speech');
+        caption.setAttribute('aria-live','polite');
+        const speaker = node('strong');
+        const words = node('p');
+        words.translate = false;
+        caption.append(speaker,words);
+        scene.append(visitor,caption);
+        const controls = node('div','ac-doorstep-controls');
+        let lines = [], position = 0;
+        const previous = button(phrase('Өмнөх мөр','Previous line'),'ac-link',() => show(position-1));
+        const counter = node('span');
+        const next = button(phrase('Дараагийн мөр','Next line'),'ac-link',() => show(position+1));
+        controls.append(previous,counter,next);
+        panel.append(title,scene,controls);
+
+        function show(line) {
+            position = line;
+            speaker.textContent = line % 2 ? phrase('Гэрийн эзэн','Host') : phrase('Аялагч','Traveler');
+            words.textContent = lines[line] || phrase('〔Хоосон мөр〕','[Blank line]');
+            counter.textContent = (line+1) + ' / ' + lines.length;
+            previous.disabled = line === 0;
+            next.disabled = line >= lines.length-1;
+            scene.dataset.speaker = line % 2 ? 'host' : 'traveler';
+        }
+        function update(output) {
+            lines = output ? output.split('\n') : [];
+            controls.hidden = lines.length < 2;
+            if (lines.length) show(0);
+            else {
+                speaker.textContent = '';
+                words.textContent = output === null
+                    ? phrase('Мэндчилгээ бичээд ажиллуулаарай. Хэвлэсэн мөр бүр энд яриа болж гарна.','Run your greeting. Each printed line becomes a line of dialogue here.')
+                    : phrase('Яриагаа эхлэхийн тулд print() ашиглаарай.','Print a line to start the conversation.');
+                delete scene.dataset.speaker;
+            }
+        }
+        update(null);
+        return {panel,update};
+    }
+
     function lanternStreet() {
-        const locations=['Гүүр','Зах','Цэцэрлэг','Тайз','Булаг','Асар'];
+        const locations=document.documentElement.lang === 'en'
+            ? ['Bridge','Market','Garden','Stage','Spring','Pavilion']
+            : ['Гүүр','Зах','Цэцэрлэг','Тайз','Булаг','Асар'];
         const panel=node('section','ac-lantern-street');
         const count=node('select','ac-select');
         for (const n of [3,5,6]) count.append(option(String(n),n+' дэнлүү'));
@@ -214,6 +265,9 @@
         }
 
         renderStage() {
+            AcademyPlayground.leave();
+            AcademyInvestigate.leave();
+            this.projectTools = null;
             this.finishButton = null;
             this.pending = null;
             this.stage.replaceChildren();
@@ -236,10 +290,79 @@
         }
 
         prediction() {
+            const choices = [
+                ['quiz',phrase('Гаралтыг таах','Predict the output')],
+                ['play',phrase('Код өөрчилж турших','Edit and run')]
+            ];
+            if (AcademySequence.has(this.index)) choices.push(['sequence',phrase('Мөрүүдийг эвлүүлэх','Arrange the lines')]);
+            const menu = node('div','ac-activities');
+            menu.setAttribute('role','tablist');
+            menu.setAttribute('aria-label',phrase('Таамаглах дасгалууд','Prediction activities'));
+            const panels = new Map(), tabs = new Map();
+            const open = id => {
+                if (id !== 'play') AcademyPlayground.pause();
+                for (const [key,panel] of panels) {
+                    const selected = key === id;
+                    panel.hidden = !selected;
+                    tabs.get(key).setAttribute('aria-selected',String(selected));
+                    tabs.get(key).tabIndex = selected ? 0 : -1;
+                }
+                const panel = panels.get(id);
+                if (!panel.hasChildNodes()) {
+                    if (id === 'quiz') this.predictionQuestion(panel);
+                    if (id === 'sequence') AcademySequence.mount(panel,this.index,this.record,() => this.store());
+                    if (id === 'play') {
+                        const editorHost = node('div','ac-play-host');
+                        const scene = this.index === 0 ? doorstepScene() : null;
+                        panel.append(editorHost);
+                        if (scene) panel.append(scene.panel);
+                        AcademyPlayground.mount(editorHost,{
+                            lesson:this.lesson, drafts:this.record.drafts, save:() => this.store(),
+                            execute:(code,task,ui) => this.execute(code,'predictExample',task,ui),
+                            stop:() => this.cancel(), onOutput:scene?.update
+                        });
+                    }
+                }
+                if ((this.record.predictActivity || 'quiz') !== id) {
+                    this.record.predictActivity = id;
+                    this.store();
+                }
+            };
+            for (const [index,[id,label]] of choices.entries()) {
+                const tab = button(label,'ac-activity',() => open(id));
+                tab.id = 'ac-activity-'+id;
+                tab.setAttribute('role','tab');
+                const panel = node('div','ac-activity-panel ac-activity-'+id);
+                panel.id = 'ac-panel-'+id;
+                panel.setAttribute('role','tabpanel');
+                panel.setAttribute('aria-labelledby',tab.id);
+                panel.tabIndex = 0;
+                tab.setAttribute('aria-controls',panel.id);
+                tab.addEventListener('keydown',event => {
+                    const keys = {ArrowRight:(index+1)%choices.length,ArrowLeft:(index+choices.length-1)%choices.length,Home:0,End:choices.length-1};
+                    if (!Object.hasOwn(keys,event.key)) return;
+                    event.preventDefault();
+                    const target = choices[keys[event.key]][0];
+                    open(target);
+                    tabs.get(target).focus();
+                });
+                tabs.set(id,tab);
+                panels.set(id,panel);
+                menu.append(tab);
+            }
+            this.stage.append(menu,...panels.values());
+            open(panels.has(this.record.predictActivity) ? this.record.predictActivity : 'quiz');
+        }
+
+        predictionQuestion(panel) {
             const m = this.lesson;
             const split = node('div','ac-predict');
             const study = node('div','ac-study');
-            study.append(node('p','ac-prose',m.intro),node('pre','ac-example',m.example));
+            const example = node('pre','ac-example');
+            const code = node('code');
+            code.append(window.PythonSyntax?.highlight(m.example) ?? m.example);
+            example.append(code);
+            study.append(node('p','ac-prose',m.intro),example);
             const exercise = node('div','ac-quiz');
             const options = node('div','ac-options');
             const feedback = node('p','ac-quiz-feedback');
@@ -263,7 +386,7 @@
             update();
             exercise.append(node('h3','',m.question),options,feedback);
             split.append(study,exercise);
-            this.stage.append(split);
+            panel.append(split);
         }
 
         projects() {
@@ -297,8 +420,28 @@
             }
             if (task.hint) brief.append(details('Санаа авах',task.hint));
             if (this.phase !== 0) brief.append(details('Хичээлийн жишээ', this.lesson.example));
-            grid.append(brief, this.editor(key, task));
+            const box = this.editor(key, task);
+            grid.append(brief, box);
             this.stage.append(grid);
+            const host = node('div','ac-phase-tools');
+            brief.append(host);
+            const options = this.toolOptions(box);
+            if (this.phase === 2) {
+                this.projectTools = AcademyProjectTools.mount(host,options);
+            } else {
+                AcademyInvestigate.mount(host,{
+                    ...options, task, execute:(code,preview,ui) => this.execute(code,'labTrace',preview,ui),
+                    stop:() => this.cancel()
+                });
+            }
+        }
+
+        toolOptions(box) {
+            return {
+                phase:this.phase, index:this.index, lesson:this.lesson, record:this.record, records:this.save.lessons,
+                save:() => this.store(), editor:box?.querySelector('.ac-code'),
+                goProject:() => this.selectPhase(2)
+            };
         }
 
         experiment() {
@@ -342,8 +485,12 @@
             if (!game) inputs.append(node('pre','ac-example','path = input("Агуй эсвэл ой? ")\nif path == "агуй":\n    print("Луу сэрлээ!")\nelse:\n    print("Ойд эрдэнэ оллоо!")'));
             brief.append(inputs);
             if (!game) brief.append(button('Бүтээлийн тайз нээх','ac-link',()=>this.adapter.openMaker()));
-            grid.append(brief, this.editor(key, {starter:code, check:'', replies}));
+            const box = this.editor(key, {starter:code, check:'', replies});
+            grid.append(brief, box);
             this.stage.append(grid, this.notes('extension','Юуг өөрчилсөн бэ? Ямар үр дүн гарав?'));
+            const host = node('div','ac-phase-tools');
+            brief.append(host);
+            this.projectTools = AcademyProjectTools.mount(host,{...this.toolOptions(box), inputs:replies});
         }
 
         notes(key, title) {
@@ -363,6 +510,9 @@
 
         reflection() {
             this.stage.append(this.notes('reflection',this.lesson.reflect));
+            const host = node('div','ac-phase-tools');
+            this.stage.append(host);
+            this.projectTools = AcademyProjectTools.mount(host,this.toolOptions());
             this.pending = node('p','ac-pending');
             this.pending.setAttribute('role','status');
             this.finishButton = button('Хичээлээ дуусгах','ac-primary', () => {
@@ -406,7 +556,7 @@
             const reset = button('Загварыг сэргээх','ac-file-button', () => {
                 if (this.running || input.value === task.starter || !confirm('Энэ алхмын кодыг эхний загварт нь буцаах уу?')) return;
                 input.value = task.starter;
-                commit();
+                input.dispatchEvent(new Event('input',{bubbles:true}));
                 show({type:'idle', text:'Кодын загварыг сэргээв.'});
                 input.focus();
             });
@@ -443,6 +593,12 @@
             const callbacks = {show,lock,street,stdout: text => {
                 output.textContent = text;
                 output.hidden = false;
+            },checked:(data,code,out) => {
+                if (key === 'debug') {
+                    input.dispatchEvent(new CustomEvent('academy-checked',{
+                        detail:{kind:data.kind,code,error:data.error,ok:data.ok,out}
+                    }));
+                }
             }};
             if(this.runs.has(cacheKey)) show(this.runs.get(cacheKey));
             else if(this.record.passed.includes(key)) show({type:'pass',text:'✓ Энэ алхмын шалгалтыг давсан.'});
@@ -451,13 +607,14 @@
                 if (e.key === 'Enter' && (e.ctrlKey || e.metaKey)) {e.preventDefault(); run.click(); return;}
                 if (this.running || e.isComposing) return;
                 if (e.key === 'Tab' && !e.shiftKey) {
-                    e.preventDefault(); input.setRangeText('    ',input.selectionStart,input.selectionEnd,'end'); commit();
+                    e.preventDefault(); input.setRangeText('    ',input.selectionStart,input.selectionEnd,'end');
+                    input.dispatchEvent(new Event('input',{bubbles:true}));
                 } else if (e.key === 'Enter' && !e.shiftKey) {
                     e.preventDefault();
                     const last = input.value.slice(0,input.selectionStart).split('\n').pop();
                     const indent = last.match(/^ */)[0] + (last.trimEnd().endsWith(':')?'    ':'');
                     input.setRangeText('\n'+indent,input.selectionStart,input.selectionEnd,'end');
-                    commit();
+                    input.dispatchEvent(new Event('input',{bubbles:true}));
                 }
             };
             terminal.append(output,message);
@@ -476,21 +633,32 @@
             const current = () => active === this && this.generation === generation;
             const lines = [];
             let length = 0;
+            let submitted = false;
+            const runInput = task.replies?.value;
+            const reportExperiment = result => {
+                if (this.phase === 4 && !task.preview && submitted) {
+                    this.projectTools?.onResult?.({...result,code,stdin:runInput});
+                }
+            };
             const fail = error => {
                 if (!current()) return;
                 this.cancel();
                 ui.lock(false);
-                ui.show({type:'error',text:error,out:lines.join('\n')});
+                const result = {type:'error',text:error,out:lines.join('\n')};
+                ui.show(result);
+                reportExperiment(result);
             };
             const send = () => {
                 clearTimeout(this.timeout);
                 this.timeout = setTimeout(()=>fail('Код 5 секундээс удаан ажиллалаа. Давталтын төгсөх нөхцөлийг шалгаарай.'),5000);
-                this.worker.postMessage({code,academy:{check:task.check,sandbox:Boolean(task.replies),
+                this.worker.postMessage({code,academy:{check:task.check,checkAlternative:task.checkAlternative,
+                    checkHint:task.checkHint,sandbox:Boolean(task.replies),
                     ...(ui.street ? {lanterns:ui.street.names()} : {}),
-                    ...(task.replies ? {stdin:task.replies.value} : {})}});
+                    ...(task.replies ? {stdin:runInput} : {})}});
+                submitted = true;
             };
             try {
-                if (!this.worker) this.worker = new Worker('worker.js?v=academy-8');
+                if (!this.worker) this.worker = new Worker('worker.js?v=academy-9');
                 this.worker.onerror = e => fail('Python эхэлж чадсангүй. ' + (e.message || 'Хуудсаа шинэчлээд дахин оролдоорой.'));
                 this.worker.onmessage = ({data}) => {
                     if (!current()) return;
@@ -506,10 +674,10 @@
                     this.running = false;
                     ui.lock(false);
                     const experiment = Boolean(task.replies);
-                    if (data.ok && (!experiment || this.lesson.capstone)) {
+                    if (data.ok && !task.preview && (!experiment || this.lesson.capstone)) {
                         if (!this.record.passed.includes(key)) this.record.passed.push(key);
                         this.record.drafts[key] = code;
-                        if (experiment) (this.record.gameInputs??={})[key]=task.replies.value;
+                        if (experiment) (this.record.gameInputs??={})[key]=runInput;
                         this.store();
                     }
                     const result = {
@@ -518,8 +686,10 @@
                         text:data.ok ? (experiment ? '✓ Туршилт ажиллалаа. Ажиглалтаа доор тэмдэглээрэй.' : '✓ Шалгалт давлаа. Энэ алхам биелсэн.') : data.error || 'Даалгаврын нөхцөлийг дахин шалгаарай.',
                         out:lines.join('\n')
                     };
-                    this.runs.set(this.index + '/' + key, result);
+                    if (!task.preview) this.runs.set(this.index + '/' + key, result);
                     ui.show(result);
+                    ui.checked?.(data,code,result.out);
+                    reportExperiment(result);
                     this.refreshProgress();
                 };
                 if (this.ready) send();
@@ -529,6 +699,8 @@
     }
 
     function leave() {
+        AcademyPlayground.leave();
+        AcademyInvestigate.leave();
         active?.cancel();
         active = null;
     }

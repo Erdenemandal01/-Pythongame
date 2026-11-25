@@ -8,9 +8,9 @@
         return node;
     }
 
-    function picture(filename, className) {
+    function picture(filename, className, directory = 'art/') {
         const image = element('img', className);
-        image.src = 'art/' + filename;
+        image.src = directory + filename;
         image.alt = '';
         image.draggable = false;
         return image;
@@ -33,12 +33,13 @@
 
     function illustration() {
         const scene = element('div', 'ss-scene');
-        scene.append(picture('avatars/camp.webp', 'ss-scenery'), picture('avatars/scout.png', 'ss-traveler'));
+        scene.append(picture('steppe-camp.webp', 'ss-scenery', 'assets/'), picture('avatars/scout.png', 'ss-traveler'));
         const sample = element('div', 'ss-example');
         const code = element('code');
+        const greeting = globalThis.GameLocale?.lang === 'en' ? 'Hello!' : 'Сайн уу!';
         code.append(element('span', 'ss-prompt', '>>> '), element('span', 'ss-fn', 'print'),
-            '(', element('span', 'ss-string', '"Сайн уу!"'), ')');
-        sample.append(code, element('samp', '', 'Сайн уу!'));
+            '(', element('span', 'ss-string', '"' + greeting + '"'), ')');
+        sample.append(code, element('samp', '', greeting));
         scene.append(sample);
         return scene;
     }
@@ -65,7 +66,11 @@
         const title = element('h1', 'ss-title');
         const intro = element('p', 'ss-intro');
         if (signedIn || hasProgress) {
-            title.textContent = signedIn && name ? 'Сайн уу, ' + name + '!' : 'Миний суралцах зам';
+            if (signedIn && name) {
+                const nickname = element('span', '', name);
+                nickname.translate = false;
+                title.append('Сайн уу, ', nickname, '!');
+            } else title.textContent = 'Миний суралцах зам';
             if (hasProgress && resumeLabel) {
                 intro.append(element('span', 'ss-resume-caption', 'Үргэлжлүүлэх'), ' ', resumeLabel);
             } else {
@@ -73,16 +78,15 @@
                     'Эхний хичээлээ нээгээд Python-оор анхны бүтээлээ хийгээрэй.';
             }
         } else {
-            title.append('Өөрийн хурдаар ', element('span', 'ss-python', 'Python'), ' суръя.');
+            title.append(element('span', 'ss-python', 'Python'), '-ийг өөрийн хурдаар суръя.');
             intro.textContent = 'Монгол тайлбартай хичээлээр код бичиж, үр дүнг нь шууд хараарай. Пиксел зургаас эхлээд өөрийн тоглоом хүртэл бүтээнэ.';
         }
         copy.append(facts, title, intro);
         if ((signedIn || hasProgress) && total > 0) copy.append(progressLine(completed, total));
 
         const controls = element('div', 'ss-controls');
-        const primary = hasProgress
-            ? action('resume', 'Үргэлжлүүлэх', 'ss-primary', options.onResume)
-            : action('start', signedIn ? 'Эхний хичээлээ нээх' : 'Үнэгүй эхлэх', 'ss-primary', options.onStart);
+        const primary = action(hasProgress ? 'resume' : 'start', options.courseAction, 'ss-primary',
+            hasProgress ? options.onResume : options.onStart);
         primary.append(arrow());
         controls.append(primary);
         if (!signedIn && authAvailable) {
@@ -122,7 +126,7 @@
 
     function learningPath(options) {
         const section = element('section', 'ss-path');
-        section.append(element('h2', 'ss-section-title', 'Хичээлийн бүлгүүд'));
+        section.append(element('h2', 'ss-section-title', 'Үндсэн хичээлүүд'));
         const units = Array.isArray(options.units) ? options.units : [];
         if (units.length) {
             const next = units.findIndex(unit => !unit.locked && unit.completed < unit.total);
@@ -156,9 +160,15 @@
 
     function tools(options) {
         const section = element('section', 'ss-tools');
-        section.append(element('h2', 'ss-section-title', 'Бие даан турших'),
-            tool('practice', 'Чөлөөт талбар', 'Python кодоо бичиж ажиллуулах', null, options.onPractice),
-            tool('reference', 'Python лавлах', 'Командын тайлбар, жишээ хайх', 'avatars/journal.png', options.onReference),
+        section.append(element('h2', 'ss-section-title', 'Нэмэлт дасгалууд'));
+        if (options.recentPractice) {
+            const {title, icon, visit} = options.recentPractice;
+            section.append(tool('recent-practice', title, 'Сүүлд нээсэн дасгал', 'avatars/' + icon, visit));
+        }
+        if (options.recentPractice?.kind !== 'practice') {
+            section.append(tool('practice', 'Чөлөөт талбар', 'Python кодоо бичиж ажиллуулах', null, options.onPractice));
+        }
+        section.append(tool('reference', 'Python лавлах', 'Командын тайлбар, жишээ хайх', 'avatars/journal.png', options.onReference),
             tool('adventure', 'Аяллын зураг', 'Кодоор баатраа удирдах', 'avatars/map.png', options.onAdventure));
         return section;
     }
@@ -172,7 +182,7 @@
         const home = element('div', 'ss-home');
         const sections = element('div', 'ss-sections');
         sections.append(learningPath(options), tools(options));
-        home.append(hero(options), guide, sections);
+        home.append(hero(options), sections, guide);
         root.replaceChildren(home);
         if (guideFocused) guide.querySelector('summary').focus({preventScroll:true});
         if (restore) {

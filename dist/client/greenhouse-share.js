@@ -1,11 +1,12 @@
 // A challenge carries just the five starting moisture readings, in pot order.
 window.GreenhouseShare = (() => {
     'use strict';
+    const workshopText = globalThis.PQEnglishWorkshops?.literal || (text => text);
     const alphabet = '0123456789ABCDEFGHJKMNPQRSTVWXYZ';
     const potCount = 5;
     const moistureBase = 101;
     const payloadLength = 7;
-    const invalidCode = 'Сорилын кодыг шалгаарай. G1-ээр эхэлсэн кодыг бүтнээр нь оруулна уу.';
+    const invalidCode = workshopText('Сорилын кодыг шалгаарай. G1-ээр эхэлсэн кодыг бүтнээр нь оруулна уу.');
 
     function checksum(digits) {
         // GF(32), x^5 + x^2 + 1. Detects one changed digit or adjacent transposition.
@@ -19,12 +20,12 @@ window.GreenhouseShare = (() => {
 
     function encode(values) {
         if (!Array.isArray(values) || values.length !== potCount) {
-            throw new Error('Таван савны чийгийг оруулна уу.');
+            throw new Error(workshopText('Таван савны чийгийг оруулна уу.'));
         }
         let packed = 0;
         for (const moisture of values) {
             if (!Number.isInteger(moisture) || moisture < 0 || moisture >= moistureBase) {
-                throw new Error('Сав бүрийн чийг 0–100 хүртэлх бүхэл тоо байна.');
+                throw new Error(workshopText('Сав бүрийн чийг 0–100 хүртэлх бүхэл тоо байна.'));
             }
             packed = packed * moistureBase + moisture;
         }
@@ -48,7 +49,7 @@ window.GreenhouseShare = (() => {
         if (digits.includes(-1)) throw new Error(invalidCode);
         const checkDigit = digits.pop();
         if (checksum(digits) !== checkDigit) {
-            throw new Error('Кодын нэг тэмдэг зөрж байна. Найзынхаа кодтой тулгаад дахин оруулаарай.');
+            throw new Error(workshopText('Кодын нэг тэмдэг зөрж байна. Найзынхаа кодтой тулгаад дахин оруулаарай.'));
         }
         let packed = 0;
         for (const digit of digits) packed = packed * 32 + digit;

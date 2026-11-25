@@ -16,7 +16,7 @@
     position: relative;
     isolation: isolate;
     padding: 24px 64px 21px 26px;
-    background: linear-gradient(95deg, #15172ef5 14%, #211a36cc 48%, #1f244062), url('art/skylands.webp') center 59% / cover;
+    background: linear-gradient(95deg, #15172ef5 14%, #211a36cc 48%, #1f244062), url('assets/steppe-camp.webp') center 59% / cover;
     border-bottom: 1px solid var(--account-line);
 }
 .account-kicker { font: 700 .77rem/1.4 Consolas, monospace; letter-spacing: .14em; color: #d6f7a9; }

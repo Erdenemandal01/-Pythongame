@@ -1,7 +1,7 @@
 (() => {
     'use strict';
 
-    const topics = [
+    const originalTopics = [
         {
             id: "range",
             title: "range() • Тооны дараалал",
@@ -274,6 +274,12 @@
         }
     ];
 
+    const english = window.GameLocale?.lang === 'en' && window.PythonReferenceEnglish;
+    const topics = english ? originalTopics.map(topic => {
+        const translated = english[topic.id];
+        return {...topic, ...translated, aliases: [...topic.aliases, ...translated.aliases]};
+    }) : originalTopics;
+
     // A pupil can type with a Mongolian or a Latin keyboard on a classroom computer.
     const letters = {
         а:'a', б:'b', в:'v', г:'g', д:'d', е:'e', ё:'yo', ж:'j', з:'z', и:'i', й:'i',
@@ -289,6 +295,12 @@
     }
 
     const fillers = new Set(words('яагаад яаж хэрхэн байна байнаа юм бэ вэ бол болох уу үү нь би миний яах дээр бас ын ийн ийг д т аар оор ээр өөр байна уу what how why do does the is'));
+    if (english) {
+        fillers.delete('in');
+        for (const word of ['a','an','can','i','my','to','of','it','me','doesn','t','am','are','on','with','when']) {
+            fillers.add(word);
+        }
+    }
     // Common inflections students use when a keyword is embedded in a question.
     const stems = {
         davtal:'davt', davtah:'davt', davtag:'davt', davtuu:'davt',

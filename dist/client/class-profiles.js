@@ -41,17 +41,19 @@ function activateStudent(next,route) {
 function classProfilePicker() {
     const box=document.createElement('details'),summary=document.createElement('summary');
     summary.textContent='Нэг компьютер ээлжилж ашиглах';box.append(summary);
-    const active=document.createElement('p');active.textContent='Одоогийн сурагч · '+state.name;box.append(active);
+    const active=document.createElement('p'), nickname=document.createElement('span');
+    nickname.translate=false;nickname.textContent=state.name;
+    active.append('Одоогийн сурагч · ',nickname);box.append(active);
     const name=document.createElement('input');
     name.maxLength=24;name.placeholder='Шинэ сурагчийн хоч';name.setAttribute('aria-label',name.placeholder);
     const select=document.createElement('select');select.setAttribute('aria-label','Хадгалсан сурагч сонгох');
     let saved={};try {saved=readParkedStudents();}catch{}
     Object.entries(saved).forEach(([id,s])=>{
         if(id===state.academy.portfolioId || !s || typeof s.name!=='string')return;
-        const option=document.createElement('option');option.value=id;option.textContent=s.name+' · '+id.slice(0,4);select.append(option);
+        const option=document.createElement('option');option.translate=false;option.value=id;option.textContent=s.name+' · '+id.slice(0,4);select.append(option);
     });
     function swap(next) {
-        if (activateStudent(next,'academy')) toast(state.name+' · Урлан нээгдлээ.');
+        if (activateStudent(next,'academy')) toast(state.name+' · '+(globalThis.GameLocale?.text('Урлан нээгдлээ.') ?? 'Урлан нээгдлээ.'));
     }
     const start=document.createElement('button');start.type='button';start.textContent='Шинэ сурагч эхлүүлэх';
     start.onclick=()=>{if(!name.value.trim())return name.focus();const next=fresh();next.name=name.value.trim();swap(next);};

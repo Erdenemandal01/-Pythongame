@@ -1,0 +1,5 @@
+.game-language { display: inline-flex; align-items: center; gap: .35rem; color: #d9cef4; font: 600 .82rem/1.2 system-ui, sans-serif; white-space: nowrap; }
+.game-language select { max-width: 9rem; padding: .35rem .4rem; color: #f4efff; border: 1px solid #63557e; border-radius: .45rem; background: #252238; font: inherit; cursor: pointer; }
+.game-language select:focus-visible { outline: 3px solid #cbb3ff; outline-offset: 2px; }
+#pq-handheld .game-language { display: inline-flex; margin-top: .85rem; }
+

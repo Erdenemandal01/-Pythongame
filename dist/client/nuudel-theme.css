@@ -1,0 +1,279 @@
+/* Shared materials of the illustrated journey. Each row of the trim is a
+   run of square stitches, repeated on the same 24px loom. */
+:root {
+    --nk-ink: #10292e;
+    --nk-deep: #0c1c22;
+    --nk-panel: #183338;
+    --nk-edge: #536057;
+    --nk-gold: #edbd70;
+    --nk-paper: #f6ead4;
+    --nk-muted: #b5c6bd;
+    --nk-turq: #74d3c0;
+    --nk-red: #974737;
+    --nk-stitch: #bb935f;
+    --nk-serif: Georgia, Cambria, "Times New Roman", serif;
+    --nk-trim:
+        linear-gradient(var(--nk-stitch), var(--nk-stitch)) 0 0 / 100% 1px no-repeat,
+        repeating-linear-gradient(90deg, var(--nk-stitch) 0 14px, transparent 14px 24px) 0 2px / 24px 2px repeat-x,
+        repeating-linear-gradient(90deg, var(--nk-stitch) 0 2px, transparent 2px 8px, var(--nk-stitch) 8px 10px, transparent 10px 12px, var(--nk-stitch) 12px 14px, transparent 14px 24px) 0 4px / 24px 2px repeat-x,
+        repeating-linear-gradient(90deg, var(--nk-stitch) 0 2px, transparent 2px 8px, var(--nk-stitch) 8px 14px, transparent 14px 18px, var(--nk-stitch) 18px 20px, transparent 20px 24px) 0 6px / 24px 2px repeat-x,
+        repeating-linear-gradient(90deg, var(--nk-stitch) 0 2px, transparent 2px 18px, var(--nk-stitch) 18px 20px, transparent 20px 24px) 0 8px / 24px 2px repeat-x,
+        repeating-linear-gradient(90deg, var(--nk-stitch) 0 20px, transparent 20px 24px) 0 10px / 24px 2px repeat-x;
+    color-scheme: dark;
+}
+body {
+    color: var(--nk-paper);
+    background-color: var(--nk-deep);
+    background-image: radial-gradient(ellipse at 87% 0, #1b393b 0, transparent 42rem),
+        repeating-linear-gradient(45deg, #b1b99d05 0 1px, transparent 1px 5px);
+}
+body > header {
+    position: relative;
+    height: 76px;
+    padding-inline: max(2rem, calc((100vw - 1450px) / 2));
+    border-bottom: 1px solid #a78252;
+    background: linear-gradient(100deg, #173b40, #112a32 54%, #233c37);
+    box-shadow: 0 4px 14px #07191a80;
+}
+body > header::after {
+    content: "";
+    pointer-events: none;
+    position: absolute;
+    inset: auto 0 0;
+    height: 12px;
+    opacity: .66;
+    background: var(--nk-trim);
+}
+body > header .tag { color: #d0c6a8; letter-spacing: .12em; }
+body > header .stats, body > header > .quest-brand, body > header > .tag { margin-bottom: 6px; }
+body > header .stats { align-items: center; }
+body > header :is(.game-language,#profileBtn) { border: 1px solid #688079; border-radius: 5px; background: #19353a; color: var(--nk-paper); }
+body > header .game-language select { color: var(--nk-paper); background: #19353a; border-color: transparent; }
+#level { color: var(--nk-turq); }
+#xp { color: var(--nk-gold); }
+main > .content { min-width: 0; }
+main > aside {
+    border-color: #51645e;
+    background: linear-gradient(155deg, #17363a 0, #132c30 40%, #10282b 86%);
+    border-bottom: 1px solid #40534c;
+}
+main > aside h2 {
+    margin-block: 0 .6rem;
+    color: var(--nk-paper);
+    font: 700 1.43rem/1.25 var(--nk-serif);
+}
+.main-nav { gap: .85rem; }
+.nav-group h3, .nav-extra > summary { color: #e4bf83; }
+.nav-extra { border-color: #435b54; }
+.main-nav button, .main-nav #openPythonReference {
+    min-height: 36px; border-radius: 4px; padding-block: .43rem; color: #ccdad1;
+}
+.main-nav button:hover, .main-nav #openPythonReference:hover { color: #fff3d7; background: #244448; }
+.main-nav button.selected, .main-nav button.selected:hover {
+    background: linear-gradient(90deg, #743f35, #5b3830);
+    border: 1px solid #bc9164; box-shadow: inset 3px 0 var(--nk-gold);
+    color: #fff2d3;
+}
+.side-worlds { border-color: #42564e; }
+.side-world { color: #d5d9c7; }
+.side-world:hover { color: var(--nk-paper); background: #223c3e; }
+.journey { border: 1px solid #506358; border-radius: 5px; background: #112c30; color: var(--nk-paper); }
+.journey small, .muted { color: var(--nk-muted); }
+.journey progress { accent-color: var(--nk-turq); }
+.journey progress::-webkit-progress-value { background: var(--nk-turq); }
+main > aside .text-button, #helpBtn {
+    background: #183333; color: #dfd5b9; border-color: #68745f;
+}
+#helpBtn:hover { background: #284643; color: white; }
+.view :is(h1,h2), .ref-top h2, .ref-topic-title, .account-top h2, #profile h2, #help .help-top h2 {
+    font-family: var(--nk-serif);
+    letter-spacing: -.015em;
+}
+.eyebrow { color: #dabb84; letter-spacing: .105em; }
+.view .pill { color: #ffdfaa; border-color: #8b7954; background: #243836; }
+
+/* The opening spread pairs warm paper with a full-colour illustration. */
+.ss-home {
+    --ss-bg: #193536; --ss-surface: #1a3437; --ss-line: #455b52;
+    --ss-ink: var(--nk-paper); --ss-dim: var(--nk-muted); --ss-mint: var(--nk-turq);
+}
+.ss-hero, .ph-camp, #questView .scene, .ac-banner {
+    border: 1px solid #ab8a59;
+    border-radius: 6px;
+    box-shadow: 0 4px 0 #07181a, 0 8px 24px #07171957;
+}
+.ss-copy {
+    --nk-stitch: #a57639;
+    color: #233a38;
+    background: radial-gradient(ellipse at 25% 10%, #fff1d6, transparent 75%), #e6cfaa;
+    border-inline-end: 3px double #92794f;
+}
+.ss-copy::before {
+    content: ""; pointer-events: none; position: absolute;
+    inset: 0 0 auto; height: 12px; opacity: .8; background: var(--nk-trim);
+}
+.ss-home .ss-title { color: #253d39; font-family: var(--nk-serif); font-weight: 700; line-height: 1.04; letter-spacing: -.035em; }
+.ss-python { color: #0e645d; }
+.ss-facts span, .ss-facts span + span, .ss-save-note, .ss-resume-caption { color: #585644; }
+.ss-facts span + span::before { background: #947b56; }
+.ss-copy .ss-intro, .ss-copy .ss-progress { color: #344740; }
+.ss-copy .ss-progress strong { color: #28534a; }
+.ss-hero .ss-primary {
+    color: #fff3db; background: #235653; border: 1px solid #1b3b3c;
+    border-radius: 5px; box-shadow: inset 0 -2px #133c39;
+}
+.ss-hero .ss-primary:hover { background: #193f3c; }
+.ss-hero .ss-secondary, .ss-hero .tg-replay {
+    border: 1px solid #9b805a; border-radius: 5px;
+    color: #3f4334; background: #f8e6c1;
+}
+.ss-hero .ss-secondary:hover, .ss-hero .tg-replay:hover { background: #fff1d2; }
+.ss-hero .ss-link { color: #265a52; }
+.ss-copy :is(.ss-primary,.ss-secondary,.ss-link,.tg-replay):focus-visible { outline-color: #703f2e; }
+.ss-scene::after { background: linear-gradient(90deg, #472e1e1a, transparent 12%), linear-gradient(0deg, #13282e80, transparent 48%); }
+.ss-example { background: #10282df2; border-color: #849078; border-inline-start-color: var(--nk-gold); }
+.ss-home .ss-section-title, .view .map-heading h2, .course-library .catalog-chapter h2 {
+    display: flex; align-items: center; gap: .65rem; font-family: var(--nk-serif);
+}
+.ss-home .ss-section-title::before, .map-heading h2::before, .catalog-chapter h2::before {
+    content: ""; flex: none; width: .55rem; height: .55rem;
+    transform: rotate(45deg); border: 1px solid var(--nk-gold); box-shadow: inset 0 0 0 2px var(--nk-deep); background: #b38c5e;
+}
+.ss-unit-number, .ss-tool-icon { color: #f0cc8b; background: #28403b; border: 1px solid #54604d; border-radius: 5px; }
+.ss-row-copy small { color: #c0cdc2; }
+.ss-unit:hover:enabled, .ss-tool:hover:enabled { background: #26423e; }
+.ph-camp { --camp-ink: var(--nk-ink); --camp-gold: var(--nk-gold); --camp-mint: var(--nk-turq); background: var(--nk-panel); }
+.ph-routes, .ph-camp-actions { background: #193234; }
+.ph-route { border-color: #556153; background: #233c3f; color: var(--nk-paper); }
+.ph-route.ph-route-primary { border-color: #a4885e; background: #2b413c; }
+
+/* Route cards keep the landscape and teaching tools clearly separated. */
+.world-card, .daily, .school-entry, .practice-help, .journal-card, .award, .summary-stats > div,
+.ws-card, .co-overview, .pace-guide, .rd-panel, .lb-panel, .lb-message, .lb-wait,
+.ce-brief, .ce-checks, .wk-brief, .wk-results {
+    border: 1px solid var(--nk-edge); border-radius: 7px; background-color: var(--nk-panel); color: var(--nk-paper);
+}
+.world-card-head { border-bottom-color: #827651; background-color: #193237; }
+.world-card-head h3, .ws-card h2 { font-family: var(--nk-serif); }
+.world-card .world-icon { border: 1px solid #a08a5c; border-radius: 5px; background: #243e39; }
+.mission-path { background-color: #142b30; }
+.mission-node.available i { color: #153630; background: #c1dfb3; border-color: #c2d4a7; }
+.mission-node i { border-radius: 6px; }
+.quest-bar .secondary, .view .secondary, .view button.reference-trigger,
+.view .ac-studio .ac-link, .view .ac-studio .ac-forward {
+    color: #e3dbbf; background: #233a39; border-color: #68735e;
+}
+.view .secondary:hover:enabled, .view button.reference-trigger:enabled:hover { background: #304943; }
+.scene-copy h2 { color: #fff2d5; }
+.scene-hud .hud-chip, .scene-dialog {
+    color: #f8eed9; border-color: #b2956a; background-color: #10242bec;
+    border-radius: 4px; box-shadow: 0 2px #091518;
+}
+.task, .ac-brief { border-inline-start-color: var(--nk-gold); }
+.task > span { color: #e8c38b; }
+.target, #hint { border-color: #5a6557; background-color: #1b3535; }
+.coding, .ac-editor, .wk-editor, .ce-editor, .jl-editor, .ref-editor, .rd-editor, .dr-editor, .mu-codecard,
+.ct-desk, .mk-editor, .lv-panel.lv-code-card {
+    background-color: #101e23; border-color: #696950; border-radius: 6px;
+}
+.editor-head, .ac-filebar, .ce-file, .wk-file, .rd-editor-head, .ref-dialog .ref-file {
+    background: #273c3c; border-color: #59675b; color: #e2c994;
+}
+.editor-foot, .ac-runbar { background-color: #192d31; border-color: #4c5b54; }
+.console, .ac-terminal { background: #0c1a20; border-color: #43564c; }
+.editor-head button, .console-title, .ac-filename { color: #c6d6ca; }
+#run, .view :is(.wk-run,.ce-run,.ref-run,.jl-run,.ct-run,.gh-run,.mk-play,.lv-primary) {
+    color: #102d2c; background: var(--nk-turq); border-radius: 5px;
+}
+
+/* The library and learning studio use the same brass clasps as the trail. */
+.ac-studio {
+    --ac-panel: var(--nk-panel); --ac-border: var(--nk-edge); --ac-muted: var(--nk-muted);
+    --ac-gold: var(--nk-gold); --ac-green: var(--nk-turq);
+}
+.ac-banner::before {
+    background: linear-gradient(95deg, #112729f5 10%, #142b2bd0 46%, #162a2024 87%),
+        var(--ac-landscape, url("art/avatars/camp.webp")) center 57% / cover no-repeat;
+}
+.ac-banner::after {
+    content: ""; position: absolute; inset: auto 0 0; height: 12px; pointer-events: none;
+    opacity: .7; background: var(--nk-trim); transform: rotate(180deg);
+}
+.ac-library summary, .ac-hint summary, .catalog-status, .catalog-intro, .ac-select, .ac-search { color: var(--nk-muted); }
+.ac-label :is(.ac-search,.ac-select,.ac-note-input,.ac-reply-input), .ref-search, .ref-share-url {
+    color: var(--nk-paper); background: #10252b; border-color: var(--nk-edge);
+}
+.course-library .ac-filters, .course-library .ac-lesson-item { border-color: var(--nk-edge); background: var(--nk-panel); color: var(--nk-paper); }
+.course-library .ac-lesson-item { border-radius: 4px; }
+.course-library .ac-lesson-item:hover, .ac-studio .ac-lesson-item[aria-current=true] { background: #2b4139; border-color: #ad946a; }
+.ac-studio .ac-step, .ac-studio .ac-option { background: #1c3337; color: #d5dfd4; border-color: #506255; }
+.ac-studio .ac-step[aria-current=step] { border-color: #ba9863; background: #504037; color: #fff0cf; box-shadow: inset 0 -3px #c19762; }
+.ac-step[aria-current=step] .ac-step-mark { color: var(--nk-gold); }
+.ac-studio .ac-option.is-correct { color: #d2efc7; background: #264b3d; border-color: #91bd8e; }
+.ac-studio .ac-option.is-wrong { color: #ffd5c6; background: #583732; border-color: #cf9980; }
+.ac-studio .ac-option[aria-pressed=true]:not(.is-correct,.is-wrong) { color: #ffe4b8; background: #443e31; border-color: #d1af76; }
+.ac-stage .ac-study, .ac-stage .ac-quiz, .ac-stage .ac-brief { border-radius: 6px; }
+.ac-lantern-street { background: linear-gradient(0deg,#10242eeb,#253b4675),url("art/avatars/camp.webp") center 68%/cover; }
+
+/* Keep each specialist workshop's simulation colours and learning signals. */
+.gh-shell { --gh-panel: var(--nk-panel); --gh-line: var(--nk-edge); --gh-text: var(--nk-paper); --gh-muted: var(--nk-muted); --gh-mint: var(--nk-turq); }
+.dr-shell { --dr-bg: var(--nk-deep); --dr-panel: var(--nk-panel); --dr-edge: var(--nk-edge); --dr-muted: var(--nk-muted); --dr-light: var(--nk-paper); }
+.lv-shell { --lv-panel: var(--nk-panel); --lv-border: var(--nk-edge); --lv-muted: var(--nk-muted); --lv-mint: var(--nk-turq); }
+.mu-shell { --mu-panel: var(--nk-panel); --mu-line: var(--nk-edge); --mu-muted: var(--nk-muted); --mu-pale: var(--nk-paper); --mu-light: var(--nk-turq); }
+.rd-shell { --rd-line: var(--nk-edge); --rd-ice: var(--nk-turq); --rd-text: var(--nk-paper); --rd-muted: var(--nk-muted); --rd-sand: var(--nk-gold); }
+.lb-ranking { --lb-border: var(--nk-edge); --lb-dim: var(--nk-muted); --lb-gold: var(--nk-gold); }
+.ws-subnav a, .ct-api summary { color: #e1c18c; }
+.ws-copy { border-top: 2px solid #8a7550; }
+.ws-card:hover, .ws-card:focus-visible { background: #203d3c; border-color: var(--nk-gold); }
+.ws-card { border-radius: 6px; }
+.mu-instrument { background: linear-gradient(150deg,#473831,#293637 70%); }
+.mu-shell .mu-pad { background: #1e3435; border-color: #706753; border-bottom-color: var(--voice); }
+.mu-instrument-icon { display: block; width: 36px; height: 36px; margin: 0 auto 3px; image-rendering: pixelated; }
+.rd-legend .rd-key-wall { background:#986d54; border-color:#c1a17f; }
+.ct-feedback, .ct-share, .mk-board, .dt-panel, .dr-stage, .mu-assignment, .gh-study, .lv-details, .rd-finish, .jl-results {
+    border-color: var(--nk-edge); background-color: var(--nk-panel); border-radius: 6px;
+}
+.ws-title, .rd-head, .mu-head, .dr-head, .gh-header, .ct-header, .dt-head, .lv-page-head, .mk-head, .wk-header {
+    padding-bottom: .85rem; border-bottom: 2px solid #7b7152;
+}
+.lb-hero, .ce-intro, .account-top, .world::before {
+    background: linear-gradient(95deg,#112c30f2 10%,#193536cc 47%,#2c362e4d),
+        url("assets/steppe-camp.webp") center 61% / cover;
+}
+.lb-hero, .ce-intro { border-color: #b39468; border-radius: 7px; }
+.lb-ranking .lb-switcher, .pace-stage { background-color: #192f31; border-color: var(--nk-edge); }
+.journal-card { border-inline-start: 3px solid #92805a; }
+.summary-stats > div, .award { background: #193234; }
+.award.earned { border-color: #a28c5d; background: linear-gradient(145deg,#2b423a,#183338); }
+.award.earned small { color: var(--nk-gold); }
+dialog:is(.ref-dialog,.jl-dialog,.account-dialog,#profile,#help.pq-help), #pq-handheld {
+    --ref-panel: var(--nk-panel); --ref-border: var(--nk-edge); --ref-ink: var(--nk-paper); --ref-soft: var(--nk-muted);
+    --account-line: var(--nk-edge); --account-ink: var(--nk-paper);
+    --help-border: var(--nk-edge); --help-muted: var(--nk-muted);
+    background-color: #152c31; color: var(--nk-paper);
+    border-color: #a78b63; border-radius: 8px;
+}
+.ref-top, #help.pq-help .help-top, .jl-head { background: #1e3a3b; border-color: #69705b; }
+.ref-top h2, #help.pq-help .help-top h2 { color: var(--nk-paper); }
+.account-link:not(.quiet), #pq-handheld button { background: var(--nk-turq); color: #16332d; }
+body.pq-handheld { background: radial-gradient(ellipse at 50% 0,#244345,transparent 75%),var(--nk-deep); }
+
+@media (min-width: 651px) {
+    body > main { padding-block-start: 0; }
+    main > aside {
+        min-height: calc(100dvh - 76px);
+        max-height: 100dvh; overflow-y: auto; overscroll-behavior-y: contain;
+        scrollbar-color: #526659 #152f32; scrollbar-width: thin;
+    }
+}
+@media (max-width: 650px) {
+    body > header { padding-inline: .9rem; }
+    main > aside { border-inline: 0; }
+}
+@media (max-width: 460px) {
+    body > header { height: auto; padding-block: .5rem .85rem; }
+}
+@media (forced-colors: active) {
+    body > header::after, .ac-banner::after, .ss-copy::before { display: none; }
+    .main-nav button.selected, .ac-studio .ac-step[aria-current=step] { outline: 2px solid Highlight; }
+}

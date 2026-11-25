@@ -74,17 +74,39 @@ const WorkshopArt = (() => {
             for(const [x,y] of [[83,15],[119,10],[158,18]]){box(x,y,9,2,'#f9ce88');box(x,y,2,10,'#f9ce88');box(x-3,y+8,5,3,'#f9ce88');}
         } else if(type==='detective') {
             const amber=['#eab56c','#8cd8c7','#c4a2e8','#e8bc71','#a8ce80'][variant%5];
-            for(let i=0;i<7;i++){const x=1+i*34;box(x,18+(i%3)*4,20,34,'#2d4354');box(x+2,20+(i%3)*4,7,2,'#678082');}
-            box(0,66,WIDTH,22,'#3c4e59');box(0,67,WIDTH,2,'#93a297');
-            for(let x=0;x<WIDTH;x+=18){box(x,72,8,2,'#627575');box(x+9,80,11,2,'#465f65');}
-            box(129,21,53,47,'#1b2d3c');box(126,21,59,5,'#70868a');box(127,25,4,43,'#86a19a');box(180,25,4,43,'#6c8887');
-            for(let i=0;i<5;i++){const y=active?27+i:28+i*7;box(134,y,43,active?1:6,i%2?'#56727a':'#69868b');}
+            // The debugging gate is the door of a roadhouse on the night steppe.
+            for(let x=0;x<WIDTH;x+=2){
+                const ridge=44+Math.round(7*Math.sin(x/23)+4*Math.sin(x/13));
+                box(x,ridge,2,60-ridge,'#435d63');
+            }
+            box(0,60,WIDTH,28,'#455d59');box(0,67,WIDTH,2,'#899980');
+            for(let x=0;x<WIDTH;x+=18){box(x,72,8,2,'#657568');box(x+9,80,11,2,'#536c60');}
+            box(101,36,108,29,'#c4bea2');
+            for(let j=0;j<11;j++)box(99+j*5,35-j*2,112-j*10,3,j%3?'#cbc6ad':'#bab69f');
+            box(149,12,16,3,'#65736b');box(153,6,3,7,'#515c5a');
+            box(101,40,108,3,'#826652');box(101,57,108,2,'#916c54');
+            box(127,24,57,43,'#562f30');box(129,24,53,4,'#bf7955');
+            box(132,29,47,38,'#203337');
+            for(let x=134;x<178;x+=9){
+                box(x,25,6,1,'#edbd73');box(x,25,1,2,'#edbd73');box(x+5,25,1,3,'#edbd73');
+            }
+            if(!active){
+                box(133,29,22,38,'#97543f');box(156,29,22,38,'#9e5e44');
+                for(const x of [135,158]){
+                    box(x,31,18,16,'#b7734c');box(x+2,33,14,12,'#99533e');
+                    box(x,51,18,12,'#c28a55');box(x+2,53,14,8,'#965740');
+                }
+                box(151,48,3,2,'#f1c374');box(157,48,3,2,'#f1c374');
+            }else{
+                box(133,30,4,37,'#92563f');box(175,30,4,37,'#92563f');
+                box(138,66,36,2,'#e5c18b');
+            }
             box(141,17,29,4,active?'#91df95':amber);box(184,40,8,13,'#2a394a');box(186,42,4,3,active?'#99e9ab':'#f6a58c');
             block(active?100:66,39,[
-                '...kk.....kk...','....k..y..k....','...kkkkkkkkk...','..kccccccccck..',
+                '.......a.......','......kak......','....kkccckk....','..kaaaaaaaaak..',
                 '..kkoooooookk..','..kobbooobbok..','..koooooooook..','...kccccccck...',
-                '....kkwwkkk....','..kkccccccckk..','.ksskaaaakcssk.','.ksskaaaakcssk.',
-                '....kcccccck...','....kkkkkkkk...','....kss..ssk...','...kkkk..kkkk..'
+                '....kkwwkkk....','..kkccwcccckk..','.ksskcwwcccssk.','.ksskaaaaaassk.',
+                '....kcccccck...','...kcccccccck..','....kss..ssk...','...kkkk..kkkk..'
             ],{k:'#24303f',c:'#b4c8be',o:'#334d58',b:active?'#bdf298':'#8ee2df',w:'#d2b087',a:amber,s:'#637d83'},2);
             box(35,61,13,6,'#b88962');box(35,61,13,2,'#d5b276');
         } else {

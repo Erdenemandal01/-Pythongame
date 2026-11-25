@@ -1,5 +1,5 @@
 .world, .scene {isolation:isolate;position:relative;overflow:hidden;border:3px solid #353042;border-radius:12px;box-shadow:0 4px 0 #090c17;background:#74b9e8}
-.world::before,.scene::before {content:"";position:absolute;inset:0;z-index:-2;background:url("art/skylands.webp") center / 100% 100% no-repeat}
+.world::before,.scene::before {content:"";position:absolute;inset:0;z-index:-2;background:url("assets/steppe-camp.webp") center / 100% 100% no-repeat}
 .world {aspect-ratio:2.5;min-height:265px;align-items:flex-end}
 .world .world-label {padding:22px 24px;margin:18px;min-width:0;background:#131725ed;border:2px solid #aaa5ba;border-radius:5px;max-width:45%;box-shadow:3px 4px #222039}
 .world h1 {font-size:clamp(20px,2.2vw,33px);margin:5px 0}.world .pill {padding:0;border:0;color:#ffd572}.world p {color:#e0e8ed}

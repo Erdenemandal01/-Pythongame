@@ -124,7 +124,8 @@
             const layout = element('div', 'ce-layout');
             const brief = element('article', 'ce-brief');
             brief.append(element('h2', '', task.title), element('p', 'ce-skill', task.skill),
-                element('p', '', task.instructions), element('h3', '', 'Жишээ'), element('code', 'ce-example', task.example));
+                element('p', '', task.instructions), element('h3', '', 'Жишээ'), element('code', 'ce-example',
+                    task.id === 'kite' ? 'kite(5, False) → '+literal(WeeklyPython.displayExpected('kite','нисгэ')) : task.example));
             const editor = element('section', 'ce-editor');
             const label = element('label', 'ce-file', task.id + '.py');
             label.htmlFor = 'ce-code';
@@ -169,7 +170,7 @@
                 const row = element('div', 'ce-row');
                 const result = element('span', 'ce-result');
                 row.append(element('code', '', fn + '(' + args.map(literal).join(', ') + ')'),
-                    element('span', 'ce-expected', 'Хүлээх утга · ' + literal(expected)), result);
+                    element('span', 'ce-expected', 'Хүлээх утга · ' + literal(WeeklyPython.displayExpected(fn,expected))), result);
                 checks.append(row);
                 return result;
             });
@@ -243,7 +244,9 @@
                     this.updateProgress();
                     this.finish('Бүх ' + index + ' оролтод зөв хариуллаа.');
                 } else {
-                    this.finish(passed + ' / ' + index + ' оролт зөв. ' + task.hint);
+                    this.finish(globalThis.GameLocale?.lang === 'en' ?
+                        passed + ' / ' + index + ' cases passed. ' + globalThis.GameLocale.text(task.hint) :
+                        passed + ' / ' + index + ' оролт зөв. ' + task.hint);
                 }
             };
         }

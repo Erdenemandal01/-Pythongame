@@ -31,6 +31,8 @@ function drawBoard(game, frame) {
         hero.classList.add(({jump:'jumping',move:'walking',collect:'collecting'})[frame.action]);
     }
     const m = MISSIONS[current];
+    const world = WORLDS[m.world];
+    const english = GameLocale.lang === 'en';
     scene.dataset.world = m.world;
     document.getElementById('sceneLevel').textContent = document.getElementById('level').textContent;
     document.getElementById('sceneXP').textContent = xp() + ' XP';
@@ -38,12 +40,15 @@ function drawBoard(game, frame) {
         ? (game.coins.length - remaining.length) + ' / ' + game.coins.length
         : (current % 6 + 1) + ' / 6';
     document.getElementById('sceneCoins').parentElement.title = m.game ? 'Цуглуулсан зоос' : 'Бүлгийн даалгавар';
-    document.getElementById('sceneTitle').textContent = WORLDS[m.world].name;
-    document.getElementById('sceneBadge').textContent = m.game ? 'ЗООСОО ЦУГЛУУЛ' : 'ДААЛГАВАР ' + (current + 1);
+    document.getElementById('sceneTitle').textContent = world.name;
+    document.getElementById('sceneBadge').textContent =
+        (english ? 'STAGE ' : 'ӨРТӨӨ ') + String(m.world + 1).padStart(2, '0');
     document.getElementById('sceneCaption').textContent = m.title;
     if (!frame) {
-        const text = m.game ? 'Эрдэнэс рүү хүрэх замаа кодоор бич.' : m.info.split('. ')[0] + '.';
-        document.getElementById('sceneLine').textContent = text;
+        scene.classList.remove('victory');
+        const line = document.getElementById('sceneLine');
+        line.parentElement.querySelector('b').textContent = english ? 'Temuulen' : 'Тэмүүлэн';
+        line.textContent = world.stops[current % 6];
     }
 }
 
@@ -53,7 +58,17 @@ function celebrateScene(m, output) {
         const game = {width:8, start:m.id % 6, coins:[7], goal:7};
         drawBoard(game, {pos:game.start + 1, coins:game.coins, action:'move'});
     }
-    document.getElementById('sceneLine').textContent = output || 'Эрдэнэсээ оллоо!';
+    const line = document.getElementById('sceneLine');
+    const english = GameLocale.lang === 'en';
+    line.parentElement.querySelector('b').textContent = output ? 'adventure.py' : (english ? 'Temuulen' : 'Тэмүүлэн');
+    if (output) {
+        line.textContent = output;
+    } else {
+        const nextWorld = WORLDS[m.world + 1];
+        line.textContent = nextWorld
+            ? (english ? 'Our next stop is ' + nextWorld.name + '.' : 'Дараагийн өртөө бол ' + nextWorld.name + '.')
+            : (english ? 'The last letter has reached Kharakhorum. Well ridden!' : 'Сүүлчийн захиа Хархорумд ирлээ. Сайн явлаа, элч минь!');
+    }
     document.getElementById('sceneXP').textContent = xp() + ' XP';
     document.getElementById('sceneLevel').textContent = 'LV. ' + (1 + Math.floor(xp() / 300));
     scene.classList.remove('victory');

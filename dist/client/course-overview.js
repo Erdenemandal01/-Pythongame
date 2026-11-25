@@ -10,7 +10,7 @@
         if (download) body.download = '';
 
         const image = document.createElement('img');
-        image.src = 'art/course-overview/' + icon + '.svg';
+        image.src = 'art/course-overview/' + icon + '.svg?v=2';
         image.alt = '';
         image.width = 32;
         image.height = 32;

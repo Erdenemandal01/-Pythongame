@@ -14,6 +14,28 @@ class ClassroomOutput(io.StringIO):
         return super().write(text)
 
 
+def report_matches(output, values):
+    """Each row ends with its assigned value; a descriptive label is optional."""
+    rows = output.splitlines()
+    if len(rows) != len(values):
+        return False
+    for row, value in zip(rows, values):
+        row = row.strip()
+        text = str(value)
+        if row == text:
+            continue
+        if not row.endswith(text):
+            return False
+        label = row[:-len(text)]
+        if not label or not (label[-1].isspace() or label[-1] in ":=："):
+            return False
+        if not any(char.isalpha() for char in label):
+            return False
+        if isinstance(value, int) and any(char.isdigit() for char in label):
+            return False
+    return True
+
+
 def explain_error(error):
     message = "".join(traceback.format_exception_only(type(error), error)).strip()
     if isinstance(error, SyntaxError):
@@ -106,18 +128,36 @@ def assess_lesson(request):
                 with contextlib.redirect_stdout(ClassroomOutput()):
                     messages = variables["light_street"](lamps.copy())
                 if isinstance(messages, list):
-                    artwork = [name + " аслаа" in messages for name in lamps]
+                    artwork = [name + " аслаа" in messages or name + " lit up" in messages for name in lamps]
             except Exception:
                 pass
         try:
             if not settings.get("sandbox"):
-                checker = {"g": variables, "out": stream.getvalue().strip(),
-                           "contextlib": contextlib, "io": io}
+                environment = {"g": variables, "out": stream.getvalue().strip(),
+                               "contextlib": contextlib, "io": io, "report_matches": report_matches}
+                checker = environment.copy()
                 with contextlib.redirect_stdout(ClassroomOutput()):
-                    exec(settings["check"], checker)
+                    try:
+                        exec(settings["check"], checker)
+                    except Exception as original_error:
+                        alternative = settings.get("checkAlternative")
+                        if not alternative:
+                            raise
+                        try:
+                            exec(alternative, environment.copy())
+                        except Exception:
+                            raise original_error
         except BaseException as error:
+            message = str(error)
+            if settings.get("checkHint") and isinstance(error, AssertionError):
+                if "wanted" in checker and "actual" in checker and "args" in checker:
+                    message = f"Input {checker['args']!r}: expected {checker['wanted']!r}, got {checker['actual']!r}."
+                elif "case_inputs" in checker and "actual" in checker:
+                    message = f"For input {checker['case_inputs']!r}, your function returned {checker['actual']!r}. " + settings["checkHint"]
+                else:
+                    message = "Check your result. " + settings["checkHint"]
             result = {"ok": False, "kind": "test",
-                      "error": str(error) or "Нөхцөлийн нэг нь биелсэнгүй. Даалгаврын жишээ болон захын утгуудаа шалгаарай."}
+                      "error": message or "Нөхцөлийн нэг нь биелсэнгүй. Даалгаврын жишээ болон захын утгуудаа шалгаарай."}
     result["output"] = stream.getvalue()
     if mode:
         result["preview"] = artwork

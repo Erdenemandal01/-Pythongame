@@ -1,5 +1,6 @@
 window.ReferenceAccess = (() => {
     'use strict';
+    const tr = (mn, en) => window.GameLocale?.lang === 'en' ? en : mn;
     const sources = 'textarea.py-editor-input:not(.ref-code)';
     const toolbars = '.editor-foot,.ac-runbar,.bq-editor-header,.ct-actions,.dr-runbar,.gh-operations,.jl-actions,.ce-controls,.lv-controls,.mk-edithead,.mu-file,.rd-editor-head,.wk-controls';
     const controls = new WeakMap();
@@ -42,7 +43,7 @@ window.ReferenceAccess = (() => {
         if (shared) history.replaceState(history.state, '', shared.hash);
         PythonReference.open({
             topicId: shared?.topicId,
-            returnLabel: field ? 'Код руугаа буцах' : 'Тоглоом руу буцах',
+            returnLabel: field ? tr('Код руугаа буцах', 'Back to my code') : tr('Тоглоом руу буцах', 'Back to the game'),
             getDraft: id => owner.referenceDrafts[id],
             saveDraft(id, code) {
                 if (adapter.profile() !== owner) return;
@@ -78,8 +79,8 @@ window.ReferenceAccess = (() => {
         button.className = 'reference-trigger';
         button.dataset.openReference = '';
         button.setAttribute('aria-haspopup', 'dialog');
-        button.title = 'Монгол Python лавлах (F1)';
-        button.textContent = 'Python лавлах';
+        button.title = tr('Монгол Python лавлах (F1)', 'Python reference (F1)');
+        button.textContent = tr('Python лавлах', 'Python reference');
         controls.set(field, button);
         button.addEventListener('click', () => open({field, opener:button}));
         // Find the nearest toolbar belonging to this editor, or place the link above its field.

@@ -1,11 +1,12 @@
 window.Leaderboard = (() => {
     'use strict';
     const periods = {day: 'Өнөөдөр', month: 'Энэ сар'};
+    const locale = globalThis.GameLocale?.lang === 'en' ? 'en' : 'mn-MN';
     const dates = {
-        day: new Intl.DateTimeFormat('mn-MN', {timeZone:'Asia/Ulaanbaatar', month:'long', day:'numeric'}),
-        month: new Intl.DateTimeFormat('mn-MN', {timeZone:'Asia/Ulaanbaatar', year:'numeric', month:'long'})
+        day: new Intl.DateTimeFormat(locale, {timeZone:'Asia/Ulaanbaatar', month:'long', day:'numeric'}),
+        month: new Intl.DateTimeFormat(locale, {timeZone:'Asia/Ulaanbaatar', year:'numeric', month:'long'})
     };
-    const format = new Intl.NumberFormat('mn-MN');
+    const format = new Intl.NumberFormat(locale);
     function element(tag, cls, text) {
         const node = document.createElement(tag);
         if (cls) node.className = cls;
@@ -24,8 +25,11 @@ window.Leaderboard = (() => {
         const marker = element('span', 'lb-marker', format.format(score.rank));
         if (score.rank >= 1 && score.rank <= 3) marker.classList.add('lb-medal-' + score.rank);
         position.append(marker);
-        const player = element('th', 'lb-player', score.alias);
+        const player = element('th', 'lb-player');
         player.scope = 'row';
+        const nickname = element('span', '', score.alias);
+        nickname.translate = false;
+        player.append(nickname);
         if (score.me) player.append(element('small', 'lb-me', 'Та'));
         row.append(position, player, element('td', 'lb-count', format.format(score.activities)),
             element('td', 'lb-xp', format.format(score.xp)));
@@ -206,7 +210,9 @@ window.Leaderboard = (() => {
             const copy = element('div');
             copy.append(element('h2','', joined ? 'Самбар дахь миний хоч' : 'Миний оролцоо'));
             if (joined) {
-                copy.append(element('strong','lb-alias',alias));
+                const nickname = element('strong','lb-alias',alias);
+                nickname.translate = false;
+                copy.append(nickname);
                 if (!self) copy.append(element('p','','Энэ хугацаанд оноо авахад таны байр гарна.'));
             } else copy.append(element('p','','Оролцвол бусад тоглогч таныг автоматаар өгсөн хочоор харна. Хүссэн үедээ жагсаалтаас гарч болно.'));
             const toggle = button('lb-action lb-membership', joined ? 'Жагсаалтаас гарах' : 'Эрэмбэд оролцох', () => void this.load(!joined));

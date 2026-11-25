@@ -1,4 +1,4 @@
-// Existing saves have only lessons. An omitted battle campaign starts at the forest.
+// Players with lesson-only saves enter at the first encounter.
 function readCampaign(saved) {
     const won = [];
     const drafts = {};
@@ -17,11 +17,11 @@ function readCampaign(saved) {
 }
 
 const relics = [
-    ['Шүүдрийн дусал', 'Ойн замд олдсон ногоон болор.'],
-    ['Мөнгөн соёо', 'Сарны туяанд гялалзах сахиус.'],
-    ['Чулуун зүрх', 'Агуйн харуулын цээжинд асаж байсан чулуу.'],
-    ['Сүнсний дэнлүү', 'Харанхуйд зам заах цэнхэр дөл.'],
-    ['Лууны хайрс', 'Таван тулааныг туулсны дурсгал.']
+    ['Хүрэл толь', 'Худгийн ус шиг мэлтэлзэх, савдгийн бэлэглэсэн толь.'],
+    ['Мөртэй чулуу', 'Алмасын мөрний хонхорт үлдсэн гөлгөр хайрга.'],
+    ['Уулын болор', 'Аваргын өргөсөн хадны доор гэрэлтэж байсан болор.'],
+    ['Гуулин хонх', 'Говийн жингийн ахлагчийн өгсөн жижиг гуулин хонх.'],
+    ['Элчийн гэрэгэ', 'Захиагаа хүргэсэн элчид өртөөнөөс гардуулсан гэрэгэ.']
 ];
 
 function battleReward(id) {
@@ -32,7 +32,7 @@ function battleReward(id) {
     persist();
     updateHeader();
     sound(true);
-    toast('Олдвор авлаа! ' + relics[id][0]);
+    toast(GameLocale.text('Олдвор авлаа!') + ' ' + GameLocale.text(relics[id][0]));
     return true;
 }
 
@@ -65,16 +65,16 @@ function showAmbush() {
     const call = $('ambush');
     const img = call.querySelector('img');
     img.src = 'art/battles/enemy-' + next.kind + '.png';
-    call.querySelector('span').textContent = next.enemy + ' · Тулалдах';
+    call.querySelector('span').textContent = GameLocale.text(next.enemy) + ' · ' + GameLocale.text('Тулалдах');
     call.hidden = false;
     call.onclick = () => enterBattle(next.id);
 }
 
 function relicAwards() {
     return BATTLES.map(battle => ({
-        icon: ['💧','🌙','🪨','🔥','🐉'][battle.id],
+        icon: ['🪞','🐾','💎','🔔','📜'][battle.id],
         title: relics[battle.id][0],
-        desc: battle.enemy + ' · ' + relics[battle.id][1],
+        desc: GameLocale.text(battle.enemy + ' · ' + relics[battle.id][1]),
         earned: state.battles.won.includes(battle.id)
     }));
 }

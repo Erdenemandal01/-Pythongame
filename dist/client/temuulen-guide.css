@@ -1,0 +1,291 @@
+/* The guide's portrait and dialogue share a frame inspired by a painted ger door. */
+.tg-dialog {
+  --tg-ink: #172529;
+  --tg-paper: #fff3d9;
+  --tg-gold: #edc37c;
+  --tg-muted: #bdc8bf;
+  --tg-border: #4d5c57;
+  --tg-pad: clamp(1.5rem, 3.1vw, 2.85rem);
+  width: min(58rem, calc(100vw - 3rem));
+  max-width: none;
+  max-height: min(49rem, calc(100dvh - 3rem));
+  margin: auto;
+  padding: 0;
+  overflow: auto;
+  overscroll-behavior: contain;
+  scrollbar-color: #7b806c var(--tg-ink);
+  color-scheme: dark;
+  color: var(--tg-paper);
+  background: var(--tg-ink);
+  border: 1px solid #968268;
+  border-radius: 14px;
+  box-shadow: 0 2rem 7rem #081214aa, 0 2px 0 #cda26238 inset;
+  font: 1rem/1.5 "Segoe UI", system-ui, sans-serif;
+}
+.tg-dialog::backdrop { background: #081417c7; backdrop-filter: blur(5px); }
+.tg-dialog:not([open]), .tg-dialog [hidden], .tg-replay[hidden], .tg-milestone[hidden] { display: none !important; }
+.tg-shell { display: grid; grid-template-columns: 37% minmax(0, 1fr); min-height: min(35rem, 78dvh); }
+
+.tg-scene {
+  position: relative;
+  isolation: isolate;
+  margin: 0;
+  overflow: hidden;
+  min-width: 0;
+  background: radial-gradient(ellipse at 48% 45%, #f6c774, #dd9b4a 86%);
+  border-inline-end: 1px solid #8c795a;
+  color: #fff4d9;
+}
+.tg-scene::before, .tg-scene::after { content: ""; position: absolute; pointer-events: none; }
+.tg-scene::before {
+  z-index: 1;
+  inset: 0;
+  background: linear-gradient(0deg, #3c402d 0, #5d4e35 2.3rem, transparent 2.4rem);
+}
+.tg-scene::after {
+  z-index: 2;
+  inset: .65rem;
+  border: 1px solid #fff5d680;
+  box-shadow: 0 0 0 1px #412f1f38;
+}
+.tg-portrait {
+  position: absolute;
+  inset: 0;
+  display: block;
+  width: 100%;
+  height: calc(100% - 2.5rem);
+  object-fit: contain;
+  object-position: center bottom;
+}
+.tg-art-caption {
+  position: absolute;
+  z-index: 3;
+  inset-inline: 1.45rem;
+  bottom: 1rem;
+  margin: 0;
+  color: #fff5df;
+  text-shadow: 0 1px 5px #31291a;
+  font: 600 1.04rem/1.25 Georgia, Cambria, serif;
+}
+.tg-panel {
+  position: relative;
+  isolation: isolate;
+  display: flex;
+  min-width: 0;
+  flex-direction: column;
+  align-items: stretch;
+  padding: 1.3rem var(--tg-pad) 1.7rem;
+  background: radial-gradient(ellipse at 100% 0%, #2a3e3e99, transparent 62%), var(--tg-ink);
+}
+.tg-dialog:not([data-step="2"]) .tg-panel::after {
+  content: "";
+  position: absolute;
+  pointer-events: none;
+  z-index: -1;
+  inset: auto 0 0;
+  height: 44%;
+  background: linear-gradient(0deg, #111f22a8, #18292a20 46%, #18282a 100%),
+              url("assets/steppe-camp.webp") center 62% / cover;
+  mask-image: linear-gradient(0deg, #000 62%, transparent);
+  opacity: .72;
+}
+.tg-panel::before {
+  /* Repeating stepped stitches, as on a deel cuff. */
+  content: "";
+  position: absolute;
+  inset: 0 0 auto;
+  height: 5px;
+  background: repeating-linear-gradient(90deg, #a7804d 0 16px, transparent 16px 22px) 0 0 / auto 1px repeat-x,
+              repeating-linear-gradient(90deg, transparent 0 10px, #a7804d 10px 12px, transparent 12px 16px, #a7804d 16px 18px, transparent 18px 22px) 0 1px / auto 3px repeat-x,
+              repeating-linear-gradient(90deg, transparent 0 10px, #a7804d 10px 18px, transparent 18px 22px) 0 4px / auto 1px repeat-x;
+  opacity: .68;
+}
+.tg-toolbar { display: flex; align-items: center; justify-content: space-between; gap: 1rem; margin-bottom: clamp(1.45rem, 4vh, 2.7rem); }
+.tg-language {
+  margin-inline-start: auto;
+  min-height: 34px;
+  padding: .25rem .45rem;
+  color: #f5e7ca;
+  background: #243635;
+  border: 1px solid #697468;
+  border-radius: 5px;
+  font: 600 .85rem/1.3 "Segoe UI", sans-serif;
+}
+.tg-progress { display: inline-flex; align-items: center; gap: .6rem; color: #d6d8c9; font: 600 .8rem/1.4 Consolas, monospace; }
+.tg-progress::before {
+  content: "";
+  width: 2.4rem;
+  height: 4px;
+  background: linear-gradient(to right, var(--tg-gold) var(--tg-position, 33%), #566359 var(--tg-position, 33%));
+  mask: repeating-linear-gradient(90deg, #000 0 29%, transparent 29% 34%);
+}
+.tg-dialog[data-step="2"] { --tg-position: 66%; }
+.tg-dialog[data-step="3"] { --tg-position: 100%; }
+.tg-dialog button { line-height: 1.25; font-family: inherit; }
+.tg-dialog .tg-skip, .tg-dialog .tg-back {
+  min-height: 36px;
+  padding: .4rem .55rem;
+  color: #d8d8ca;
+  background: transparent;
+  border: 1px solid transparent;
+  font-size: .85rem;
+}
+.tg-dialog .tg-skip:hover, .tg-dialog .tg-back:hover { color: #fff3d9; background: #33403e; }
+.tg-dialog .tg-speaker {
+  display: flex;
+  align-items: center;
+  gap: .55rem;
+  margin: 0 0 .6rem;
+  color: var(--tg-gold);
+  font-size: .82rem;
+  font-weight: 700;
+  letter-spacing: .035em;
+}
+.tg-speaker::before { content: ""; width: .43rem; height: .43rem; transform: rotate(45deg); border: 1.5px solid currentColor; }
+.tg-dialog .tg-title {
+  margin: 0 0 .72rem;
+  color: var(--tg-paper);
+  font: 600 clamp(1.85rem, 3.35vw, 2.75rem)/1.12 Georgia, Cambria, serif;
+  letter-spacing: -.035em;
+  overflow-wrap: break-word;
+  text-wrap: balance;
+}
+.tg-title:focus { outline: 0; }
+.tg-dialog .tg-body, .tg-dialog .tg-body p {
+  margin: 0;
+  color: #d7dfd6;
+  font-size: 1rem;
+  line-height: 1.58;
+}
+.tg-dialog .tg-body p + p { margin-top: .65rem; }
+.tg-dialog .tg-code {
+  margin: .9rem 0 .2rem;
+  padding: .67rem .92rem;
+  border: 1px solid #3d504b;
+  border-inline-start: 3px solid #9ed1bf;
+  border-radius: 6px;
+  background: #101b20;
+  color: #ffe3a9;
+  font: 500 .96rem/1.45 Consolas, "Courier New", monospace;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}
+.tg-options { display: grid; gap: .42rem; padding: 0; margin: .7rem 0 0; border: 0; min-width: 0; }
+.tg-dialog .tg-choice {
+  display: flex;
+  align-items: center;
+  gap: .72rem;
+  min-height: 39px;
+  padding: .5rem .8rem;
+  background: #213333;
+  color: #e1e9df;
+  border: 1px solid var(--tg-border);
+  border-radius: 6px;
+  font-size: .94rem;
+  text-align: start;
+}
+.tg-choice::before {
+  content: "";
+  flex: 0 0 auto;
+  width: .75rem;
+  height: .75rem;
+  border: 1.5px solid #a0b2a7;
+  border-radius: 50%;
+}
+.tg-dialog .tg-choice:hover:enabled { border-color: #b6af89; background: #2b3d39; }
+.tg-dialog .tg-choice[aria-pressed="true"] { background: #374338; border-color: var(--tg-gold); color: #fff0cd; }
+.tg-choice[aria-pressed="true"]::before { border-color: var(--tg-gold); background: var(--tg-gold); box-shadow: inset 0 0 0 2px #374338; }
+.tg-dialog .tg-feedback { margin: .6rem 0 0; color: var(--tg-muted); font-size: .88rem; line-height: 1.45; }
+.tg-dialog .tg-feedback:empty { display: none; }
+.tg-dialog .tg-feedback[data-tone="correct"] { color: #aee9c2; }
+.tg-dialog .tg-feedback[data-tone="retry"] { color: #ffcf95; }
+.tg-actions { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: .5rem .75rem; margin: auto 0 0; padding-top: 1.45rem; }
+.tg-dialog .tg-next {
+  display: inline-flex;
+  margin-inline-start: auto;
+  align-items: center;
+  justify-content: center;
+  gap: .7rem;
+  min-height: 43px;
+  max-width: 100%;
+  padding: .7rem 1.25rem;
+  border: 1px solid #ffe1a5;
+  border-radius: 7px;
+  background: #efca89;
+  color: #30291f;
+  box-shadow: 0 2px 0 #937751;
+  font-size: .95rem;
+  font-weight: 700;
+}
+.tg-dialog .tg-next:enabled:hover { background: #ffdea1; }
+.tg-dialog .tg-next:enabled:active { transform: translateY(1px); box-shadow: none; }
+.tg-dialog :disabled { cursor: default; }
+.tg-dialog :is(button,select):focus-visible, .tg-replay:focus-visible { outline: 3px solid #f3d699; outline-offset: 3px; }
+.tg-replay {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: .55rem;
+  min-height: 38px;
+  padding: .45rem .85rem;
+  color: #ffe6b4;
+  border: 1px solid #736751;
+  border-radius: 7px;
+  background: #273333;
+  font: 650 .86rem/1.3 "Segoe UI", sans-serif;
+}
+.tg-replay::before {
+  content: "";
+  width: 1.55rem;
+  height: 1.55rem;
+  flex: none;
+  border: 1px solid #a08b6b;
+  border-radius: 50%;
+  background: #bda482 url("assets/temuulen-guide.webp?v=2") center 14% / 255% auto no-repeat;
+}
+.tg-replay:hover { background: #38433b; border-color: #c2a877; }
+.tg-milestone {
+  display: flex;
+  align-items: center;
+  gap: .8rem;
+  border-inline-start: 3px solid #d5ae71;
+  border-radius: 5px;
+  padding: .7rem 1rem;
+  margin: .8rem 0;
+  color: #f1e4c6;
+  background: #273731;
+  font: 550 .94rem/1.5 "Segoe UI", sans-serif;
+}
+.tg-milestone-portrait {
+  flex: 0 0 auto;
+  width: 2.6rem;
+  height: 2.8rem;
+  border-radius: 5px;
+  border: 1px solid #ac936c;
+  object-fit: cover;
+  object-position: 50% 15%;
+}
+@media (max-height: 730px) {
+  .tg-shell { min-height: min(31rem, 83dvh); }
+  .tg-toolbar { margin-bottom: .8rem; }
+  .tg-actions { padding-top: 1rem; }
+  .tg-panel { padding-block: .85rem 1.2rem; }
+}
+@media (max-width: 720px) {
+  .tg-dialog { width: calc(100vw - 1.5rem); max-height: calc(100dvh - 1.5rem); }
+  .tg-shell { grid-template-columns: 29% minmax(0, 1fr); }
+  .tg-panel { --tg-pad: 1.25rem; }
+}
+@media (max-width: 500px) {
+  .tg-shell { display: flex; flex-direction: column; }
+  .tg-scene { min-height: 12rem; border-inline-end: 0; border-bottom: 1px solid #8c795a; }
+  .tg-art-caption { inset-inline: 1rem; bottom: .9rem; }
+}
+@media (forced-colors: active) {
+  .tg-dialog, .tg-dialog button, .tg-replay, .tg-milestone { border: 1px solid CanvasText; }
+  .tg-choice[aria-pressed="true"]::before { background: Highlight; forced-color-adjust: none; }
+}
+@media (prefers-reduced-motion: no-preference) {
+  .tg-dialog[open] { animation: tg-arrive 180ms ease-out both; }
+  @keyframes tg-arrive { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: none; } }
+}

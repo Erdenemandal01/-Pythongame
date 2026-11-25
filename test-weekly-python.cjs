@@ -63,6 +63,17 @@ test('all eight weekly policies and their next cycle pass varied independent tes
         assert.ok(fails>0,'hardcoded worked example must not solve '+c.title);
     }
     assert.equal(seen.size,8);
+    const beacon=weekly.current(new Date(epoch+week));
+    target.GameLocale={lang:'en'};
+    const englishBeacon='def beacon(light):\n    return "green" if light >= 70 else "yellow" if light >= 30 else "red"';
+    for(let i=0;i<beacon.cases.length;i++){
+        assert.equal((await assess(weekly.caseRequest(beacon,englishBeacon,i))).ok,true);
+        assert.equal((await assess(weekly.caseRequest(beacon,'def beacon(light): return "blue"',i))).ok,false);
+    }
+    assert.equal(weekly.displayExpected('beacon','ногоон'),'green');
+    target.GameLocale={lang:'mn'};
+    assert.equal(weekly.displayExpected('beacon','ногоон'),'ногоон');
+    assert.equal((await assess(weekly.caseRequest(beacon,englishBeacon,0))).ok,true);
     const c=weekly.current(new Date(epoch));
     const wrong=await assess(weekly.caseRequest(c,'def bag_count(items,capacity): return True',2));
     assert.equal(wrong.ok,false);assert.equal(wrong.kind,'test');

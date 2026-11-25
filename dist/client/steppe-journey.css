@@ -1,0 +1,65 @@
+/* The four later stages share a single illustrated landscape atlas. */
+#questView .scene,
+#worldCards .world-card {
+    --trail-art: url("assets/steppe-routes.webp");
+    --trail-size: 200% 200%;
+    --trail-place: left top;
+}
+#questView .scene[data-world="0"],
+#world-0.world-card {
+    --trail-art: url("assets/steppe-camp.webp");
+    --trail-size: cover;
+    --trail-place: center 66%;
+}
+#questView .scene[data-world="2"], #world-2.world-card { --trail-place: right top; }
+#questView .scene[data-world="3"], #world-3.world-card { --trail-place: left bottom; }
+#questView .scene[data-world="4"], #world-4.world-card { --trail-place: right bottom; }
+
+#questView .scene::before {
+    background-image: var(--trail-art);
+    background-position: var(--trail-place);
+    background-size: var(--trail-size);
+    filter: none;
+}
+#questView .scene .sprite { bottom: 8%; }
+#questView .scene .sprite-coin { bottom: 18.5%; }
+#questView .scene .sprite-pit { bottom: 4%; }
+#questView .scene-dialog { border-color: #98805d; }
+#questView .scene-dialog b { color: #f1c382; }
+
+.world-card-head {
+    position: relative;
+    isolation: isolate;
+    overflow: hidden;
+    background-color: #19212a;
+}
+.world-card-head::before {
+    content: "";
+    position: absolute;
+    z-index: -1;
+    inset: 0 0 0 auto;
+    width: min(44%, 20rem);
+    background: var(--trail-art) var(--trail-place) / var(--trail-size) no-repeat;
+    mask-image: linear-gradient(90deg, transparent, black 54%);
+    pointer-events: none;
+}
+.world-card-head > div {
+    max-width: 62%;
+}
+.world-card-head p { color: #d2d7de; }
+.world-card-head .world-score {
+    position: relative;
+    align-self: center;
+    padding: .35em .6em;
+    border: 1px solid #e6e3d166;
+    border-radius: 5px;
+    background: #111820eb;
+    color: #fff2d9;
+}
+@media (max-width: 760px) {
+    .world-card-head::before { width: 26%; }
+    .world-card-head > div { max-width: 68%; }
+}
+@media (forced-colors: active) {
+    .world-card-head::before { display: none; }
+}

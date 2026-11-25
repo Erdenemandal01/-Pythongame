@@ -1,6 +1,14 @@
 .co-overview {
+    --co-divider: rgb(181 198 189 / 17%);
     container: course-overview / inline-size;
     min-width: 0;
+}
+
+.ph-camp > .co-overview {
+    border: 0;
+    border-block-start: 1px solid var(--co-divider);
+    border-radius: 0;
+    background-color: transparent;
 }
 
 .co-facts {
@@ -10,11 +18,8 @@
     margin: 0;
     padding: 0;
     list-style: none;
-    border: 1px solid #d2ded8;
-    border-radius: 14px;
-    background: #fff;
-    color: #172736;
-    box-shadow: 0 2px 7px #142c2312;
+    border-radius: inherit;
+    color: var(--nk-paper, #f6ead4);
     font-family: "Segoe UI", sans-serif;
     text-align: center;
 }
@@ -25,7 +30,7 @@
 }
 
 .co-fact + .co-fact {
-    border-inline-start: 1px solid #dbe3df;
+    border-inline-start: 1px solid var(--co-divider);
 }
 
 .co-fact-body {
@@ -56,7 +61,7 @@
 
 .co-caption {
     margin-block-start: 4px;
-    color: #51635c;
+    color: var(--nk-muted, #b5c6bd);
     font-size: clamp(11px, 1.35cqw, 14px);
     line-height: 1.35;
     text-wrap: balance;
@@ -64,18 +69,18 @@
 
 a.co-fact-body:hover,
 a.co-fact-body:focus-visible {
-    background: #ecf7f1;
+    background: rgb(116 211 192 / 9%);
 }
 
 a.co-fact-body:hover .co-value,
 a.co-fact-body:focus-visible .co-value {
-    color: #0a6241;
+    color: var(--nk-turq, #74d3c0);
     text-decoration: underline;
     text-underline-offset: .15em;
 }
 
 a.co-fact-body:focus-visible {
-    outline: 2px solid #0b6746;
+    outline: 2px solid var(--nk-turq, #74d3c0);
     outline-offset: -3px;
 }
 
@@ -84,7 +89,7 @@ a.co-fact-body:focus-visible {
     .co-fact { grid-column: span 2; }
     .co-fact:nth-child(n + 4) {
         grid-column: span 3;
-        border-block-start: 1px solid #dbe3df;
+        border-block-start: 1px solid var(--co-divider);
     }
     .co-fact:nth-child(4) { border-inline-start: 0; }
 }

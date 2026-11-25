@@ -75,7 +75,9 @@ def main():
             else: archive.write(path,name)
         archive.writestr('classroom-engine.js',launcher)
         archive.writestr('START-HERE.txt',
-            'КОДЫН НҮҮДЭЛ — АНГИЙН БАГЦ\n\n'
+            'КОДЫН НҮҮДЭЛ / CODE NOMAD\n\n'
+            'English: Extract all files and open index.html in a desktop browser. Choose English in the top bar. '
+            'Start with Core lessons or open Optional practice to explore games. Python is included and runs offline.\n\n'
             '1. ZIP файлыг бүгдийг нь нэг хавтаст задлаарай.\n'
             '2. Компьютер дээр index.html-ийг Chrome эсвэл Edge-ээр нээнэ. Python суулгах шаардлагагүй.\n'
             '3. «Python урлан»-д ороод хичээлийн дугаараа сонгоно.\n'

@@ -11,6 +11,15 @@ window.GameAccount = (() => {
     let newerRevision = 0;
     let syncMessage = '', formBusy = false, authNotice = '', editing = false, leaving = false, switching = false;
     let authMode = 'signin', usernameValue = '', authUser, authReady = false, authStarting;
+    const localize = value => globalThis.GameLocale?.text(value) ?? value;
+    const unsavedLogout = 'Энэ цонхонд хадгалаагүй ахиц үлдсэн байна. Бүртгэлээс гарах уу?';
+    function validationMessages(field, required, tooShort) {
+        field.addEventListener('invalid', () => {
+            if (field.validity.valueMissing) field.setCustomValidity(localize(required));
+            else if (tooShort && field.validity.tooShort) field.setCustomValidity(localize(tooShort));
+        });
+        field.addEventListener('input', () => field.setCustomValidity(''));
+    }
 
     function status() { return {phase, sync, profile: profile && {...profile}, cloud, offline, authAvailable: !offline, newer: newerRevision > revision}; }
     function notify() {
@@ -48,7 +57,7 @@ window.GameAccount = (() => {
             const btn = action(discard ? 'Хадгалаагүй өөрчлөлтөө орхиод гарах' : 'Бүртгэлээс гарах', async () => {
                 if (formBusy) return;
                 if (discard) {
-                    if (!window.confirm('Энэ цонхонд хадгалаагүй ахиц үлдсэн байна. Бүртгэлээс гарах уу?')) return;
+                    if (!window.confirm(localize(unsavedLogout))) return;
                 } else if (cloud && (sync !== 'saved' || changedSinceSave())) {
                     if (sync === 'saved') changed();
                     if (sync === 'dirty') void flush();
@@ -79,7 +88,7 @@ window.GameAccount = (() => {
         if (discard) {
             el.textContent = 'Хадгалаагүй өөрчлөлтөө орхиод гарах';
             el.addEventListener('click', event => {
-                if (formBusy || !window.confirm('Энэ цонхонд хадгалаагүй ахиц үлдсэн байна. Бүртгэлээс гарах уу?')) { event.preventDefault(); return; }
+                if (formBusy || !window.confirm(localize(unsavedLogout))) { event.preventDefault(); return; }
                 leaving = true;
                 setTimeout(() => { leaving = false; }, 15000);
             });
@@ -289,7 +298,7 @@ window.GameAccount = (() => {
     async function resolveConflict(localWins) {
         if (formBusy) return;
         const question = localWins ? 'Бүртгэлд байгаа хувилбарыг энэ цонхны ахицаар солих уу?' : 'Энэ цонхны ахицыг бүртгэлд байгаа хувилбараар солих уу?';
-        if (!window.confirm(question)) return;
+        if (!window.confirm(localize(question))) return;
         const at = generation;
         formBusy = true;
         updateSyncUI();
@@ -367,7 +376,8 @@ window.GameAccount = (() => {
         username.type = 'text'; username.name = 'username'; username.required = true;
         username.autocomplete = 'username'; username.autocapitalize = 'none'; username.spellcheck = false;
         username.value = usernameValue;
-        username.addEventListener('input', () => { usernameValue = username.value; username.setCustomValidity(''); });
+        validationMessages(username, 'Хэрэглэгчийн нэрээ оруулна уу.');
+        username.addEventListener('input', () => { usernameValue = username.value; });
         label.append(username);
         form.append(label);
         if (signup) {
@@ -379,6 +389,7 @@ window.GameAccount = (() => {
         password.type = 'password'; password.name = 'password'; password.required = true;
         password.autocomplete = signup ? 'new-password' : 'current-password';
         if (signup) password.minLength = 8;
+        validationMessages(password, 'Нууц үгээ оруулна уу.', signup ? 'Нууц үгээ 8-аас доошгүй тэмдэгтээр бичээрэй.' : '');
         passwordLabel.append(password);
         form.append(passwordLabel);
         const message = node('p', 'account-form-message');
@@ -396,7 +407,7 @@ window.GameAccount = (() => {
             event.preventDefault();
             if (formBusy) return;
             if (!usernameAccount.validUsername(username.value)) {
-                username.setCustomValidity(usernameHelp);
+                username.setCustomValidity(localize(usernameHelp));
                 username.reportValidity();
                 return;
             }
@@ -433,7 +444,7 @@ window.GameAccount = (() => {
         name.value = enroll ? '' : profile.name;
         name.maxLength = 48;
         name.required = true;
-        name.addEventListener('input', () => name.setCustomValidity(''));
+        validationMessages(name, 'Тоглоомын хочоо оруулна уу.');
         label.append(name);
         const roles = node('fieldset', 'account-roles');
         roles.append(node('legend', '', 'Баатраа сонго'));
@@ -455,13 +466,20 @@ window.GameAccount = (() => {
             const count = guest.done?.length ?? 0, projects = guest.academy?.won?.length ?? 0;
             const choices = [
                 ['fresh', 'Шинэ аялал эхлүүлэх', 'Анхны даалгавраас эхэлнэ.'],
-                ['device', 'Энэ төхөөрөмжийн ахицыг авах', `${guest.name || 'Аялагч'} · ${count} даалгавар · ${projects} хичээл`]
+                ['device', 'Энэ төхөөрөмжийн ахицыг авах', `${count} даалгавар · ${projects} хичээл`]
             ];
             for (const [value, title, subtitle] of choices) {
                 const opt = node('label', 'account-source-option'), radio = node('input');
                 radio.type = 'radio'; radio.name = 'origin'; radio.value = value; radio.checked = value === 'fresh';
                 const lines = node('span');
-                lines.append(node('b', '', title), node('small', '', subtitle));
+                const detail = node('small');
+                if (value === 'device') {
+                    const nickname = node('span', '', guest.name || localize('Аялагч'));
+                    nickname.translate = false;
+                    detail.append(nickname, ' · ');
+                }
+                detail.append(subtitle);
+                lines.append(node('b', '', title), detail);
                 opt.append(radio, lines);
                 origin.append(opt);
             }
@@ -479,7 +497,7 @@ window.GameAccount = (() => {
             if (formBusy) return;
             const alias = name.value.trim().normalize('NFC');
             if ([...alias].length < 2 || [...alias].length > 24 || /[<>\p{Cc}\p{Cf}]/u.test(alias)) {
-                name.setCustomValidity('Хочоо 2–24 харагдах тэмдэгтээр бичээрэй.');
+                name.setCustomValidity(localize('Хочоо 2–24 харагдах тэмдэгтээр бичээрэй.'));
                 name.reportValidity();
                 return;
             }
@@ -580,7 +598,9 @@ window.GameAccount = (() => {
             if (editing) body.append(makeForm(false));
             else {
                 const badge = node('div', 'account-identity');
-                const copy = node('div'); copy.append(node('h3', '', profile.name), note(avatars[profile.avatar]));
+                const copy = node('div'); const nickname = node('h3', '', profile.name);
+                nickname.translate = false;
+                copy.append(nickname, note(avatars[profile.avatar]));
                 badge.append(portrait(profile.avatar), copy);
                 body.append(badge, syncPanel(), actions(action('Баатраа засах', () => { editing = true; render(); }, true), action('Ахиц татах', download, true)), authLink(true));
                 if (usernameAccount) body.append(note('Дундын компьютер ашиглаж байгаа бол хичээлээ дуусгаад бүртгэлээсээ гараарай.'));
@@ -659,5 +679,13 @@ window.GameAccount = (() => {
         if (usernameAccount) await startUsernameAccount();
         else await check();
     }
-    return Object.freeze({init, open, changed, status, isCloud: () => cloud});
+    async function saveBeforeNavigation() {
+        if (!cloud) return !switching;
+        const activeGeneration = generation;
+        if (pending) await pending;
+        if (switching || activeGeneration !== generation || !cloud || sync === 'conflict') return false;
+        if (changedSinceSave()) await flush();
+        return activeGeneration === generation && !pending && !changedSinceSave();
+    }
+    return Object.freeze({init, open, changed, status, saveBeforeNavigation, isCloud: () => cloud});
 })();

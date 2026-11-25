@@ -1,31 +1,32 @@
 (() => {
     'use strict';
+    const workshopText = globalThis.PQEnglishWorkshops?.literal || (text => text);
     const studies={
         groove:{
-            title:'Бөмбөрийн хээ', goal:'Нам бөмбөр, цан, цохилуур, цан гэсэн дөрвөн авиаг for давталтаар хоёр удаа тоглуулаарай. Авиа бүр нэг цохилт үргэлжилнэ.',
-            hint:'range(1) хэдэн удаа давтаж байна вэ? Тоог нь өөрчлөөд үз.',
+            title:workshopText('Бөмбөрийн хээ'), goal:workshopText('Нам бөмбөр, цан, цохилуур, цан гэсэн дөрвөн авиаг for давталтаар хоёр удаа тоглуулаарай. Авиа бүр нэг цохилт үргэлжилнэ.'),
+            hint:workshopText('range(1) хэдэн удаа давтаж байна вэ? Тоог нь өөрчлөөд үз.'),
             a:'for i in range(1):\n    drum("kick")\n    drum("hat")\n    drum("snare")\n    drum("hat")',
             b:'for i in range(1):\n    drum("kick")\n    drum("hat")\n    drum("snare")\n    rest()'
         },
         steps:{
-            title:'Нотын шат', goal:'C4, E4, G4, C5 дөрвөн нотыг жагсаалтаас дарааллаар нь тоглуул. Төгсгөлд нэг цохилт амраарай.',
-            hint:'Жагсаалт дахь G4-ийн ард "C5" нэмээрэй. for нь жагсаалтын бүх нотоор явна.',
+            title:workshopText('Нотын шат'), goal:workshopText('C4, E4, G4, C5 дөрвөн нотыг жагсаалтаас дарааллаар нь тоглуул. Төгсгөлд нэг цохилт амраарай.'),
+            hint:workshopText('Жагсаалт дахь G4-ийн ард "C5" нэмээрэй. for нь жагсаалтын бүх нотоор явна.'),
             a:'notes = ["C4", "E4", "G4"]\nfor note in notes:\n    play(note)\nrest()',
             b:'notes = ["G4", "E4", "C4"]\nfor note in notes:\n    play(note)\nrest()'
         },
         echo:{
-            title:'Цуурай', goal:'Өөрийн функцээр G4, E4, нэг амралт гэсэн хээг бүтээ. Ижил хээг хоёр удаа дуугаргаарай.',
-            hint:'def echo() нь хээг хадгална. Хамгийн сүүлд echo() дуудлагыг дахиад нэг бичээрэй.',
+            title:workshopText('Цуурай'), goal:workshopText('Өөрийн функцээр G4, E4, нэг амралт гэсэн хээг бүтээ. Ижил хээг хоёр удаа дуугаргаарай.'),
+            hint:workshopText('def echo() нь хээг хадгална. Хамгийн сүүлд echo() дуудлагыг дахиад нэг бичээрэй.'),
             a:'def echo():\n    play("G4")\n    play("E4")\n    rest()\n\necho()',
             b:'def echo():\n    play("G4", 0.5)\n    play("E4", 0.5)\n    rest()\n\necho()'
         }
     };
     const voices=[
-        {id:'kick',name:'Нам бөмбөр',short:'БҮМ',color:'#ff967d'},
-        {id:'snare',name:'Цохилуур',short:'ТАК',color:'#e9bb79'},
-        {id:'hat',name:'Цан',short:'ЦИК',color:'#8cdece'},
-        {id:'note',name:'Нот',short:'ДО',color:'#bcabff'},
-        {id:'rest',name:'Амралт',short:'·',color:'#99aac2'}
+        {id:'kick',name:workshopText('Нам бөмбөр'),short:workshopText('БҮМ'),color:'#ff967d'},
+        {id:'snare',name:workshopText('Цохилуур'),short:workshopText('ТАК'),color:'#e9bb79'},
+        {id:'hat',name:workshopText('Цан'),short:workshopText('ЦИК'),color:'#8cdece'},
+        {id:'note',name:workshopText('Нот'),short:workshopText('ДО'),color:'#bcabff'},
+        {id:'rest',name:workshopText('Амралт'),short:'·',color:'#99aac2'}
     ];
     const pitch={C:0,D:2,E:4,F:5,G:7,A:9,B:11};
     const labelFor=event=>event.kind==='note'?event.value:voices.find(v=>v.id===(event.value||'rest')).short;
@@ -48,12 +49,54 @@
     const btn=(label,cls,fn)=>{const e=node('button',cls,label);e.type='button';e.onclick=fn;return e;};
     function option(value,label){const e=node('option','',label);e.value=value;return e;}
 
+    // The note pad bears a two-string morin khuur. These icons sit beside the
+    // actual names of the four synthesized voices.
+    const instrumentPixels={
+        kick:[
+            '   .........', ' ..+++++++++..', '.++*********++.', '.+**+++++++**+.',
+            '.+*+++++++++*+.', '.++**+++++**++.', ' ..++*****++..', ' .o..+++++..o.',
+            ' .o**.....**o.', ' .o+o*+++*o+o.', ' .o+o*+++*o+o.', ' .o**o+*+o**o.',
+            '  .++*****++.', '   .........', '   oo     oo'
+        ],
+        snare:[
+            ' **         **','  **       **','   **     **','    oo   oo','     oo oo',
+            '  ....o.o....', ' .+++++++++++.', '.+***********+.', '.+***+++++***+.',
+            ' .+++++++++++.', ' .o.........o.', ' .o*o+o+o+o*o.', ' .o++*+*+*++o.',
+            '  .+++++++++.', '   .........'
+        ],
+        hat:[
+            '       oo', '      o**o', '    oo+**+oo', '  oo++****++oo',
+            '.o++********++o.', ' .oo++++++++oo.', '    oooooooo', '       oo',
+            '      o**o', '    oo+**+oo', '  oo++****++oo', '.o++********++o.',
+            ' .oo++++++++oo.', '    oooooooo'
+        ],
+        note:[
+            '      o  o', '     oo*oo', '     o++ooo', '      o+oo++', '    oo+*  oo',
+            '      o*o    o', '     oo*o   o*', '      o*o   o*', '      o*o   o*',
+            '      o*o   o*', '      o*o   o*', '     o+*+o o*', '    o+**+o o*',
+            '   o+*+*++o*', '  o++*+*++o', ' o++****+++o', '  ooooooooo'
+        ]
+    };
+    function instrumentIcon(voice){
+        const icon=node('canvas','mu-instrument-icon');
+        icon.width=18;icon.height=18;icon.setAttribute('aria-hidden','true');
+        const g=icon.getContext('2d');
+        if(!g)return icon;
+        const palette={'.':'#3e2823',o:'#916347','+':voice.color,'*':'#f5dab0'};
+        const rows=instrumentPixels[voice.id];
+        const top=Math.floor((icon.height-rows.length)/2);
+        rows.forEach((row,y)=>[...row].forEach((pixel,x)=>{
+            if(pixel!==' '){g.fillStyle=palette[pixel];g.fillRect(x+1,y+top,1,1);}
+        }));
+        return icon;
+    }
+
     class Synth {
         constructor(){this.sources=new Set();}
         async unlock() {
             if(!this.context) {
                 const AC=window.AudioContext||window.webkitAudioContext;
-                if(!AC)throw Error('Браузер дуу тоглуулахыг дэмжихгүй байна. Хэмнэлийн хүснэгтээр нотоо шалгаарай.');
+                if(!AC)throw Error(workshopText('Браузер дуу тоглуулахыг дэмжихгүй байна. Хэмнэлийн хүснэгтээр нотоо шалгаарай.'));
                 const ctx=this.context=new AC();
                 this.master=ctx.createGain();this.master.gain.value=.35;this.master.connect(ctx.destination);
                 const noise=this.noise=ctx.createBuffer(1,Math.ceil(ctx.sampleRate*.35),ctx.sampleRate);
@@ -117,9 +160,9 @@
         }
         page(){
             const root=node('section','mu-shell'),head=node('div','mu-head'),copy=node('div');
-            copy.append(node('h1','','Хөгжмийн урлан'),node('p','','Кодоор хэмнэл зохио. Нэг авиаг өөрчилж, найзаараа ялгааг сонсгоорой.'));
-            const tabs=node('nav','mu-tabs');tabs.setAttribute('aria-label','Хөгжмийн горим');
-            for(const [mode,name] of [['compose','Зохиох'],['quiz','Сонсож таах']]){
+            copy.append(node('h1','',workshopText('Хөгжмийн урлан')),node('p','',workshopText('Кодоор хэмнэл зохио. Нэг авиаг өөрчилж, найзаараа ялгааг сонсгоорой.')));
+            const tabs=node('nav','mu-tabs');tabs.setAttribute('aria-label',workshopText('Хөгжмийн горим'));
+            for(const [mode,name] of [['compose',workshopText('Зохиох')],['quiz',workshopText('Сонсож таах')]]){
                 const tab=btn(name,'mu-'+mode,()=>{if(this.mode===mode)return;this.stop();this.round=null;this.mode=mode;this.page();});
                 tab.setAttribute('aria-pressed',String(this.mode===mode));tabs.append(tab);
             }
@@ -128,11 +171,11 @@
             for(const [id,s] of Object.entries(studies))pick.append(option(id,s.title+(this.state.won.includes(id)?' ✓':'')));
             pick.value=this.state.study;
             pick.onchange=()=>{this.stop();this.state.study=pick.value;this.state.slot='a';this.scores={};this.round=null;this.ctx.save();this.page();};
-            const studyLabel=node('label','mu-control');studyLabel.append(node('span','','Дасгал'),pick);
+            const studyLabel=node('label','mu-control');studyLabel.append(node('span','',workshopText('Дасгал')),pick);
             const tempo=node('input','mu-tempo');tempo.type='range';tempo.min=60;tempo.max=180;tempo.value=this.state.bpm;
             const bpm=node('span','mu-bpm',this.state.bpm+' BPM'),tempoLabel=node('label','mu-control mu-tempo-wrap');
-            tempoLabel.append(node('span','','Хурд'),tempo,bpm);
-            tempo.oninput=()=>{this.stop();this.state.bpm=Number(tempo.value);bpm.textContent=tempo.value+' BPM';this.ctx.save();this.report('Шинэ хурдыг сонсохын тулд дахин тоглуулаарай.');};
+            tempoLabel.append(node('span','',workshopText('Хурд')),tempo,bpm);
+            tempo.oninput=()=>{this.stop();this.state.bpm=Number(tempo.value);bpm.textContent=tempo.value+' BPM';this.ctx.save();this.report(workshopText('Шинэ хурдыг сонсохын тулд дахин тоглуулаарай.'));};
             bar.append(studyLabel,tempoLabel);root.append(bar);
             this.info=node('p','mu-status');this.info.setAttribute('role','status');
             this.scoreBox=null;this.stopBtn=null;this.quizAnswers=null;this.grid=null;this.consoleBox=null;
@@ -143,33 +186,33 @@
         compose(root){
             const study=studies[this.state.study],desk=node('div','mu-desk'),instrument=node('section','mu-panel mu-instrument');
             const trackhead=node('div','mu-trackhead');
-            trackhead.append(node('h2','','Хэмнэлийн самбар'));
-            this.counter=node('span','mu-position','0 цохилт');trackhead.append(this.counter);instrument.append(trackhead);
+            trackhead.append(node('h2','',workshopText('Хэмнэлийн самбар')));
+            this.counter=node('span','mu-position',workshopText('0 цохилт'));trackhead.append(this.counter);instrument.append(trackhead);
             const pads=node('div','mu-pads');
             for(const v of voices.slice(0,4)){
                 const pad=btn('','mu-pad',()=>this.preview(v.id));pad.style.setProperty('--voice',v.color);
-                pad.append(node('strong','',v.short),node('small','',v.name));pad.setAttribute('aria-label',v.name+' сонсох');pads.append(pad);
+                pad.append(instrumentIcon(v),node('strong','',v.short),node('small','',v.name));pad.setAttribute('aria-label',v.name+workshopText(' сонсох'));pads.append(pad);
             }
             instrument.append(pads);
             this.scoreBox=node('div','mu-score');instrument.append(this.scoreBox);
             const transport=node('div','mu-transport');
-            transport.append(btn('▶ Кодоо тоглуулах','mu-play mu-primary',()=>this.listen(this.state.slot)),btn('Дуугүй шалгах','mu-check',()=>this.check()));
-            this.stopBtn=btn('■ Зогсоох','mu-stop',()=>{this.stop();this.report('Тоглуулалтыг зогсоолоо.');});
+            transport.append(btn(workshopText('▶ Кодоо тоглуулах'),'mu-play mu-primary',()=>this.listen(this.state.slot)),btn(workshopText('Дуугүй шалгах'),'mu-check',()=>this.check()));
+            this.stopBtn=btn(workshopText('■ Зогсоох'),'mu-stop',()=>{this.stop();this.report(workshopText('Тоглуулалтыг зогсоолоо.'));});
             this.stopBtn.disabled=true;transport.append(this.stopBtn);instrument.append(transport);
             const codecard=node('section','mu-panel mu-codecard'),file=node('div','mu-file'),slots=node('div','mu-tabs');
             file.append(node('strong','','beat.py'));
             for(const key of ['a','b']){
-                const b=btn('Хэмнэл '+key.toUpperCase(),'mu-slot-'+key,()=>{if(this.state.slot===key)return;this.stop();this.state.slot=key;this.ctx.save();this.page();});
+                const b=btn(workshopText('Хэмнэл ')+key.toUpperCase(),'mu-slot-'+key,()=>{if(this.state.slot===key)return;this.stop();this.state.slot=key;this.ctx.save();this.page();});
                 b.setAttribute('aria-pressed',String(this.state.slot===key));slots.append(b);
             }
             file.append(slots);codecard.append(file);
             this.input=node('textarea','mu-code');this.input.spellcheck=false;this.input.wrap='off';
-            this.input.setAttribute('aria-label','Хэмнэлийн Python код');this.input.maxLength=16000;
+            this.input.setAttribute('aria-label',workshopText('Хэмнэлийн Python код'));this.input.maxLength=16000;
             this.input.value=this.state.songs[this.state.study][this.state.slot];
             this.input.oninput=()=>{
                 this.stop();this.state.songs[this.state.study][this.state.slot]=this.input.value;
                 delete this.scores[this.state.slot];this.ctx.save();this.renderScore(null);
-                this.consoleBox.hidden=true;this.report('Код хадгалагдлаа. Хэмнэлээ тоглуулж сонсоорой.');
+                this.consoleBox.hidden=true;this.report(workshopText('Код хадгалагдлаа. Хэмнэлээ тоглуулж сонсоорой.'));
             };
             this.input.onkeydown=e=>{
                 if(e.key==='Enter'&&(e.ctrlKey||e.metaKey)){e.preventDefault();this.listen(this.state.slot);}
@@ -178,38 +221,38 @@
             codecard.append(this.input);this.consoleBox=node('pre','mu-output');this.consoleBox.hidden=true;codecard.append(this.consoleBox);
             desk.append(instrument,codecard);root.append(desk);
             const assignment=node('section','mu-assignment');assignment.append(node('h2','',study.title),node('p','',study.goal));
-            const clue=node('details');clue.append(node('summary','','Санаа авах'),node('p','',study.hint));assignment.append(clue);
-            const commands=node('details','mu-guide');commands.append(node('summary','','Хөгжмийн командууд'),
-                node('p','','drum("kick"), drum("snare"), drum("hat") — гурван төрлийн бөмбөр.'),
-                node('p','','play("C4") — нэг цохилтын нот. A–G үсэг, 3–5 октав, диез (#) ашиглаж болно.'),
-                node('p','','rest() — нэг цохилт чимээгүй. play("E4", 0.5), drum("hat", 0.5), rest(2) гэж үргэлжлэх хугацааг өөрчилнө.'));
+            const clue=node('details');clue.append(node('summary','',workshopText('Санаа авах')),node('p','',study.hint));assignment.append(clue);
+            const commands=node('details','mu-guide');commands.append(node('summary','',workshopText('Хөгжмийн командууд')),
+                node('p','',workshopText('drum("kick"), drum("snare"), drum("hat") — гурван төрлийн бөмбөр.')),
+                node('p','',workshopText('play("C4") — нэг цохилтын нот. A–G үсэг, 3–5 октав, диез (#) ашиглаж болно.')),
+                node('p','',workshopText('rest() — нэг цохилт чимээгүй. play("E4", 0.5), drum("hat", 0.5), rest(2) гэж үргэлжлэх хугацааг өөрчилнө.')));
             assignment.append(commands);root.append(assignment);
-            this.renderScore(this.scores[this.state.slot]);this.report(this.state.won.includes(this.state.study)?'✓ Энэ дасгалыг биелүүлсэн. Шинэ хэмнэл туршиж болно.':'Кодоо тоглуулж, цохилт бүрийг самбараас дагаарай.');
+            this.renderScore(this.scores[this.state.slot]);this.report(this.state.won.includes(this.state.study)?workshopText('✓ Энэ дасгалыг биелүүлсэн. Шинэ хэмнэл туршиж болно.'):workshopText('Кодоо тоглуулж, цохилт бүрийг самбараас дагаарай.'));
         }
         renderScore(score){
             if(!this.scoreBox)return;
             const ticks=score?.ticks||16;
-            this.counter.textContent=score?ticks/4+' цохилт':'— цохилт';
+            this.counter.textContent=score?ticks/4+workshopText(' цохилт'):workshopText('— цохилт');
             const scroll=node('div','mu-scroll'),grid=node('div','mu-grid');
             grid.style.setProperty('--ticks',ticks);
             const width=Math.max(220,ticks*8);
             grid.style.minWidth=(width+58)+'px';
             const scale=node('div','mu-scale');scale.style.gridTemplateColumns='repeat('+Math.ceil(ticks/4)+',1fr)';
             for(let i=0;i<ticks;i+=4)scale.append(node('span','',String(i/4+1)));
-            grid.append(node('span','mu-y-label','Цохилт'),scale);
+            grid.append(node('span','mu-y-label',workshopText('Цохилт')),scale);
             for(const voice of voices){
                 const track=node('div','mu-lane'),name=node('span','mu-y-label',voice.name);
                 track.style.setProperty('--voice',voice.color);track.style.backgroundSize=(400/ticks)+'% 100%';
                 for(const e of score?.events||[])if(trackFor(e)===voice.id){
                     const mark=node('span','mu-mark',e.kind==='note'?e.value:e.kind==='rest'?'·':'');
                     mark.style.left=(100*e.start/ticks)+'%';mark.style.width=(100*e.ticks/ticks)+'%';
-                    mark.title=voice.name+' · '+(1+e.start/4)+'-р цохилт · '+e.ticks/4;track.append(mark);
+                    mark.title=voice.name+' · '+(1+e.start/4)+workshopText('-р цохилт · ')+e.ticks/4;track.append(mark);
                 }
                 const cursor=node('i','mu-cursor');cursor.hidden=true;track.append(cursor);grid.append(name,track);
             }
             scroll.append(grid);
-            scroll.setAttribute('role','region');scroll.setAttribute('aria-label','Хэмнэлийн дараалал');scroll.tabIndex=0;
-            const transcript=node('p','mu-transcript',score?score.events.map(e=>labelFor(e)).join(' · '):'Кодоо тоглуулахад хэмнэл энд зурагдана.');
+            scroll.setAttribute('role','region');scroll.setAttribute('aria-label',workshopText('Хэмнэлийн дараалал'));scroll.tabIndex=0;
+            const transcript=node('p','mu-transcript',score?score.events.map(e=>labelFor(e)).join(' · '):workshopText('Кодоо тоглуулахад хэмнэл энд зурагдана.'));
             this.scoreBox.replaceChildren(scroll,transcript);this.grid=grid;this.displayTicks=ticks;
         }
         paintTick(tick){
@@ -231,7 +274,7 @@
             try{
                 const result=await this.ctx.run(this.state.songs[this.state.study][slot],{exercise:this.state.study});
                 if(gen!==this.generation)return null;
-                if(!result.ok)throw Error('Хэмнэл '+slot.toUpperCase()+' · '+(result.error||'Кодоо шалгаарай.'));
+                if(!result.ok)throw Error(workshopText('Хэмнэл ')+slot.toUpperCase()+' · '+(result.error||workshopText('Кодоо шалгаарай.')));
                 this.scores[slot]=result;
                 if(result.solved&&!this.state.won.includes(this.state.study)){
                     this.state.won.push(this.state.study);this.ctx.save();
@@ -242,24 +285,24 @@
             }finally{if(gen===this.generation)this.compiling=false;}
         }
         async check(){
-            this.stop();const gen=this.generation;this.stopBtn.disabled=false;this.report('Кодоо шалгаж байна…');
+            this.stop();const gen=this.generation;this.stopBtn.disabled=false;this.report(workshopText('Кодоо шалгаж байна…'));
             try{
                 const score=await this.compile(this.state.slot,gen);if(!score||gen!==this.generation)return;
                 this.renderScore(score);this.consoleBox.textContent=score.output||'';this.consoleBox.hidden=!score.output;
-                this.report(score.solved?'✓ Дасгал биеллээ!':'Код ажиллалаа. Самбарын дарааллыг дасгалтай тулгаарай.');
+                this.report(score.solved?workshopText('✓ Дасгал биеллээ!'):workshopText('Код ажиллалаа. Самбарын дарааллыг дасгалтай тулгаарай.'));
             }catch(e){if(gen===this.generation)this.report(e.message,true);}
             finally{if(gen===this.generation)this.stopBtn.disabled=true;}
         }
         async listen(slot,mystery=false){
             this.stop();const gen=this.generation;
-            this.stopBtn.disabled=false;this.report('Хэмнэл бэлдэж байна…');
+            this.stopBtn.disabled=false;this.report(workshopText('Хэмнэл бэлдэж байна…'));
             try{
                 const ctx=await this.synth.unlock();if(gen!==this.generation)return;
                 if(mystery){
                     const a=await this.compile('a',gen);if(!a)return;
                     const b=await this.compile('b',gen);if(!b)return;
                     const fingerprint=s=>JSON.stringify(s.events.filter(e=>e.kind!=='rest').map(e=>[e.kind,e.value,e.start,e.kind==='note'?e.ticks:0]));
-                    if(fingerprint(a)===fingerprint(b))throw Error('A ба B ижил сонсогдож байна. Зохиох хэсэгт нэг авианы утга эсвэл хэмийг өөрчлөөрэй.');
+                    if(fingerprint(a)===fingerprint(b))throw Error(workshopText('A ба B ижил сонсогдож байна. Зохиох хэсэгт нэг авианы утга эсвэл хэмийг өөрчлөөрэй.'));
                     if(!this.round)this.round={slot:Math.random()<.5?'a':'b',heard:false};
                     slot=this.round.slot;
                 }
@@ -271,8 +314,8 @@
                 const start=ctx.currentTime+.055,beat=60/this.state.bpm;
                 for(const e of score.events)this.synth.hit(e,start+e.start*beat/4,beat);
                 if(mystery){this.round.heard=true;this.enableGuess(true);}
-                const label=mystery?'Нууц хэмнэл':'Хэмнэл '+slot.toUpperCase();
-                this.report(label+' тоглож байна.');
+                const label=mystery?workshopText('Нууц хэмнэл'):workshopText('Хэмнэл ')+slot.toUpperCase();
+                this.report(label+workshopText(' тоглож байна.'));
                 const frame=()=>{
                     if(gen!==this.generation)return;
                     const tick=(ctx.currentTime-start)*4/beat;this.paintTick(Math.max(0,tick));
@@ -282,32 +325,32 @@
                 this.finishTimer=setTimeout(()=>{
                     if(gen!==this.generation)return;
                     this.playing=false;this.stopBtn.disabled=true;cancelAnimationFrame(this.animation);this.paintTick(-1);
-                    this.report(mystery?'Аль хэмнэл тоглосон бэ?':score.solved?'✓ Дасгал биеллээ! Хэмнэлээ B хувилбарт өөрчилж үзээрэй.':'Тоглож дууслаа. Өөр нэг өөрчлөлт хийж туршаарай.');
+                    this.report(mystery?workshopText('Аль хэмнэл тоглосон бэ?'):score.solved?workshopText('✓ Дасгал биеллээ! Хэмнэлээ B хувилбарт өөрчилж үзээрэй.'):workshopText('Тоглож дууслаа. Өөр нэг өөрчлөлт хийж туршаарай.'));
                 },(score.ticks*beat/4+.10)*1000);
             }catch(e){
                 if(gen!==this.generation)return;
-                this.stop();this.report(e.message||'Дууг тоглуулж чадсангүй.',true);
+                this.stop();this.report(e.message||workshopText('Дууг тоглуулж чадсангүй.'),true);
             }
         }
         enableGuess(enabled){for(const b of this.quizAnswers?.children||[])b.disabled=!enabled;}
         quiz(root){
-            const panel=node('section','mu-panel mu-duel');panel.append(node('h2','','Аль хэмнэл вэ?'),
-                node('p','','Хосоороо A, B хоёрыг эхлээд сонс. Дараа нь найз чинь кодыг харалгүй нууц хэмнэлийг таана.'));
+            const panel=node('section','mu-panel mu-duel');panel.append(node('h2','',workshopText('Аль хэмнэл вэ?')),
+                node('p','',workshopText('Хосоороо A, B хоёрыг эхлээд сонс. Дараа нь найз чинь кодыг харалгүй нууц хэмнэлийг таана.')));
             const examples=node('div','mu-listens');
-            for(const slot of ['a','b'])examples.append(btn(slot.toUpperCase()+' сонсох','mu-audition-'+slot,()=>this.listen(slot)));
+            for(const slot of ['a','b'])examples.append(btn(slot.toUpperCase()+workshopText(' сонсох'),'mu-audition-'+slot,()=>this.listen(slot)));
             panel.append(examples);
             const transport=node('div','mu-transport');
-            transport.append(btn('Нууц хэмнэл сонсох','mu-primary mu-mystery',()=>this.listen(null,true)));
-            this.stopBtn=btn('■ Зогсоох','mu-stop',()=>{this.stop();this.report('Тоглуулалтыг зогсоолоо.');});
+            transport.append(btn(workshopText('Нууц хэмнэл сонсох'),'mu-primary mu-mystery',()=>this.listen(null,true)));
+            this.stopBtn=btn(workshopText('■ Зогсоох'),'mu-stop',()=>{this.stop();this.report(workshopText('Тоглуулалтыг зогсоолоо.'));});
             this.stopBtn.disabled=true;transport.append(this.stopBtn);panel.append(transport);
             const answers=this.quizAnswers=node('div','mu-guess');
-            for(const key of ['a','b'])answers.append(btn('Хэмнэл '+key.toUpperCase(),'mu-guess-'+key,()=>{
+            for(const key of ['a','b'])answers.append(btn(workshopText('Хэмнэл ')+key.toUpperCase(),'mu-guess-'+key,()=>{
                 if(!this.round?.heard)return;
                 this.stop();const answer=this.round.slot;this.round=null;this.enableGuess(false);
-                this.report((answer===key?'✓ Зөв таалаа! ':'Энэ удаа ')+ 'Хэмнэл '+answer.toUpperCase()+' тоглосон. Нууц хэмнэл дарж дахин тоглоорой.');
+                this.report((answer===key?workshopText('✓ Зөв таалаа! '):workshopText('Энэ удаа '))+ workshopText('Хэмнэл ')+answer.toUpperCase()+workshopText(' тоглосон. Нууц хэмнэл дарж дахин тоглоорой.'));
             }));
             this.enableGuess(false);panel.append(answers);root.append(panel);
-            this.report('Нууц хэмнэл сонссоны дараа хариугаа сонгоорой.');
+            this.report(workshopText('Нууц хэмнэл сонссоны дараа хариугаа сонгоорой.'));
         }
     }
     function leave(){if(active){active.leave();active=null;}}
@@ -315,8 +358,8 @@
         const data=normalize(raw),rows=[];
         for(const [id,study] of Object.entries(studies)){
             if(!data.won.includes(id)&&['a','b'].every(k=>data.songs[id][k]===study[k]))continue;
-            if(data.won.includes(id))rows.push({title:study.title,text:'Сурагч энэ дасгалын хэмнэлийг кодоор биелүүлсэн.'});
-            for(const k of ['a','b'])rows.push({title:study.title+' · Хэмнэл '+k.toUpperCase(),text:data.songs[id][k]});
+            if(data.won.includes(id))rows.push({title:study.title,text:workshopText('Сурагч энэ дасгалын хэмнэлийг кодоор биелүүлсэн.')});
+            for(const k of ['a','b'])rows.push({title:study.title+workshopText(' · Хэмнэл ')+k.toUpperCase(),text:data.songs[id][k]});
         }
         return rows;
     }

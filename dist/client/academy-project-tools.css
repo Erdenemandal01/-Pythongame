@@ -1,0 +1,36 @@
+.ac-project-tools {
+    color:var(--nk-paper,#f5e9d5); border:1px solid #53665d; border-inline-start:3px solid #c79d65;
+    background:linear-gradient(120deg,#223c3b,#1b3134); border-radius:5px;
+    margin-block:1rem; padding:clamp(12px,1.5vw,20px); min-width:0; container-type:inline-size;
+}
+.ac-project-tools [hidden] { display:none !important; }
+.ac-project-tools .ac-pt-heading { color:inherit; margin:0 0 .45rem; font-size:1.12rem; }
+.ac-pt-intro,.ac-pt-status,.ac-pt-comparison,.ac-pt-empty,.ac-pt-difference { color:#c6d4c9; line-height:1.5; font-size:.88rem; overflow-wrap:anywhere; }
+.ac-pt-intro { margin:.2rem 0 .75rem; }
+.ac-pt-status,.ac-pt-comparison { margin:.55rem 0 0; }
+.ac-pt-status:empty,.ac-pt-comparison:empty,.ac-pt-difference:empty { display:none; }
+.ac-pt-actions { display:flex; flex-wrap:wrap; gap:.4rem; margin:.55rem 0; }
+.ac-project-tools .ac-pt-button {
+    font:600 .84rem/1.3 system-ui,sans-serif; padding:.46rem .66rem; border:1px solid #748478;
+    color:#f4e4c4; background:#263d39; border-radius:4px; min-height:34px;
+}
+.ac-project-tools .ac-pt-button:hover:enabled { background:#37524a; }
+.ac-project-tools .ac-pt-button:disabled { opacity:.55; cursor:default; }
+.ac-project-tools :is(button,summary):focus-visible { outline:3px solid #f2ce92; outline-offset:2px; }
+.ac-pt-details { margin:.65rem 0; font-size:.85rem; }
+.ac-pt-details > summary { cursor:pointer; color:#83d9c5; }
+.ac-project-tools .ac-pt-pre {
+    min-width:0; max-height:10.5rem; overflow:auto; margin:.35rem 0; padding:.55rem .65rem;
+    color:#f0e3cb; border:1px solid #425a50; border-radius:3px; background:#102328;
+    white-space:pre-wrap; overflow-wrap:anywhere; tab-size:4; font: .82rem/1.47 Consolas,monospace;
+}
+.ac-pt-pair { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:.5rem; }
+.ac-pt-cell { min-width:0; background:#21393a; border:1px solid #586b5d; border-radius:4px; padding:.55rem; }
+.ac-pt-cell h4 { margin:0; font-size:.95rem; color:#f0d49a; }
+.ac-pt-empty,.ac-pt-label { margin:.4rem 0 .2rem; }
+.ac-pt-label,.ac-pt-cell b,.ac-pt-state { font-size:.82rem; }
+.ac-pt-state { color:#89d4b8; }
+.ac-pt-state[data-state="error"] { color:#ffc0a7; }
+@container (max-width:350px) {
+    .ac-pt-pair { grid-template-columns:minmax(0,1fr); }
+}

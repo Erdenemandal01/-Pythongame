@@ -51,6 +51,8 @@
         return content;
     }
 
+    window.PythonSyntax = {highlight};
+
     const textStyles = ['fontFamily', 'fontSize', 'fontStyle', 'fontWeight', 'fontStretch', 'fontVariant',
         'fontKerning', 'fontFeatureSettings', 'fontVariationSettings', 'lineHeight', 'letterSpacing',
         'wordSpacing', 'tabSize', 'textAlign', 'textIndent', 'textTransform', 'textRendering', 'direction',

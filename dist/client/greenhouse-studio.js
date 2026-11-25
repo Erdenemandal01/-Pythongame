@@ -1,15 +1,16 @@
 (() => {
     'use strict';
+    const workshopText = globalThis.PQEnglishWorkshops?.literal || (text => text);
     const firstSoil = [18, 30, 65];
     const fiveSoil = [29, 68, 30, 53, 12];
     const starters = {
         first: 'for i in range(len(moisture)):\n    if moisture[i] < 30:\n        water(i)',
         five: 'for i in range(3):\n    if moisture[i] <= 30:\n        water(i)',
-        custom: 'for i in range(len(moisture)):\n    # Хуурай савыг энд шалгаарай\n    pass'
+        custom: workshopText('for i in range(len(moisture)):\n    # Хуурай савыг энд шалгаарай\n    pass')
     };
     const titles = {
-        first: 'Гурван сав, хоёр дусал', five: 'Таван савны цэцэрлэг',
-        custom: 'Миний зохиосон сорил', friend: 'Найзын хүлэмж'
+        first: workshopText('Гурван сав, хоёр дусал'), five: workshopText('Таван савны цэцэрлэг'),
+        custom: workshopText('Миний зохиосон сорил'), friend: workshopText('Найзын хүлэмж')
     };
     const modes = Object.keys(titles);
     const cleanSoil = values => Array.isArray(values) && values.length === 5 &&
@@ -89,6 +90,10 @@
         rect(12,34,24,4,'#834c49');rect(14,38,20,4,'#834c49');rect(16,42,16,1,'#834c49');
         rect(14,34,19,4,'#cf815d');rect(16,38,15,4,'#bf7056');rect(15,34,3,4,'#e39669');
         rect(29,34,4,4,'#b26953');rect(28,38,3,3,'#ad634e');
+        for(const x of [16,22,28]){
+            rect(x,34,5,1,'#ffe0a4');rect(x,35,1,3,'#ffe0a4');
+            rect(x+3,35,2,2,'#ffe0a4');rect(x+2,37,2,1,'#ffe0a4');
+        }
         if(wet){rect(12,29,24,2,'#75cfc7');rect(31,30,2,4,'#7be0d9');}
     }
     function drawGlass(canvas) {
@@ -105,6 +110,13 @@
             bar(x,y,3,h-y,color);
         }};
         hills(41,6,'#acd0b3',0);hills(49,5,'#80b8a2',3);hills(59,6,'#65998b',2);
+        // Overlapping wooden strips at the foot of the glass echo a ger's khana.
+        for(let x=-24;x<w;x+=24){
+            for(let step=0;step<12;step++){
+                bar(x+step*2,49+step*2,3,2,'#897b5b');
+                bar(x+22-step*2,49+step*2,3,2,'#a59972');
+            }
+        }
         for(let n=0;n<9;n++){const x=n*51-10;bar(x,0,2,72,'#648f83');bar(x+2,0,1,72,'#b5d3a8');}
         bar(0,8,w,2,'#739c86');bar(0,10,w,1,'#c4d9ae');bar(0,49,w,2,'#679685');
         for(let x=0;x<w;x+=4){const roof=8+Math.floor(Math.abs(x%102-51)*.33);bar(x,roof,4,1,'#abd1ba');}
@@ -150,20 +162,20 @@
             this.builderChanged=false;
             const shell=el('section','gh-shell');
             const head=el('header','gh-header');
-            head.append(el('h1','','Миний хүлэмж'));
+            head.append(el('h1','',workshopText('Миний хүлэмж')));
             const growth=el('div','gh-growth');
             const progress=el('span','gh-growth-marks');
             progress.setAttribute('aria-hidden','true');
             for(let i=0;i<3;i++){const m=el('i');if(i<this.state.growth)m.className='filled';progress.append(m);}
-            growth.append(progress,el('span','', ['Үр суулгалаа','Үр соёоллоо','Нахиа гарлаа','Цэцэг дэлгэрлээ'][this.state.growth]));
+            growth.append(progress,el('span','', [workshopText('Үр суулгалаа'),workshopText('Үр соёоллоо'),workshopText('Нахиа гарлаа'),workshopText('Цэцэг дэлгэрлээ')][this.state.growth]));
             this.growth=growth;head.append(growth);
-            const tabs=el('nav','gh-tabs');tabs.setAttribute('aria-label','Хүлэмжийн талбай');
-            const names=['Гурван сав','Таван сав','Сорил зохиох','Кодоор нээх'];
+            const tabs=el('nav','gh-tabs');tabs.setAttribute('aria-label',workshopText('Хүлэмжийн талбай'));
+            const names=[workshopText('Гурван сав'),workshopText('Таван сав'),workshopText('Сорил зохиох'),workshopText('Кодоор нээх')];
             modes.forEach((mode,i)=>{
                 const b=button('gh-tab',names[i],()=>this.switchTo(mode));
                 b.dataset.mode=mode;b.setAttribute('aria-pressed',String(this.mode===mode));
                 b.disabled=mode==='five'&&!this.state.won.includes('first');
-                if(b.disabled)b.title='Гурван савыг зөв услаад нээнэ.';
+                if(b.disabled)b.title=workshopText('Гурван савыг зөв услаад нээнэ.');
                 tabs.append(b);
             });
             shell.append(head,tabs);
@@ -172,13 +184,13 @@
                 if(this.mode==='custom')shell.append(this.builder());
                 const study=el('div','gh-study');
                 const heading=el('h2','',titles[this.mode]);
-                const brief=el('p','','Хөрсний чийг 30% буюу түүнээс бага бол нэг дусал ус өг. Бусад савыг хэвээр үлдээгээрэй.');
+                const brief=el('p','',workshopText('Хөрсний чийг 30% буюу түүнээс бага бол нэг дусал ус өг. Бусад савыг хэвээр үлдээгээрэй.'));
                 study.append(heading,brief);shell.append(study,this.bench(),this.editor());
                 if(this.mode==='custom'){
                     const box=el('section','gh-sharebox');
-                    box.append(el('h3','','Найздаа сорил илгээх'));
-                    this.shareHint=el('p','','Бүх саваа дүрмийн дагуу услаад сорилын кодоо аваарай.');
-                    this.shareButton=button('gh-share','Сорилын код авах',()=>this.showShare());
+                    box.append(el('h3','',workshopText('Найздаа сорил илгээх')));
+                    this.shareHint=el('p','',workshopText('Бүх саваа дүрмийн дагуу услаад сорилын кодоо аваарай.'));
+                    this.shareButton=button('gh-share',workshopText('Сорилын код авах'),()=>this.showShare());
                     this.shareResult=el('div','gh-share-result');
                     box.append(this.shareHint,this.shareButton,this.shareResult);shell.append(box);
                 }
@@ -199,7 +211,7 @@
                     this.ctx.save();this.paint();
                 });
                 const canvas=el('canvas','gh-sprout');canvas.width=48;canvas.height=46;canvas.setAttribute('aria-hidden','true');
-                const name=el('span','gh-pot-label','Сав '+(i+1));
+                const name=el('span','gh-pot-label',workshopText('Сав ')+(i+1));
                 const pct=el('b','gh-soil',n+'%');const indicator=el('span','gh-indicator');
                 p.dataset.pot=i;p.append(canvas,name,pct,indicator);shelf.append(p);
                 this.pots.push({p,canvas,indicator});
@@ -207,7 +219,7 @@
             scene.append(shelf);section.append(scene);
             const panel=el('div','gh-bench-foot');
             this.note=el('p','gh-pred-note');
-            this.predict=button('gh-predict','Таамгаа хадгалах',()=>{
+            this.predict=button('gh-predict',workshopText('Таамгаа хадгалах'),()=>{
                 if(this.rec.predicted){
                     this.clearTrace();this.rec.predicted=false;
                 }else this.rec.predicted=true;
@@ -225,7 +237,7 @@
             const area=el('div','gh-code-wrap');this.mark=el('div','gh-active-line');
             this.numbers=el('div','gh-numbers');this.numbers.setAttribute('aria-hidden','true');
             this.code=el('textarea','gh-code');this.code.value=this.rec.code;this.code.maxLength=16000;
-            this.code.spellcheck=false;this.code.wrap='off';this.code.setAttribute('aria-label','Хүлэмжийн Python код');
+            this.code.spellcheck=false;this.code.wrap='off';this.code.setAttribute('aria-label',workshopText('Хүлэмжийн Python код'));
             this.code.oninput=()=>{this.clearTrace();this.rec.code=this.code.value;this.rec.verified=false;this.ctx.save();this.paint();};
             this.code.onscroll=()=>this.paintLine();this.code.onkeydown=e=>{
                 if(e.ctrlKey&&e.key==='Enter'){e.preventDefault();this.execute(true);}
@@ -233,23 +245,23 @@
             };
             area.append(this.mark,this.numbers,this.code);codeSide.append(area);
             const operations=el('div','gh-operations');
-            this.run=button('gh-run','▶ Ажиллуулах',()=>this.execute(true));
-            this.step=button('gh-step','Нэг алхам',()=>this.execute(false));
-            this.stop=button('gh-stop','Зогсоох',()=>{
-                this.cancel();this.paint();this.report('Тоглуулалт зогслоо. «Нэг алхам» дарж мөрөө дагаарай.');
+            this.run=button('gh-run',workshopText('▶ Ажиллуулах'),()=>this.execute(true));
+            this.step=button('gh-step',workshopText('Нэг алхам'),()=>this.execute(false));
+            this.stop=button('gh-stop',workshopText('Зогсоох'),()=>{
+                this.cancel();this.paint();this.report(workshopText('Тоглуулалт зогслоо. «Нэг алхам» дарж мөрөө дагаарай.'));
             });
             operations.append(this.run,this.step,this.stop);codeSide.append(operations);
-            const readout=el('section','gh-readout');readout.append(el('h3','','Кодын алхам'));
+            const readout=el('section','gh-readout');readout.append(el('h3','',workshopText('Кодын алхам')));
             this.trace=el('div','gh-trace');this.variables=el('div','gh-vars');this.lineSource=el('code','gh-source');
             this.status=el('p','gh-status');this.status.setAttribute('role','status');
             this.output=el('pre','gh-output');
-            this.next=button('gh-next','Таван савыг нээх →',()=>this.switchTo('five'));
+            this.next=button('gh-next',workshopText('Таван савыг нээх →'),()=>this.switchTo('five'));
             readout.append(this.trace,this.lineSource,this.variables,this.status,this.output,this.next);
             const help=el('details','gh-help');
-            help.append(el('summary','','Кодын тусламж'),el('p','',
-                'moisture нь савнуудын чийгийг зүүнээс баруун тийш жагсаана. Эхний савны дугаар код дотор 0 байдаг. water(i) нь тэр дугаартай саванд нэг дусал ус өгнө.'),
-                el('p','',this.mode==='first'?'30 нь 30-аас бага уу? Тэнцүү тохиолдлыг багтаахдаа <= гэж бичдэг.':
-                    'range(len(moisture)) нь жагсаалтын бүх савны дугаарыг нэг нэгээр авна.'));
+            help.append(el('summary','',workshopText('Кодын тусламж')),el('p','',
+                workshopText('moisture нь савнуудын чийгийг зүүнээс баруун тийш жагсаана. Эхний савны дугаар код дотор 0 байдаг. water(i) нь тэр дугаартай саванд нэг дусал ус өгнө.')),
+                el('p','',this.mode==='first'?workshopText('30 нь 30-аас бага уу? Тэнцүү тохиолдлыг багтаахдаа <= гэж бичдэг.'):
+                    workshopText('range(len(moisture)) нь жагсаалтын бүх савны дугаарыг нэг нэгээр авна.')));
             panel.append(codeSide,readout,help);return panel;
         }
         report(text, bad=false){
@@ -261,7 +273,7 @@
             if(this.timer){clearTimeout(this.timer);this.timer=0;}
             if(!this.result){
                 const generation=++this.generation;
-                this.loading=true;this.paint();this.report('Python кодыг ажиллуулж байна…');
+                this.loading=true;this.paint();this.report(workshopText('Python кодыг ажиллуулж байна…'));
                 try{
                     const result=await this.ctx.run(this.rec.code,{moisture:this.soil.slice()});
                     if(generation!==this.generation)return;
@@ -314,15 +326,15 @@
                 const selected=rec.prediction.includes(i),wet=water.includes(i),current=frame?.pot===i;
                 p.setAttribute('aria-pressed',String(selected));
                 p.setAttribute('aria-disabled',String(rec.predicted));
-                p.setAttribute('aria-label','Сав '+(i+1)+', чийг '+this.soil[i]+'%'+(wet?', усалсан':'')+(selected?', таамагт сонгосон':''));
+                p.setAttribute('aria-label',workshopText('Сав ')+(i+1)+workshopText(', чийг ')+this.soil[i]+'%'+(wet?workshopText(', усалсан'):'')+(selected?workshopText(', таамагт сонгосон'):''));
                 p.classList.toggle('gh-current',current);p.classList.toggle('gh-wet',wet);
-                indicator.textContent=wet?'◆ Усалсан':selected?'✓ Сонгосон':'';
+                indicator.textContent=wet?workshopText('◆ Усалсан'):selected?workshopText('✓ Сонгосон'):'';
                 drawPot(canvas,this.state.growth,wet,i);
             });
-            this.drops.textContent='◈ '+(frame?.remaining??expected.length)+' / '+expected.length+' дусал';
-            this.note.textContent=rec.predicted?'Миний таамаг · '+(rec.prediction.length?rec.prediction.map(i=>i+1).join(', ')+'-р сав':'услах савгүй'):
-                'Аль саванд ус өгөх вэ? Савнуудаа сонгоод таамгаа хадгалаарай.';
-            this.predict.textContent=rec.predicted?'Таамгаа засах':'Таамгаа хадгалах';
+            this.drops.textContent='◈ '+(frame?.remaining??expected.length)+' / '+expected.length+workshopText(' дусал');
+            this.note.textContent=rec.predicted?workshopText('Миний таамаг · ')+(rec.prediction.length?rec.prediction.map(i=>i+1).join(', ')+workshopText('-р сав'):workshopText('услах савгүй')):
+                workshopText('Аль саванд ус өгөх вэ? Савнуудаа сонгоод таамгаа хадгалаарай.');
+            this.predict.textContent=rec.predicted?workshopText('Таамгаа засах'):workshopText('Таамгаа хадгалах');
             this.code.readOnly=!rec.predicted;
             const numbers=this.code.value.split('\n').map((_,i)=>i+1).join('\n');
             if(this.numbers.textContent!==numbers)this.numbers.textContent=numbers;
@@ -335,24 +347,24 @@
             this.run.disabled=!rec.predicted||this.loading||!!this.timer;
             this.step.disabled=!rec.predicted||this.loading;
             this.stop.disabled=!this.loading&&!this.timer;
-            this.trace.textContent=frame?'Алхам '+(this.cursor+1)+' / '+this.frames.length+' · Мөр '+(line??frame.line):'Ажиллуулсан мөрөө энд харна.';
+            this.trace.textContent=frame?workshopText('Алхам ')+(this.cursor+1)+' / '+this.frames.length+workshopText(' · Мөр ')+(line??frame.line):workshopText('Ажиллуулсан мөрөө энд харна.');
             this.lineSource.hidden=!line;
             this.lineSource.textContent=line?(this.code.value.split('\n')[line-1]??'').trim():'';
             this.variables.replaceChildren();
             if(frame){
                 const values=Object.entries(frame.variables||{}).slice(0,4);
-                if(frame.pot!=null)values.push(['Чийг',this.soil[frame.pot]+'%']);
+                if(frame.pot!=null)values.push([workshopText('Чийг'),this.soil[frame.pot]+'%']);
                 for(const [k,v] of values)this.variables.append(el('code','',k+' = '+String(v)));
             }
             const passed=this.finished && this.result?.ok && this.result?.won;
             if(this.finished){
                 const predictedRight=same(rec.prediction,expected);
-                const text=passed?('✓ Бүх савыг зөв усаллаа. '+(this.earned?'+'+this.earned+' XP. ':'')+(predictedRight?'Таамаг таарлаа.':'Аль сав таны таамгаас өөр байсныг хараарай.')):
-                    (this.result?.error||'Зарим сав дүрэмтэй таарсангүй. Кодоо засаж дахин туршаарай.');
+                const text=passed?(workshopText('✓ Бүх савыг зөв усаллаа. ')+(this.earned?'+'+this.earned+' XP. ':'')+(predictedRight?workshopText('Таамаг таарлаа.'):workshopText('Аль сав таны таамгаас өөр байсныг хараарай.'))):
+                    (this.result?.error||workshopText('Зарим сав дүрэмтэй таарсангүй. Кодоо засаж дахин туршаарай.'));
                 this.report(text,!passed);
-            }else if(this.loading)this.report('Python кодыг ажиллуулж байна…');
-            else if(frame)this.report(frame.added?.length?'Нэг дусал ус саванд орлоо.':'');
-            else this.report(rec.predicted?'Кодоо туршаарай. Мөр бүрийг тусад нь харах бол «Нэг алхам» дар.':'Кодоо ажиллуулахаас өмнө услах савнуудаа таагаарай.');
+            }else if(this.loading)this.report(workshopText('Python кодыг ажиллуулж байна…'));
+            else if(frame)this.report(frame.added?.length?workshopText('Нэг дусал ус саванд орлоо.'):'');
+            else this.report(rec.predicted?workshopText('Кодоо туршаарай. Мөр бүрийг тусад нь харах бол «Нэг алхам» дар.'):workshopText('Кодоо ажиллуулахаас өмнө услах савнуудаа таагаарай.'));
             this.next.hidden=this.mode!=='first'||!this.state.won.includes('first');
             this.output.textContent=this.finished?(this.result?.output||''):'';this.output.hidden=!this.output.textContent;
             const unlock=this.root.querySelector('[data-mode="five"]');
@@ -360,24 +372,24 @@
             this.paintGrowth();
             if(this.mode==='custom'){
                 this.shareButton.disabled=!rec.verified||this.builderChanged;
-                this.shareHint.textContent=this.builderChanged?'«Чийгийг тохируулах» дарж шинэ утгуудаа туршаарай.':
-                    rec.verified?'Энэ кодоор найз чинь таны таван савыг өөрийн хүлэмжид нээнэ.':'Бүх саваа дүрмийн дагуу услаад сорилын кодоо аваарай.';
+                this.shareHint.textContent=this.builderChanged?workshopText('«Чийгийг тохируулах» дарж шинэ утгуудаа туршаарай.'):
+                    rec.verified?workshopText('Энэ кодоор найз чинь таны таван савыг өөрийн хүлэмжид нээнэ.'):workshopText('Бүх саваа дүрмийн дагуу услаад сорилын кодоо аваарай.');
                 if(this.shareButton.disabled)this.shareResult.replaceChildren();
             }
         }
         paintGrowth(){
-            this.growth.lastChild.textContent=['Үр суулгалаа','Үр соёоллоо','Нахиа гарлаа','Цэцэг дэлгэрлээ'][this.state.growth];
+            this.growth.lastChild.textContent=[workshopText('Үр суулгалаа'),workshopText('Үр соёоллоо'),workshopText('Нахиа гарлаа'),workshopText('Цэцэг дэлгэрлээ')][this.state.growth];
             this.growth.querySelectorAll('i').forEach((dot,i)=>dot.classList.toggle('filled',i<this.state.growth));
         }
         builder(){
-            const box=el('section','gh-builder');box.append(el('h3','','Таван савны чийгийг тохируул'));
+            const box=el('section','gh-builder');box.append(el('h3','',workshopText('Таван савны чийгийг тохируул')));
             const form=el('form','gh-input-row');const fields=[];
             this.state.customSoil.forEach((n,i)=>{
-                const label=el('label','', (i+1)+'-р сав (%)');
+                const label=el('label','', (i+1)+workshopText('-р сав (%)'));
                 const input=el('input');input.type='number';input.min=0;input.max=100;input.step=1;input.required=true;input.value=n;
                 label.append(input);fields.push(input);form.append(label);
             });
-            const apply=el('button','gh-apply','Чийгийг тохируулах');apply.type='submit';form.append(apply);
+            const apply=el('button','gh-apply',workshopText('Чийгийг тохируулах'));apply.type='submit';form.append(apply);
             form.oninput=()=>{
                 this.builderChanged=!same(fields.map(input=>input.valueAsNumber),this.state.customSoil);
                 this.paint();
@@ -393,24 +405,24 @@
         showShare(){
             if(!this.rec.verified||this.builderChanged)return;
             const value=window.GreenhouseShare.encode(this.state.customSoil);
-            const field=el('input','gh-code-value');field.readOnly=true;field.value=value;field.setAttribute('aria-label','Найздаа өгөх сорилын код');
-            const copy=button('gh-copy','Код хуулах',async()=>{
-                try{await navigator.clipboard.writeText(value);copy.textContent='Хууллаа';}
-                catch{field.focus();field.select();copy.textContent='Ctrl+C дарж хуулна уу';}
+            const field=el('input','gh-code-value');field.readOnly=true;field.value=value;field.setAttribute('aria-label',workshopText('Найздаа өгөх сорилын код'));
+            const copy=button('gh-copy',workshopText('Код хуулах'),async()=>{
+                try{await navigator.clipboard.writeText(value);copy.textContent=workshopText('Хууллаа');}
+                catch{field.focus();field.select();copy.textContent=workshopText('Ctrl+C дарж хуулна уу');}
             });
             this.shareResult.replaceChildren(field,copy);field.focus();field.select();
         }
         friendForm(){
-            const section=el('section','gh-builder');section.append(el('h3','','Найзын сорилыг нээх'));
-            const form=el('form','gh-input-row'),label=el('label','','Сорилын богино код');
+            const section=el('section','gh-builder');section.append(el('h3','',workshopText('Найзын сорилыг нээх')));
+            const form=el('form','gh-input-row'),label=el('label','',workshopText('Сорилын богино код'));
             const field=el('input','gh-friend-code');field.required=true;field.maxLength=32;field.placeholder='G1-XXXX-XXXX';field.autocomplete='off';field.spellcheck=false;
             if(this.state.friendSoil)field.value=window.GreenhouseShare.encode(this.state.friendSoil);
-            label.append(field);const open=el('button','gh-open-code','Сорил нээх');open.type='submit';
+            label.append(field);const open=el('button','gh-open-code',workshopText('Сорил нээх'));open.type='submit';
             form.append(label,open);const status=el('p','gh-friend-status');status.setAttribute('role','status');
             form.onsubmit=e=>{
                 e.preventDefault();try{
                     const soil=window.GreenhouseShare.decode(field.value);
-                    if(this.state.friendSoil && same(soil,this.state.friendSoil)){status.textContent='Энэ сорил нээлттэй байна.';return;}
+                    if(this.state.friendSoil && same(soil,this.state.friendSoil)){status.textContent=workshopText('Энэ сорил нээлттэй байна.');return;}
                     this.clearTrace();this.state.friendSoil=soil;
                     this.state.records.friend=record({code:this.state.records.friend.code},'friend',5);
                     this.ctx.save();this.render();

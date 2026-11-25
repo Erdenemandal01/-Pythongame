@@ -1,0 +1,82 @@
+.world-card .rc-meet, #questView .rc-meet {
+    display: inline-flex;
+    align-items: center;
+    gap: .5rem;
+    padding: .14rem .7rem .14rem .38rem;
+    min-height: 40px;
+    border: 1px solid #8b8868;
+    border-radius: 4px;
+    background: #203737;
+    color: #f1ddb0;
+    font: 650 .88rem/1.24 system-ui,sans-serif;
+}
+.world-card .rc-meet { margin-block-start: .6rem; }
+.rc-meet:hover, #questView .rc-meet:hover { background: #2e4944; }
+.rc-meet .rc-portrait { width: 25px; height: 34px; object-fit: contain; }
+.rc-meet:focus-visible, .rc-encounter :is(button,summary):focus-visible {
+    outline: 3px solid #ffda8a; outline-offset: 3px;
+}
+dialog.rc-encounter {
+    color-scheme: dark;
+    width: min(850px,calc(100vw - 2rem));
+    max-width: none;
+    max-height: calc(100dvh - 2rem);
+    padding: 0;
+    overflow: auto;
+    color: var(--nk-paper,#f6ead4);
+    background: #183236;
+    border: 2px solid #b09362;
+    border-radius: 6px;
+    box-shadow: 0 10px 50px #050c10aa;
+}
+.rc-encounter::backdrop { background-color: #061316cb; }
+.rc-shell { display: grid; grid-template-columns: minmax(0, .86fr) minmax(0, 1.14fr); }
+.rc-figure {
+    --rc-cell: left top;
+    margin: 0;
+    padding: 1.1rem .8rem .65rem;
+    display: grid;
+    grid-template-rows: minmax(0,1fr) auto;
+    justify-items: center;
+    align-items: end;
+    gap: .45rem;
+    overflow: hidden;
+    isolation: isolate;
+    position: relative;
+    border-inline-end: 1px solid #a68c60;
+    background: #253f3a;
+}
+.rc-figure::before {
+    content: "";
+    position: absolute; inset: 0; z-index: -1;
+    background: linear-gradient(0deg,#0f272bec,#19353650 45%,#0e202930),url("assets/steppe-routes.webp") var(--rc-cell) / 200% 200%;
+}
+.rc-encounter[data-world="2"] .rc-figure { --rc-cell: right top; }
+.rc-encounter[data-world="3"] .rc-figure { --rc-cell: left bottom; }
+.rc-encounter[data-world="4"] .rc-figure { --rc-cell: right bottom; }
+.rc-figure .rc-portrait {
+    display: block;
+    width: 100%; height: clamp(208px,48vh,390px); object-fit: contain; object-position: bottom center;
+    filter: drop-shadow(0 3px 2px #0a1819aa);
+}
+.rc-territory { color: #ffebbd; font: 600 .9rem/1.45 system-ui,sans-serif; text-align: center; }
+.rc-message { min-width: 0; padding: clamp(18px,3.3vw,36px); }
+.rc-heading { display: flex; justify-content: space-between; align-items: start; gap: 1rem; }
+.rc-role { margin: 0 0 .24rem; color: var(--nk-gold,#edbd70); font-weight: 650; font-size: .86rem; }
+.rc-heading h2 { margin: 0; font: 700 clamp(1.8rem,4vw,2.7rem)/1.1 var(--nk-serif,Georgia,serif); }
+.rc-close { background: #263e3c; color: #f7ead3; border: 1px solid #828469; padding: .42rem .72rem; border-radius: 4px; }
+.rc-topic { margin: 1.3rem 0 .2rem; color: #f6e7c7; font-size: 1.04rem; }
+.rc-story, .rc-answer p { margin: .44rem 0 .85rem; line-height: 1.52; }
+.rc-code, .rc-answer pre {
+    font: .93rem/1.52 Consolas,monospace; white-space: pre-wrap; overflow-wrap: anywhere;
+    margin: .8rem 0; padding: .7rem .9rem; border-radius: 4px;
+}
+.rc-code { border: 1px solid #4f6456; background: #0b1e24; color: #f4e5c9; }
+.rc-answer summary { cursor: pointer; color: var(--nk-turq,#74d3c0); padding: .35rem 0; }
+.rc-answer pre { color: #d7e8b2; background: #223b36; border-inline-start: 2px solid #aaba84; }
+@media(max-width: 680px) {
+    .rc-shell { grid-template-columns: minmax(0,1fr); }
+    .rc-figure { border-inline: 0; border-bottom: 1px solid #a68c60; padding: .55rem; }
+    .rc-figure .rc-portrait { height: min(32dvh,210px); }
+    .rc-message { padding: 1rem; }
+}

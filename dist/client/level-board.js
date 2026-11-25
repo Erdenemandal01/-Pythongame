@@ -1,12 +1,13 @@
 (() => {
     'use strict';
+    const workshopText = globalThis.PQEnglishWorkshops?.literal || (text => text);
     const WIDTH = 9, HEIGHT = 6, TILE = 40;
     const symbols = {
-        '.': 'Зам', '#': 'Хад', 'S': 'Эхлэл', 'E': 'Өндөг', 'C': 'Агуй', 'D': 'Унтаж буй луу'
+        '.': workshopText('Зам'), '#': workshopText('Хад'), 'S': workshopText('Эхлэл'), 'E': workshopText('Өндөг'), 'C': workshopText('Агуй'), 'D': workshopText('Унтаж буй луу')
     };
     const fileFormat = 'python-quest-level';
     const defaultMap = () => ({
-        title: 'Лууны өндгийг аврах',
+        title: workshopText('Лууны өндгийг аврах'),
         rows: ['..##...#.', '...D..#..', '.#.....D.', '.SEEEC...', '...#..#..', '.#...D...']
     });
     function error(message) { throw new Error(message); }
@@ -24,13 +25,13 @@
     function validate(input) {
         if (!input || typeof input.title !== 'string' || !input.title.trim() ||
             input.title.length > 60 || /[\u0000-\u001f\u007f]/.test(input.title))
-            error('Түвшиндээ 1–60 тэмдэгттэй нэр өгөөрэй.');
-        if (!validRows(input.rows)) error('Газрын зураг 9 багана, 6 мөртэй байна. Нүдний тэмдэглэгээг шалгаарай.');
+            error(workshopText('Түвшиндээ 1–60 тэмдэгттэй нэр өгөөрэй.'));
+        if (!validRows(input.rows)) error(workshopText('Газрын зураг 9 багана, 6 мөртэй байна. Нүдний тэмдэглэгээг шалгаарай.'));
         const rows = input.rows.slice(), starts = locations(rows, 'S'), caves = locations(rows, 'C');
         const eggs = locations(rows, 'E');
-        if (starts.length !== 1) error('Газрын зураг дээр яг нэг эхлэл байрлуулна.');
-        if (caves.length !== 1) error('Газрын зураг дээр яг нэг агуй байрлуулна.');
-        if (!eggs.length) error('Аврах өндөгнөөс дор хаяж нэгийг байрлуулаарай.');
+        if (starts.length !== 1) error(workshopText('Газрын зураг дээр яг нэг эхлэл байрлуулна.'));
+        if (caves.length !== 1) error(workshopText('Газрын зураг дээр яг нэг агуй байрлуулна.'));
+        if (!eggs.length) error(workshopText('Аврах өндөгнөөс дор хаяж нэгийг байрлуулаарай.'));
         const queue = [starts[0]], seen = new Set([starts[0].join(',')]);
         for (let i = 0; i < queue.length; i++) {
             const [x, y] = queue[i];
@@ -43,8 +44,8 @@
         }
         for (const [x, y] of [...eggs, caves[0]]) {
             if (!seen.has(x + ',' + y))
-                error('(' + x + ', ' + y + ') нүдний ' + (rows[y][x] === 'C' ? 'агуйд' : 'өндгөнд') +
-                    ' хүрэх зам алга. Хад эсвэл лууны байрлалыг өөрчлөөрэй.');
+                error('(' + x + ', ' + y + workshopText(') нүдний ') + (rows[y][x] === 'C' ? workshopText('агуйд') : workshopText('өндгөнд')) +
+                    workshopText(' хүрэх зам алга. Хад эсвэл лууны байрлалыг өөрчлөөрэй.'));
         }
         return {title:input.title.trim(), rows};
     }
@@ -52,10 +53,10 @@
         return JSON.stringify({format:fileFormat, version:1, ...validate(map)}, null, 2);
     }
     function decode(text) {
-        if (typeof text !== 'string' || text.length > 16000) error('Жижиг хэмжээтэй түвшний JSON файл сонгоорой.');
+        if (typeof text !== 'string' || text.length > 16000) error(workshopText('Жижиг хэмжээтэй түвшний JSON файл сонгоорой.'));
         let data;
-        try { data = JSON.parse(text.trim()); } catch { error('Түвшний файлыг уншиж чадсангүй.'); }
-        if (data?.format !== fileFormat || data.version !== 1) error('«Миний түвшин»-ээс татсан түвшний файл сонгоорой.');
+        try { data = JSON.parse(text.trim()); } catch { error(workshopText('Түвшний файлыг уншиж чадсангүй.')); }
+        if (data?.format !== fileFormat || data.version !== 1) error(workshopText('«Миний түвшин»-ээс татсан түвшний файл сонгоорой.'));
         return validate(data);
     }
 
@@ -175,17 +176,18 @@
     }
     function dragon(ctx) {
         shadow(ctx,2,33,35);
-        shape(ctx,'#3b4c56',[[1,23],[5,24],[9,27],[7,23],[8,17],[12,13],[14,13],[15,8],[18,12],[22,12],[23,8],[25,13],[28,15],[31,15],[31,12],[34,15],[37,17],[38,22],[35,25],[33,26],[31,31],[24,33],[13,33],[6,31],[2,28]]);
-        shape(ctx,'#705a86',[[3,25],[9,29],[11,28],[9,24],[10,18],[14,15],[20,14],[25,16],[30,18],[34,16],[36,19],[36,22],[32,23],[31,27],[27,30],[21,31],[13,31],[7,30],[4,28]]);
-        shape(ctx,'#ab86ae',[[10,22],[11,17],[15,14],[21,14],[25,17],[24,22],[19,24],[15,25]]);
-        shape(ctx,'#5e526f',[[10,24],[11,17],[17,13],[24,13],[21,18],[24,21],[19,23],[18,25],[13,25]]);
-        shape(ctx,'#c78eae',[[11,23],[12,18],[17,15],[23,15],[20,18],[22,21],[18,22],[17,24],[14,24]]);
-        shape(ctx,'#edbbbd',[[13,20],[16,16],[20,16],[17,18],[15,21]]);
-        shape(ctx,'#a784aa',[[23,18],[29,16],[32,16],[36,19],[35,22],[32,23],[28,22],[24,24],[22,22]]);
-        shape(ctx,'#eaca87',[[14,14],[16,9],[18,14]]);shape(ctx,'#f1d394',[[23,15],[25,7],[26,14]]);
-        shape(ctx,'#e2bd7e',[[30,15],[32,10],[33,16]]);
-        rect(ctx,'#4c435b',27,18,1,1);rect(ctx,'#4c435b',28,19,3,1);rect(ctx,'#493b52',35,20,1,1);
-        rect(ctx,'#d4ae99',27,24,4,2);rect(ctx,'#c9a4ad',17,29,7,1);
+        // A coiled, whiskered luu asleep beside the eggs.
+        shape(ctx,'#284541',[[1,20],[5,23],[9,22],[12,17],[18,15],[23,16],[26,19],[26,23],[23,26],[18,27],[15,26],[14,28],[19,30],[26,28],[29,23],[27,20],[26,16],[28,13],[33,13],[35,17],[38,18],[38,22],[35,24],[33,25],[32,29],[29,32],[24,34],[14,34],[8,32],[6,28],[6,26],[3,25]]);
+        shape(ctx,'#488875',[[2,21],[6,24],[11,22],[13,18],[18,17],[22,18],[24,20],[24,23],[21,25],[17,25],[15,24],[12,25],[12,28],[15,30],[21,31],[27,28],[30,24],[29,21],[31,18],[34,20],[33,25],[31,29],[28,31],[24,32],[14,32],[9,30],[8,27],[9,25],[5,25]]);
+        shape(ctx,'#81ba95',[[11,22],[14,18],[18,17],[22,19],[23,21],[19,20],[15,21],[12,24],[9,25]]);
+        shape(ctx,'#e2c68d',[[8,27],[10,29],[15,31],[22,31],[28,29],[26,31],[22,32],[14,32],[10,30]]);
+        shape(ctx,'#478477',[[26,18],[27,14],[31,13],[34,15],[33,17],[35,18],[37,18],[37,21],[34,22],[30,21],[28,23],[26,22]]);
+        shape(ctx,'#89ba98',[[27,17],[28,14],[31,14],[33,16],[31,16],[29,17]]);
+        rect(ctx,'#e5c58a',30,21,6,1);rect(ctx,'#253d39',30,18,3,1);rect(ctx,'#253d39',36,19,1,1);
+        rect(ctx,'#e3ba6c',27,8,2,6);rect(ctx,'#e3ba6c',24,9,4,2);rect(ctx,'#f1d29a',24,8,2,2);
+        rect(ctx,'#d6b071',31,9,2,4);rect(ctx,'#f1d29a',32,9,3,1);
+        rect(ctx,'#f1d69d',36,23,3,1);rect(ctx,'#e1bd87',38,21,1,3);
+        rect(ctx,'#ebc579',12,18,2,1);rect(ctx,'#e5bd72',15,16,2,1);rect(ctx,'#dfb871',19,15,2,1);
         rect(ctx,'#eff2b9',29,7,4,1);rect(ctx,'#eff2b9',31,8,1,1);rect(ctx,'#eff2b9',30,9,1,1);rect(ctx,'#eff2b9',29,10,4,1);
         rect(ctx,'#fff4c6',34,2,3,1);rect(ctx,'#fff4c6',35,3,1,1);rect(ctx,'#fff4c6',34,4,3,1);
     }
@@ -262,11 +264,11 @@
         }
         if(!editing) {
             const eggs=Array.isArray(remaining)?remaining:locations(map.rows,'E');
-            const description = map.title + '. Баатар ' + (player?'('+player.join(', ')+') нүдэнд':'эхлэлгүй') +
-                '. Үлдсэн өндөг ' + (eggs.map(p=>'('+p.join(', ')+')').join(', ')||'0') +
-                '. Агуй '+locations(map.rows,'C').map(p=>'('+p.join(', ')+')').join(', ') +
-                '. Хад '+(locations(map.rows,'#').map(p=>'('+p.join(', ')+')').join(', ')||'байхгүй')+
-                '. Луу '+(locations(map.rows,'D').map(p=>'('+p.join(', ')+')').join(', ')||'байхгүй')+'.';
+            const description = map.title + workshopText('. Баатар ') + (player?'('+player.join(', ')+workshopText(') нүдэнд'):workshopText('эхлэлгүй')) +
+                workshopText('. Үлдсэн өндөг ') + (eggs.map(p=>'('+p.join(', ')+')').join(', ')||'0') +
+                workshopText('. Агуй ')+locations(map.rows,'C').map(p=>'('+p.join(', ')+')').join(', ') +
+                workshopText('. Хад ')+(locations(map.rows,'#').map(p=>'('+p.join(', ')+')').join(', ')||workshopText('байхгүй'))+
+                workshopText('. Луу ')+(locations(map.rows,'D').map(p=>'('+p.join(', ')+')').join(', ')||workshopText('байхгүй'))+'.';
             surface.canvas.setAttribute('aria-label',description);
         }
     }
@@ -299,10 +301,10 @@
         const draft={title:typeof map?.title==='string'?map.title:'',rows:validRows(map?.rows)?map.rows.slice():defaultMap().rows};
         const root=node('section','lb-editor'), name=node('label','lb-name'), input=node('input','lb-name-input');
         input.type='text';input.maxLength=60;input.value=draft.title;
-        name.append(node('span','','Түвшний нэр'),input);
+        name.append(node('span','',workshopText('Түвшний нэр')),input);
         const emit=()=>onChange?.({title:draft.title,rows:draft.rows.slice()});
         input.addEventListener('input',()=>{draft.title=input.value;emit();});
-        const toolbar=node('div','lb-tools');toolbar.setAttribute('role','group');toolbar.setAttribute('aria-label','Газрын зургийн хэрэгсэл');
+        const toolbar=node('div','lb-tools');toolbar.setAttribute('role','group');toolbar.setAttribute('aria-label',workshopText('Газрын зургийн хэрэгсэл'));
         let brush='E',focusIndex=0;
         const controls=new Map();
         for(const mark of ['S','E','C','#','D','.']) {
@@ -314,9 +316,9 @@
             controls.set(mark,button);toolbar.append(button);
         }
         const holder=node('div','lb-holder'), board=surface(holder,true), overlay=node('div','lb-cell-overlay');
-        overlay.setAttribute('role','group');overlay.setAttribute('aria-label','Газрын зургийн нүднүүд');
+        overlay.setAttribute('role','group');overlay.setAttribute('aria-label',workshopText('Газрын зургийн нүднүүд'));
         board.field.append(overlay);
-        root.append(name,toolbar,node('p','lb-instruction','Тэмдгээ сонгоод нүдэнд байрлуул. Сумтай товчоор шилжиж, Enter дарж зурна.'),holder);
+        root.append(name,toolbar,node('p','lb-instruction',workshopText('Тэмдгээ сонгоод нүдэнд байрлуул. Сумтай товчоор шилжиж, Enter дарж зурна.')),holder);
         container.replaceChildren(root);
         const buttons=[];
         function refresh() {

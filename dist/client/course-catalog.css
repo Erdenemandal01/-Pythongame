@@ -17,4 +17,14 @@ body[data-study-page] .side-worlds {display: none;}
 body[data-study-page] .content > footer {display: none;}
 .main-nav #openPythonReference {display: flex; align-items: center; gap: 12px; padding: 11px 14px; text-align: left; background: transparent; border: 1px solid transparent; color: #b1b3c5; font-size: 15px; font-weight: 500;}
 .main-nav #openPythonReference:hover {background: #242332; color: #efebfa;}
-body[data-study-page] .main-nav button:is([data-view="academy"],[data-view="quest"],[data-view="level"],[data-view="battle"],[data-view="duel"],[data-view="maker"]) {display: none;}
+.main-nav {gap: 16px; margin-top: 16px;}
+.nav-group {display: grid; gap: 3px;}
+.nav-group h3, .nav-extra > summary {margin: 0; padding: 4px 12px; color: #d8c7ef; font-size: .87rem; font-weight: 650;}
+.nav-extra {border-block: 1px solid #3b3949; padding-block: 5px;}
+.nav-extra > summary {padding-block: 10px; cursor: pointer;}
+.nav-extra > summary:hover {color: #f3e7ff;}
+.nav-extra > summary:focus-visible {outline: 2px solid #c1eca4; outline-offset: -2px;}
+@media (max-width: 650px) {
+    .main-nav {align-items: start; gap: 10px;}
+    .nav-group, .nav-extra {flex: none;}
+}
