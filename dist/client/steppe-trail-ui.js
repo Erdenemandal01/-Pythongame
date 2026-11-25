@@ -337,4 +337,5 @@
     setTimeout(() => URL.revokeObjectURL(url),1000);
   });
   render(params.has('stop') ? track + '/' + params.get('stop') : undefined);
+  setBusy(false);
 })();

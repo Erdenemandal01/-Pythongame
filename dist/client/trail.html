@@ -60,12 +60,12 @@
             <div class="file-bar"><label for="code" id="filename"></label><button type="button" id="download" data-copy="download"></button></div>
             <div class="editor">
               <pre aria-hidden="true" id="highlight"><code></code></pre>
-              <textarea id="code" aria-describedby="task" spellcheck="false" autocorrect="off" autocapitalize="off" wrap="off"></textarea>
+              <textarea id="code" aria-describedby="task" spellcheck="false" autocorrect="off" autocapitalize="off" wrap="off" readonly></textarea>
             </div>
             <div class="editor-foot">
-              <div id="input-wrap"><label for="stdin" data-copy="stdin"></label><input id="stdin" type="text" inputmode="numeric" maxlength="3" autocomplete="off" pattern="[0-9]{1,3}" required></div>
-              <button type="button" id="try-code" data-copy="practice"></button>
-              <button type="button" id="run" class="primary" data-copy="run"></button>
+              <div id="input-wrap"><label for="stdin" data-copy="stdin"></label><input id="stdin" type="text" inputmode="numeric" maxlength="3" autocomplete="off" pattern="[0-9]{1,3}" required readonly></div>
+              <button type="button" id="try-code" data-copy="practice" disabled></button>
+              <button type="button" id="run" class="primary" data-copy="run" disabled></button>
               <button type="button" id="stop" hidden data-copy="stop"></button>
             </div>
           </div>
